@@ -46,15 +46,15 @@ vertices=v.tolist();faces=f.tolist();previous=rim;boundary=v[rim]
 for t in np.linspace(0,1,35)[1:-1]:
  smooth=gaussian_filter1d(boundary,8,axis=0,mode='wrap');blend=min(1,t*5)
  q=boundary*(1-blend)+smooth*blend;r=np.cos(t*np.pi/2)
- q[:,0]*=r;q[:,1]=.20+(q[:,1]-.20)*r;q[:,2]=q[:,2]*(1-t)-1.02*np.sin(t*np.pi/2)
+ q[:,0]*=r;q[:,1]=.20+(q[:,1]-.20)*r;q[:,2]=q[:,2]*(1-t)-.92*np.sin(t*np.pi/2)
  current=list(range(len(vertices),len(vertices)+len(q)));vertices.extend(q.tolist())
  for i in range(len(q)):
   j=(i+1)%len(q);faces.extend([[previous[i],previous[j],current[j]],[previous[i],current[j],current[i]]])
  previous=current
-pole=len(vertices);vertices.append([0,.20,-1.02])
+pole=len(vertices);vertices.append([0,.20,-.92])
 for i in range(len(previous)):faces.append([previous[i],previous[(i+1)%len(previous)],pole])
 angles=np.linspace(0,2*np.pi,97)[:-1];previous=None
-profile=[(-.35,.55),(-.60,.55),(-.85,.53),(-1.05,.52),(-1.20,.54),(-1.32,.61),(-1.43,.77),(-1.55,1.02),(-1.68,1.25),(-1.78,1.32)]
+profile=[(-.35,.55),(-.60,.55),(-.85,.53),(-1.05,.52),(-1.20,.54),(-1.32,.61),(-1.43,.77),(-1.55,.90),(-1.68,1.03),(-1.78,1.08)]
 for y,r in profile:
  q=[[r*np.sin(th),y,-.30+min(r*.85,.64)*np.cos(th)] for th in angles];current=list(range(len(vertices),len(vertices)+len(q)));vertices.extend(q)
  if previous is not None:

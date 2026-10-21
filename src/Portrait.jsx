@@ -144,8 +144,8 @@ export default function Portrait() {
       }
       if(c.spinning) spinAngle += dt * .65;
       else spinAngle = Math.round((yaw.value + .60) / (Math.PI * 2)) * Math.PI * 2;
-      sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * 1.05), dt, 7);
-      sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .38, dt, 9);
+      sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * .70), dt, 7);
+      sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .18, dt, 9);
       sculpture.userData.expression.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
       renderer.render(scene, camera);
     });
