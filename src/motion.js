@@ -28,3 +28,14 @@ export function cursorTarget(clientX, clientY, width, height) {
     y: Math.max(-1, Math.min(1, (clientY / Math.max(1, height)) * 2 - 1)),
   };
 }
+
+// Unit-mass critically damped spring, integrated analytically (stable across frame rates).
+export function stepSpring(state, target, dt, frequency = 10) {
+  if (![state.value, state.velocity, target, dt, frequency].every(Number.isFinite) || dt < 0 || frequency <= 0) throw new TypeError('Invalid spring state');
+  const offset = state.value - target;
+  const impulse = state.velocity + frequency * offset;
+  const decay = Math.exp(-frequency * dt);
+  state.value = target + (offset + impulse * dt) * decay;
+  state.velocity = (state.velocity - frequency * impulse * dt) * decay;
+  return state.value;
+}

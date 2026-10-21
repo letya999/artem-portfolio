@@ -12,9 +12,17 @@ from scipy.spatial.transform import Rotation
 
 OUT=Path(__file__).resolve().parents[1]
 
+# Pose-aligned measurements previously extracted locally from the supplied photographs.
+LANDMARKS = np.array(json.loads((OUT/'scripts'/'face-landmarks.json').read_text(encoding='utf-8')))
+assert LANDMARKS.shape == (468,3) and np.isfinite(LANDMARKS).all()
+FACE_SCALE = .70/.82  # Preserve the measured inter-eye distance in model units.
+NOSE_Y = 2.055 + LANDMARKS[1,1]*FACE_SCALE
+MOUTH_Y = 2.055 + (LANDMARKS[13,1]+LANDMARKS[14,1])*.5*FACE_SCALE
+MOUTH_HALF = abs(LANDMARKS[61,0])*FACE_SCALE
+
 # Axis convention: Y up; face looks along +Z. All dimensions are design units.
-YS=np.array([.91,.98,1.10,1.28,1.50,1.78,2.05,2.30,2.57,2.80,3.00,3.16,3.24])
-WS=np.array([.05,.34,.55,.71,.77,.81,.84,.85,.82,.73,.57,.31,.01])
+YS=np.array([.72,.80,.94,1.14,1.40,1.72,2.05,2.30,2.57,2.80,3.00,3.16,3.24])
+WS=np.array([.08,.34,.52,.67,.75,.80,.82,.83,.80,.72,.57,.31,.01])
 FS=np.array([.37,.53,.64,.62,.62,.63,.63,.69,.69,.58,.40,.17,-.04])
 BS=np.array([-.24,-.38,-.51,-.65,-.78,-.88,-.94,-.96,-.94,-.84,-.68,-.40,-.06])
 width=PchipInterpolator(YS,WS)
@@ -32,26 +40,37 @@ def volume(x,y,z):
     edge=np.maximum(0.,1.-r*r)
     ff=center+(front(yy)-center)*edge**.40
     bb=center+(back(yy)-center)*edge**.50
-    # Orbital recesses and simplified voxel eyes. No eyeball sphere or pupil.
-    for s in [-1.,1.]:
-        ff-=.245*gauss(x,y,s*.35,2.055,.225,.155)
-        ff+=.105*gauss(x,y,s*.355,2.232,.29,.080)
-        ff+=.060*gauss(x,y,s*.35,2.040,.125,.060)
-        ff+=.100*gauss(x,y,s*.56,1.830,.20,.18)
-        ff-=.045*gauss(x,y,s*.55,1.540,.24,.19)
-    # Nasal bridge, tip, alae and nostrils.
-    ff+=.285*gauss(x,y,0.,1.983,.115,.245)
-    ff+=.405*gauss(x,y,0.,1.785,.150,.100)
-    for s in [-1.,1.]:
-        ff+=.145*gauss(x,y,s*.155,1.755,.087,.075)
-        ff-=.125*gauss(x,y,s*.145,1.678,.070,.045)
-    ff-=.055*gauss(x,y,0.,1.61,.080,.065)
-    # Lip planes, mouth seam and chin.
-    ff+=.115*gauss(x,y,0.,1.532,.310,.048)
-    ff+=.120*gauss(x,y,0.,1.398,.315,.060)
-    ff-=.095*gauss(x,y,0.,1.465,.350,.035)
-    ff-=.055*gauss(x,y,0.,1.288,.310,.060)
-    ff+=.080*gauss(x,y,0.,1.110,.340,.115)
+    # Photo-derived landmark proportions: preserve the longer lower face and low mouth.
+    # Depth remains a sculpted estimate; landmark depth is not a metrical scan.
+    eye_y = 2.055
+    eye_x = .35
+    for side in [-1., 1.]:
+        dx = x - side*eye_x
+        lid_y = eye_y + .025*(dx*side/.20)
+        ff -= .19*gauss(x,y,side*eye_x,eye_y,.24,.115)
+        ff += .090*gauss(x,y,side*.36,2.205,.28,.065)
+        # Almond-shaped eyelids instead of circular orbital craters.
+        lens = np.maximum(0,1-(dx/.22)**2)
+        ff += .075*np.exp(-(dx/.21)**4-((y-lid_y)/(.035+.025*lens))**2)
+        ff += .045*np.exp(-(dx/.23)**4-((y-lid_y-.064*lens)/.023)**2)
+        ff += .035*np.exp(-(dx/.23)**4-((y-lid_y+.053*lens)/.024)**2)
+        ff += .075*gauss(x,y,side*.54,1.79,.23,.20)
+        ff -= .030*gauss(x,y,side*.55,1.40,.23,.20)
+    # Feature centers use the measured ratios from the owner's neutral views.
+    ff += .255*gauss(x,y,0.,1.91,.110,.28)
+    ff += .35*gauss(x,y,0.,NOSE_Y,.145,.105)
+    for side in [-1.,1.]:
+        ff += .12*gauss(x,y,side*.155,NOSE_Y-.04,.077,.063)
+        ff -= .13*gauss(x,y,side*.125,NOSE_Y-.092,.051,.032)
+    ff -= .035*gauss(x,y,0.,1.45,.065,.075)
+    # Defined vermilion planes, cupid's bow and closed lip seam.
+    lip_line=MOUTH_Y + .026*np.exp(-(x/.11)**2) - .015*(x/.32)**2
+    envelope=np.exp(-(x/MOUTH_HALF)**6)
+    ff += .085*envelope*np.exp(-((y-lip_line-.036)/.033)**2)
+    ff += .115*envelope*np.exp(-((y-lip_line+.064)/.044)**2)
+    ff -= .070*envelope*np.exp(-((y-lip_line)/.018)**2)
+    ff -= .040*gauss(x,y,0.,1.10,.30,.050)
+    ff += .075*gauss(x,y,0.,.94,.33,.10)
     head=(y>=YS[0])&(y<=YS[-1])&(r<=1)&(z<=ff)&(z>=bb)
     # Short neck behind the jaw, with a modest flat bottom rather than shoulders.
     head_y=y; y=world_y
@@ -134,7 +153,7 @@ def voxelize(pitch):
                       'normal':np.round(n,6).tolist(),'quaternion':np.round(q,8).tolist(),'region':region(p),'ao':a})
     return {
         'format':'voxel-portrait/1.0','name':'Voxel portrait вЂ” cube study',
-        'description':'Original stylized approximation from the supplied visual references; not a biometric scan.',
+        'description':'Sculpted approximation calibrated to facial landmark proportions; not a biometric scan.',
         'construction':'Equal-size beveled cubes, slightly oriented to follow the relief. Cubes are separate closed meshes; the aggregate is not a fused watertight solid.',
         'axis':{'up':'+Y','front':'+Z'},'units':'design units',
         'count':len(cubes),'pitch':round(pitch,6),'cubeSize':round(pitch*.966,6),
@@ -189,7 +208,7 @@ def export_glb(data,path):
                      struct.pack('<I4s',len(binary),b'BIN\0')+binary)
 
 if __name__ == '__main__':
-    d = voxelize(.055)
+    d = voxelize(.043)
     p, n = cube_mesh(d['bevelRatio'])
     d['geometry'] = {'positions': p.round(7).tolist(), 'normals': n.round(7).tolist()}
     (OUT/'public'/'voxel-portrait.json').write_text(json.dumps(d, separators=(',', ':')), encoding='utf-8')

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { layerPose, cursorTarget } from "./motion.js";
+import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 import { SLICE_COUNT } from "./sculpture.js";
 test("reduced motion keeps all plates assembled even in split mode", () => {
   for (const time of [0, 5, 10, 100])
@@ -42,4 +42,19 @@ test("gaze maps the entire viewport and clamps out-of-window coordinates", () =>
   assert.deepEqual(cursorTarget(720, 450, 1440, 900), { x: 0, y: 0 });
   assert.deepEqual(cursorTarget(1440, 900, 1440, 900), { x: 1, y: 1 });
   assert.deepEqual(cursorTarget(-20, 1000, 390, 844), { x: -1, y: 1 });
+});
+
+
+test("spring preserves inertia and converges identically at 30 and 120 fps", () => {
+  const a = {value: 0, velocity: 0}, b = {value: 0, velocity: 0};
+  stepSpring(a, 1, 1/30);
+  assert.ok(a.value > 0 && a.value < 1);
+  assert.ok(a.velocity > 0);
+  for(let i=1;i<60;i++) stepSpring(a,1,1/30);
+  for(let i=0;i<240;i++) stepSpring(b,1,1/120);
+  assert.ok(Math.abs(a.value-b.value)<1e-12);
+  assert.ok(Math.abs(a.value-1)<1e-6);
+  stepSpring(a,0,10);
+  assert.ok(Math.abs(a.value)<1e-6);
+  assert.throws(()=>stepSpring(a,0,-1));
 });

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { makeVoxelPortrait } from "./voxel.js";
-import { layerPose, cursorTarget } from "./motion.js";
+import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
     control = useRef({ paused: false, spread: false, replay: 0 });
@@ -26,11 +25,29 @@ export default function Portrait() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     host.appendChild(renderer.domElement);
-    const pmrem = new THREE.PMREMGenerator(renderer),
-      room = new RoomEnvironment();
-    const env = pmrem.fromScene(room, 0.035);
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const studio = new THREE.Scene();
+    studio.background = new THREE.Color().setScalar(.32);
+    const panelGeometry = new THREE.PlaneGeometry(1, 1);
+    const panels = [
+      {position: [-3, 2, 4], size: [3, 5], intensity: 5},
+      {position: [4, 1, 2], size: [1.2, 4], intensity: 2.5},
+      {position: [0, 5, 0], size: [4, 3], intensity: 3},
+      {position: [-2, 0, -4], size: [2, 4], intensity: 2},
+    ];
+    for (const p of panels) {
+      const material = new THREE.MeshBasicMaterial({color: new THREE.Color().setScalar(p.intensity), side: THREE.DoubleSide});
+      const panel = new THREE.Mesh(panelGeometry, material);
+      panel.position.set(...p.position);
+      panel.scale.set(...p.size, 1);
+      panel.lookAt(0, 0, 0);
+      studio.add(panel);
+    }
+    const env = pmrem.fromScene(studio, .025);
     scene.environment = env.texture;
-    room.dispose();
+    scene.environmentIntensity = .85;
+    studio.children.forEach(p => p.material.dispose());
+    panelGeometry.dispose();
     pmrem.dispose();
     scene.add(new THREE.HemisphereLight(0xffffff, 0x363c44, 0.25));
     const light = new THREE.DirectionalLight(0xffffff, 2.4);
@@ -58,6 +75,8 @@ export default function Portrait() {
       replay = 0,
       visible = true;
     const pointer = { x: 0, y: 0 };
+    const yaw = {value: -.18, velocity: 0}, pitch = {value: 0, velocity: 0};
+    const assembly = {value: 0, velocity: 0};
     const move = (e) => {
       Object.assign(
         pointer,
@@ -105,7 +124,7 @@ export default function Portrait() {
       if (c.paused) return;
       if (!reduced.matches) time += dt;
       const target = reduced.matches ? 0 : c.spread ? 1 : 0;
-      amount += (target - amount) * (1 - Math.exp(-dt * 5));
+      amount = stepSpring(assembly, target, dt, 7);
       sculpture.children.forEach((layer, i) => {
         const p = layerPose(Math.round(i / (sculpture.children.length - 1) * 41), time, amount, reduced.matches);
         layer.position.x = p.x;
@@ -113,12 +132,13 @@ export default function Portrait() {
         layer.rotation.y = p.rotation;
         layer.position.y = layer.userData.restY * p.expansion;
       });
-      sculpture.rotation.y +=
-        ((reduced.matches ? 0 : pointer.x * 0.30) - sculpture.rotation.y) *
-        (1 - Math.exp(-dt * 5));
-      sculpture.rotation.x +=
-        ((reduced.matches ? 0 : pointer.y * 0.14) - sculpture.rotation.x) *
-        (1 - Math.exp(-dt * 5));
+      if (reduced.matches) {
+        yaw.value = -.18; pitch.value = 0;
+        yaw.velocity = pitch.velocity = 0;
+        assembly.value = assembly.velocity = 0;
+      }
+      sculpture.rotation.y = stepSpring(yaw, -.18 + (reduced.matches ? 0 : pointer.x * .42), dt, 9);
+      sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .16, dt, 9);
       renderer.render(scene, camera);
     });
     return () => {
