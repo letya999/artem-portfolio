@@ -25,8 +25,23 @@ export default function Portrait() {
     renderer.toneMappingExposure = 1.1;
     host.appendChild(renderer.domElement);
     const pmrem = new THREE.PMREMGenerator(renderer),
-      room = new RoomEnvironment(),
-      env = pmrem.fromScene(room, 0.04);
+      room = new RoomEnvironment();
+    // Architectural reflection cards create the black/white bands of polished steel.
+    for (const [x, y, z, width, height, color] of [
+      [-3, 3, 6, 3, 12, 0x060708],
+      [3.5, 3, 5, 1.5, 12, 0xffffff],
+      [0, 7, 7, 8, 1.5, 0x111315],
+      [0.8, 2, 8, 1, 10, 0x101214],
+    ]) {
+      const card = new THREE.Mesh(
+        new THREE.PlaneGeometry(width, height),
+        new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide }),
+      );
+      card.position.set(x, y, z);
+      card.lookAt(0, 2, 0);
+      room.add(card);
+    }
+    const env = pmrem.fromScene(room, 0.015);
     scene.environment = env.texture;
     room.dispose();
     pmrem.dispose();
@@ -43,7 +58,6 @@ export default function Portrait() {
     });
     resize.observe(host);
     let sculpture,
-      texture,
       disposed = false,
       time = 0,
       last = performance.now(),
@@ -76,39 +90,22 @@ export default function Portrait() {
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
     const abort = new AbortController();
-    Promise.allSettled([
-      new THREE.TextureLoader().loadAsync("./portrait.png"),
-      fetch("./head-contours.bin", { signal: abort.signal }).then((r) => {
+    fetch("./head-contours.bin", { signal: abort.signal })
+      .then((r) => {
         if (!r.ok) throw new Error("Portrait geometry unavailable");
         return r.arrayBuffer();
-      }),
-    ]).then(([image, mesh]) => {
-      if (image.status === "fulfilled") texture = image.value;
-      if (
-        disposed ||
-        image.status !== "fulfilled" ||
-        mesh.status !== "fulfilled"
-      ) {
-        texture?.dispose();
-        if (!disposed) setReady(false);
-        return;
-      }
-      try {
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.anisotropy = Math.min(
-          8,
-          renderer.capabilities.getMaxAnisotropy(),
-        );
-        sculpture = makeSlices(texture, new Float32Array(mesh.value));
+      })
+      .then((mesh) => {
+        if (disposed) return;
+        sculpture = makeSlices(new Float32Array(mesh));
         sculpture.scale.setScalar(1.08);
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
-      } catch {
-        texture.dispose();
-        setReady(false);
-      }
-    });
+      })
+      .catch(() => {
+        if (!disposed) setReady(false);
+      });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     renderer.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
@@ -165,7 +162,6 @@ export default function Portrait() {
         else if (o.material) mats.add(o.material);
       });
       mats.forEach((m) => m.dispose());
-      texture?.dispose();
       env.dispose();
       renderer.dispose();
       renderer.domElement.remove();

@@ -60,9 +60,9 @@ for y in [.24,.26,.285]:
     for x in np.linspace(l,r,15)[1:-1]:
         points.append([x,y]);values.append(0)
 interp=CloughTocher2DInterpolator(points,values,fill_value=0)
-count=64
-segments=192
-rows=4
+count=42
+segments=128
+rows=3
 ys=np.linspace(-.1775,.285,count*rows+1)
 data=[]
 for y in ys:
@@ -73,9 +73,16 @@ for y in ys:
     depth=np.interp(y,[-.1775,-.15,-.05,.08,.18,.23,.285],[.005,.57,.83,.8,.55,.43,.44])
     z=-.28-depth*np.abs(np.sin(theta))
     z[front]=base(x[front],y)+np.clip(interp(x[front],np.full(front.sum(),y)),-.45,.75)
+    # A broad cranial dome replaces interpolation ripples above the brows.
+    crown_blend=np.clip((-.025-y)/.065,0,1)
+    z[front]=(1-crown_blend)*z[front]+crown_blend*base(x[front],y)
     coords=uv(x,y)
     data.extend(np.column_stack([x*scale,np.full(len(x),-y*scale+.28),z,coords[:,0],1-coords[:,1]]).ravel())
-array=np.array(data,dtype='<f4')
+array=np.array(data,dtype='<f4').reshape(len(ys),segments+1,5)
+# Simplify small facial ripples into broad sculpted planes, retaining the nose and jaw.
+array[:,:,2]=gaussian_filter1d(gaussian_filter1d(array[:,:,2],1.1,axis=0),.8,axis=1)
+array[:,-1,:3]=array[:,0,:3]
+array=array.ravel()
 assert np.isfinite(array).all()
 array.tofile(ROOT/'public/head-contours.bin')
 # Eye socket ellipses are oriented with the source, for a local gaze shader inside the lids.

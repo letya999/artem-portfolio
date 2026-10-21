@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import * as THREE from "three";
 import { makeSlices, SLICE_COUNT } from "./sculpture.js";
 const bytes = readFileSync(
   new URL("../public/head-contours.bin", import.meta.url),
@@ -10,8 +9,15 @@ const contours = new Float32Array(
   bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
 );
 test("baked portrait is made of closed, deep plates rather than rectangular photo strips", () => {
-  const sculpture = makeSlices(new THREE.Texture(), contours);
+  const sculpture = makeSlices(contours);
   assert.equal(sculpture.children.length, SLICE_COUNT);
+  assert.equal(SLICE_COUNT, 42);
+  const materials = sculpture.children[0].children[0].material;
+  for (const m of materials) {
+    assert.equal(m.map, null, "steel must not carry a photographic face");
+    assert.equal(m.metalness, 1);
+    assert.ok(m.roughness < 0.2);
+  }
   let triangles = 0;
   for (const layer of sculpture.children) {
     const edges = new Map();
@@ -36,25 +42,22 @@ test("baked portrait is made of closed, deep plates rather than rectangular phot
     for (const count of edges.values())
       assert.equal(count, 2, "each plate must be watertight");
   }
-  assert.ok(triangles > 100000);
-  const cheek = sculpture.children[28].children[0].geometry;
+  assert.ok(triangles > 30000 && triangles < 50000);
+  const cheek = sculpture.children[18].children[0].geometry;
   cheek.computeBoundingBox();
   assert.ok(
     cheek.boundingBox.max.z - cheek.boundingBox.min.z > 1.2,
     "head has full front-to-back volume",
   );
-  const nose = sculpture.children[30].children[0].geometry.attributes.position;
+  const nose = sculpture.children[20].children[0].geometry.attributes.position;
   assert.ok(
     [...nose.array].some((z, i) => i % 3 === 2 && z > 0.65),
     "nose protrudes beyond the cheeks",
   );
 });
 test("invalid geometry is rejected so the photo fallback can remain visible", () => {
-  assert.throws(
-    () => makeSlices(new THREE.Texture(), new Float32Array(5)),
-    /Invalid/,
-  );
+  assert.throws(() => makeSlices(new Float32Array(5)), /Invalid/);
   const invalid = contours.slice();
   invalid[100] = NaN;
-  assert.throws(() => makeSlices(new THREE.Texture(), invalid), /Invalid/);
+  assert.throws(() => makeSlices(invalid), /Invalid/);
 });

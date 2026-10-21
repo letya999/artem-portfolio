@@ -5,49 +5,53 @@ export const SLICE_COUNT = head.slices;
 export const CONTOUR_FLOATS =
   (head.slices * head.rows + 1) * (head.segments + 1) * head.stride;
 
-export function makeSlices(texture, contours) {
+export function makeSlices(contours) {
   if (contours.length !== CONTOUR_FLOATS || !contours.every(Number.isFinite)) {
     throw new Error("Invalid portrait contour asset");
   }
   const group = new THREE.Group();
   const gaze = { value: new THREE.Vector2() };
   group.userData.gaze = gaze;
-  const photo = new THREE.MeshStandardMaterial({
-    map: texture,
-    color: 0xd8dadd,
-    roughness: 0.46,
-    metalness: 0.32,
-    envMapIntensity: 0.65,
+  const steel = new THREE.MeshStandardMaterial({
+    color: 0xc6ccd0,
+    metalness: 1,
+    roughness: 0.18,
+    envMapIntensity: 1.1,
   });
-  // Shift iris sampling only inside the photographed eye openings; lids stay fixed.
-  photo.onBeforeCompile = (shader) => {
+  // Procedural recessed eye slots and movable pupils; no photographic surface map.
+  steel.onBeforeCompile = (shader) => {
     shader.uniforms.portraitGaze = gaze;
+    shader.vertexShader = "varying vec2 portraitUv;\n" + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <uv_vertex>",
+      "#include <uv_vertex>\nportraitUv = uv;",
+    );
     shader.fragmentShader =
-      `uniform vec2 portraitGaze;\n` + shader.fragmentShader;
-    const masks = head.eyes
+      "varying vec2 portraitUv;\nuniform vec2 portraitGaze;\n" +
+      shader.fragmentShader;
+    const eyes = head.eyes
       .map(
         (eye, i) => `
-      vec2 d${i} = vMapUv - vec2(${eye.center.join(",")});
-      d${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * d${i};
-      float mask${i} = 1.0 - smoothstep(0.45, 1.0, length(d${i} / vec2(${eye.radius.join(",")})));
+      vec2 eye${i} = portraitUv - vec2(${eye.center.join(",")});
+      eye${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * eye${i};
+      float socket${i} = 1.0 - smoothstep(0.72, 1.0, length(eye${i} / vec2(${eye.radius[0]}, 0.0048)));
+      float pupil${i} = 1.0 - smoothstep(0.65, 1.0, length((eye${i} - portraitGaze) / vec2(0.0032, 0.0032)));
+      diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(0.035), vec3(0.34, 0.39, 0.30), pupil${i}), socket${i});
     `,
       )
       .join("\n");
     shader.fragmentShader = shader.fragmentShader.replace(
-      "#include <map_fragment>",
-      masks +
-        THREE.ShaderChunk.map_fragment.replace(
-          "texture2D( map, vMapUv )",
-          "texture2D( map, vMapUv - portraitGaze * max(mask0, mask1) )",
-        ),
+      "#include <color_fragment>",
+      "#include <color_fragment>\n" + eyes,
     );
   };
   const metal = new THREE.MeshStandardMaterial({
-    color: 0xaeb5b8,
+    color: 0x919a9f,
     metalness: 1,
-    roughness: 0.25,
-    envMapIntensity: 1.15,
+    roughness: 0.27,
+    envMapIntensity: 1,
   });
+  const rear = steel.clone();
   const width = head.segments + 1;
   for (let slice = 0; slice < head.slices; slice++) {
     const positions = [],
@@ -59,7 +63,7 @@ export function makeSlices(texture, contours) {
     const top = contours[offset + 1];
     const bottom = contours[offset + head.rows * width * head.stride + 1];
     const center = (top + bottom) / 2;
-    const gap = Math.min(0.0035, (top - bottom) * 0.08);
+    const gap = Math.min(0.012, (top - bottom) * 0.16);
     for (let row = 0; row <= head.rows; row++) {
       for (let col = 0; col < width; col++) {
         const k = offset + (row * width + col) * head.stride;
@@ -94,7 +98,7 @@ export function makeSlices(texture, contours) {
       }
     }
     const shell = new THREE.BufferGeometry();
-    // Two index ranges allow a photographic face and a polished, fully rounded back.
+    // Separate front UVs keep the procedural eye slots off the rear of the head.
     for (let half = 0; half < 2; half++) {
       const start = indices.length;
       for (let row = 0; row < head.rows; row++) {
@@ -148,10 +152,7 @@ export function makeSlices(texture, contours) {
     const layer = new THREE.Group();
     layer.userData.restY = center;
     layer.position.y = center;
-    layer.add(
-      new THREE.Mesh(shell, [photo, metal]),
-      new THREE.Mesh(cap, metal),
-    );
+    layer.add(new THREE.Mesh(shell, [steel, rear]), new THREE.Mesh(cap, metal));
     group.add(layer);
   }
   return group;

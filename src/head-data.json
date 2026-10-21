@@ -1,7 +1,7 @@
 {
-  "slices": 64,
-  "segments": 192,
-  "rows": 4,
+  "slices": 42,
+  "segments": 128,
+  "rows": 3,
   "eyes": [
     {
       "center": [0.39488983154296875, 0.7282511293888092],

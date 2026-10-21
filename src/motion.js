@@ -4,8 +4,8 @@ export function layerPose(index, time, spread, reduced) {
   if (reduced) return { x: 0, z: 0, rotation: 0, expansion: 1 };
   const t = index / (SLICE_COUNT - 1);
   // A travelling turn: each plate completes a revolution and locks back into the face.
-  const cycle = time % 12;
-  const progress = Math.max(0, Math.min(1, (cycle - 2 - t * 3.6) / 4.2));
+  const cycle = time % 18;
+  const progress = Math.max(0, Math.min(1, (cycle - 2 - t * 4.5) / 8.5));
   const eased =
     progress * progress * progress * (progress * (progress * 6 - 15) + 10);
   return {
