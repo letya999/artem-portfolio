@@ -38,3 +38,10 @@ The two OBJ variants and interactive evaluation viewer are kept locally under `q
 - [Basel Face Model terms](https://www.faces.cs.unibas.ch/bfm/main.php?id=downloads&nav=1-2): internal, non-commercial research/evaluation/testing. Do not copy these assets or resulting experiment into a published portfolio without resolving the applicable model license.
 
 Do not present this experiment as a successful identity reconstruction. More landmarks alone do not resolve missing depth, occlusions, camera differences or the limitations of the statistical identity basis.
+
+
+## Estimated full-head completion
+
+`python scripts/complete-research-head.py qa/reconstruction` extends the fitted face boundary into a smoothed bald cranium and adds estimated ear shells and a neck. It exports `fitted-head.obj` and `fitted-smile-head.obj`, each with 73,453 vertices and 145,673 triangles, plus a Three.js inspection page. The viewer adds separate cursor-responsive iris/pupil meshes; these are not included in the OBJ exports. Put the locally supplied neutral portrait at `qa/reconstruction/neutral-reference.png` for side-by-side inspection.
+
+The face remains the multi-view fit. Skull, ears and neck are artistic estimates, not a scan of unseen anatomy. The neck and ear surfaces intersect the head and are not a watertight fabrication mesh. Eye interiors and teeth remain incomplete. Model-data license restrictions still apply. No claim of verified portrait similarity is made.
