@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { makeVoxelPortrait } from './voxel.js';
+import { makeVoxelPortrait, poseVoxelPortrait } from './voxel.js';
 import { Matrix4, Vector3 } from 'three';
 const data = JSON.parse(readFileSync(new URL('../public/voxel-portrait.json',import.meta.url)));
 test('voxel integration preserves every solid cube and its full-depth transform',()=>{
@@ -31,17 +31,36 @@ test('malformed voxel payload fails safely',()=>{
 
 test('the resting portrait raises its chin slightly without rolling the head',()=>{
  const model=makeVoxelPortrait(data);
- assert.ok(model.rotation.x<-.06&&model.rotation.x>-.14,'Resting chin must be raised by a few degrees');
+ model.updateMatrixWorld(true);
+ const direction=new Vector3(0,0,1).transformDirection(model.children.at(-1).matrixWorld);
+ assert.ok(direction.y>.06&&direction.y<.14,'Resting chin must be raised by a few degrees');
  assert.equal(model.rotation.z,0);
- assert.equal(model.userData.restPitch,model.rotation.x);
+ assert.equal(model.userData.restPitch,model.children.at(-1).rotation.x);
+ model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
+});
+
+test('raising the head leaves the neck base horizontal and rooted',()=>{
+ const model=makeVoxelPortrait(data),base=model.children[0];
+ model.updateMatrixWorld(true);
+ const a=new Vector3(-.4,0,-.32).applyMatrix4(base.matrixWorld);
+ const b=new Vector3(.4,0,.08).applyMatrix4(base.matrixWorld);
+ assert.ok(Math.abs(a.y-b.y)<1e-6,'Chin elevation must not tilt the neck cap');
+ assert.ok(Math.abs(base.matrixWorld.elements[13]-base.userData.restY)<1e-6,'Base must stay at its original height');
  model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
 });
 
 test('the head can look upward while fully turned to the side',()=>{
  const model=makeVoxelPortrait(data);
- model.rotation.set(-.55,1.05,0);
- const direction=new Vector3(0,0,1).applyQuaternion(model.quaternion);
+ model.userData.headRotation.set(-.55,1.05,0);
+ poseVoxelPortrait(model,model.userData.headRotation);
+ const skull=model.children.at(-1);
+ const direction=new Vector3(0,0,1).applyQuaternion(skull.quaternion);
  assert.ok(direction.y>.50,'Turning sideways must preserve the upward gaze angle');
+ const jawRows=new Set(data.cubes.filter(c=>c.region==='jaw'&&c.position[2]>.18).map(c=>Math.round(c.position[1]/data.pitch)));
+ const centerY=(data.bounds.min[1]+data.bounds.max[1])/2;
+ for(const band of model.children)if(jawRows.has(Math.round((band.userData.restY+centerY)/data.pitch))){
+  assert.ok(band.quaternion.angleTo(skull.quaternion)<1e-6,'The jaw must rotate rigidly with the skull, not bend with the neck');
+ }
  model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
 });
 
@@ -167,4 +186,23 @@ test('cube fronts retain a square face and a visible bevel rim',()=>{
  const width=Math.max(...front.map(p=>p[0]))-Math.min(...front.map(p=>p[0]));
  assert.ok(width>=.90&&width<=.94,'Flat faces must leave a visible bevel around each cube');
  assert.ok(Math.abs(Math.max(...data.geometry.positions.map(p=>p[0]))-.5)<1e-6,'Bevel must retain full cube size');
+});
+
+test('eyelids and brows have local expression weights without deforming the back or neck',()=>{
+ const model=makeVoxelPortrait(data),totals=[0,0,0,0],matrix=new Matrix4(),point=new Vector3();
+ for(const band of model.children){
+  const face=band.geometry.attributes.instanceFace;
+  assert.ok(face,'Eye and brow regions need independent expression controls');
+  assert.equal(face.count,band.count);
+  for(let i=0;i<band.count;i++){
+   band.getMatrixAt(i,matrix);point.setFromMatrixPosition(matrix);point.y+=band.userData.restY+(data.bounds.min[1]+data.bounds.max[1])/2;
+   for(let axis=0;axis<4;axis++){
+    const weight=face.array[i*4+axis];assert.ok(weight>=0&&weight<=1);totals[axis]+=weight;
+    if(point.z<.4||point.y<1.5)assert.equal(weight,0,'Expressions must leave the neck and rear skull untouched');
+   }
+  }
+  band.geometry.dispose();
+ }
+ assert.ok(totals.every(n=>n>1),'Both lids, brows and pupils must be represented');
+ model.children[0].material.dispose();
 });

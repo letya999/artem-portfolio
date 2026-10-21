@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { makeVoxelPortrait } from "./voxel.js";
+import { makeVoxelPortrait, poseVoxelPortrait } from "./voxel.js";
 import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
@@ -81,6 +81,9 @@ export default function Portrait() {
     const pointer = { x: 0, y: 0, active: false };
     const yaw = {value: -.60, velocity: 0}, pitch = {value: 0, velocity: 0};
     const assembly = {value: 0, velocity: 0};
+    const overview = {value: 0, velocity: 0};
+    const brow = {value: 0, velocity: 0};
+    const eyeYaw = {value: -.60, velocity: 0}, eyePitch = {value: 0, velocity: 0};
     const move = (e) => {
       const rect = host.getBoundingClientRect();
       Object.assign(
@@ -115,7 +118,8 @@ export default function Portrait() {
         sculpture = makeVoxelPortrait(data);
         pitch.value = sculpture.userData.restPitch;
         sculpture.scale.setScalar(Math.min(1.40,(camera.right-camera.left)*.90/sculpture.userData.width));
-        sculpture.rotation.y = -.60;
+        sculpture.userData.headRotation.y = -.60;
+        poseVoxelPortrait(sculpture, sculpture.userData.headRotation);
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
@@ -129,33 +133,46 @@ export default function Portrait() {
       if (c.replay !== replay) {
         time = 0;
         spinAngle = 0;
+        overview.value = overview.velocity = 0;
         replay = c.replay;
       }
       if (c.paused) return;
       if (!reduced.matches) time += dt;
       const target = reduced.matches ? 0 : c.spread ? 1 : 0;
       amount = stepSpring(assembly, target, dt, 7);
-      sculpture.children.forEach((layer, i) => {
-        const p = layerPose(Math.round(i / (sculpture.children.length - 1) * 41), time, amount, reduced.matches);
-        layer.position.x = p.x;
-        layer.position.z = p.z;
-        layer.rotation.y = p.rotation;
-        layer.position.y = layer.userData.restY * p.expansion;
-      });
       if (reduced.matches && !c.spinning) {
         yaw.value = -.60; pitch.value = sculpture.userData.restPitch;
         yaw.velocity = pitch.velocity = 0;
         assembly.value = assembly.velocity = 0;
       }
       if(c.spinning) spinAngle += dt * .65;
-      else spinAngle = Math.round((yaw.value + .60) / (Math.PI * 2)) * Math.PI * 2;
+      else spinAngle = Math.round(overview.value / (Math.PI * 2)) * Math.PI * 2;
       const following = pointer.active && !c.spinning && !reduced.matches;
-      sculpture.rotation.y = stepSpring(yaw, spinAngle + (following ? pointer.x : -.60), dt, 7);
-      sculpture.rotation.x = stepSpring(pitch, sculpture.userData.restPitch + (following ? pointer.y : 0), dt, 9);
-      sculpture.userData.expression?.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
+      const head = sculpture.userData.headRotation;
+      head.y = stepSpring(yaw, following ? THREE.MathUtils.clamp(pointer.x * .82, -.95, .95) : -.60, dt, 7);
+      head.x = stepSpring(pitch, sculpture.userData.restPitch + (following ? THREE.MathUtils.clamp(pointer.y * .72, -.38, .42) : 0), dt, 9);
+      sculpture.rotation.y = stepSpring(overview, spinAngle, dt, 7);
+      poseVoxelPortrait(sculpture, head);
+      sculpture.children.forEach((layer, i) => {
+        const p = layerPose(Math.round(i / (sculpture.children.length - 1) * 41), time, amount, reduced.matches);
+        layer.position.x += p.x;
+        layer.position.z += p.z;
+        layer.rotateY(p.rotation);
+        layer.position.y += layer.userData.restY * (p.expansion - 1);
+      });
+      const cycle=time%13.7,blinkTime=cycle-(cycle<7.9?3.2:8.7);
+      const blinkProgress=blinkTime<0||blinkTime>.22?0:blinkTime<.065?blinkTime/.065:1-(blinkTime-.065)/.155;
+      const blink=blinkProgress*blinkProgress*(3-2*blinkProgress);
+      const browLift=stepSpring(brow,following?-pointer.y*.65:0,dt,8);
+      sculpture.userData.expression.value.set(reduced.matches||c.spinning?0:blink,reduced.matches||c.spinning?0:browLift);
       sculpture.userData.motionTime.value=time;
       sculpture.userData.motionAmount.value=reduced.matches?0:1;
-      sculpture.userData.gaze.value.set(reduced.matches||c.spinning?0:pointer.x,reduced.matches||c.spinning?0:pointer.y);
+      const eyeX=stepSpring(eyeYaw,following?THREE.MathUtils.clamp(pointer.x,-1.15,1.15):head.y,dt,24);
+      const eyeY=stepSpring(eyePitch,following?THREE.MathUtils.clamp(pointer.y,-.52,.52):head.x-sculpture.userData.restPitch,dt,24);
+      sculpture.userData.gaze.value.set(
+        reduced.matches||c.spinning?0:THREE.MathUtils.clamp(eyeX-head.y,-.32,.32),
+        reduced.matches||c.spinning?0:THREE.MathUtils.clamp(eyeY-(head.x-sculpture.userData.restPitch),-.22,.22),
+      );
       renderer.render(scene, camera);
     });
     return () => {
