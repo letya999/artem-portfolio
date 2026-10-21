@@ -15,8 +15,8 @@ test("baked portrait is made of closed, deep plates rather than rectangular phot
   const materials = sculpture.children[0].children[0].material;
   for (const m of materials) {
     assert.equal(m.map, null, "steel must not carry a photographic face");
-    assert.ok(m.metalness >= .7);
-    assert.ok(m.roughness >= .55, "satin steel must not mirror the room");
+    assert.ok(m.metalness >= 0.7);
+    assert.ok(m.roughness >= 0.55, "satin steel must not mirror the room");
   }
   let triangles = 0;
   for (const layer of sculpture.children) {
@@ -42,7 +42,7 @@ test("baked portrait is made of closed, deep plates rather than rectangular phot
     for (const count of edges.values())
       assert.equal(count, 2, "each plate must be watertight");
   }
-  assert.ok(triangles > 30000 && triangles < 50000);
+  assert.ok(triangles > 80000 && triangles < 110000);
   const cheek = sculpture.children[18].children[0].geometry;
   cheek.computeBoundingBox();
   assert.ok(

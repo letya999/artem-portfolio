@@ -83,7 +83,7 @@ export default function Portrait() {
       .then((mesh) => {
         if (disposed) return;
         sculpture = makeSlices(new Float32Array(mesh));
-        sculpture.scale.setScalar(1.08);
+        sculpture.scale.setScalar(0.98);
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
@@ -122,8 +122,8 @@ export default function Portrait() {
       const gaze = sculpture.userData.gaze.value;
       gaze.lerp(
         gazeTarget.set(
-          reduced.matches ? 0 : pointer.x * 0.006,
-          reduced.matches ? 0 : -pointer.y * 0.0025,
+          reduced.matches ? 0 : pointer.x * 0.012,
+          reduced.matches ? 0 : -pointer.y * 0.005,
         ),
         1 - Math.exp(-dt * 9),
       );

@@ -34,8 +34,8 @@ export function makeSlices(contours) {
         (eye, i) => `
       vec2 eye${i} = portraitUv - vec2(${eye.center.join(",")});
       eye${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * eye${i};
-      float socket${i} = 1.0 - smoothstep(0.72, 1.0, length(eye${i} / vec2(${eye.radius[0]}, 0.006)));
-      float pupil${i} = 1.0 - smoothstep(0.65, 1.0, length((eye${i} - portraitGaze) / vec2(0.0032, 0.0032)));
+      float socket${i} = 1.0 - smoothstep(0.72, 1.0, length(eye${i} / vec2(${eye.radius[0]}, ${eye.radius[1]})));
+      float pupil${i} = 1.0 - smoothstep(0.65, 1.0, length((eye${i} - portraitGaze) / vec2(0.004, 0.005)));
       diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(0.035), vec3(0.34, 0.39, 0.30), pupil${i}), socket${i});
     `,
       )
