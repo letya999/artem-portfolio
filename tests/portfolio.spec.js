@@ -188,9 +188,13 @@ test('larger portrait keeps its raised rest pose and follows the cursor around i
     });
     expect(baseTilt,'The neck base must stay horizontal while the skull tracks the cursor').toBeLessThan(1e-6);
   }
+  await page.getByRole('button',{name:'Разобрать +',exact:true}).click();
+  const liningVisible=()=>page.evaluate(()=>window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount).userData.neckSkin.visible);
+  await expect.poll(liningVisible,{message:'Disassembly must not expose a solid inner neck'}).toBe(false);
   await page.getByRole('button',{name:'Заново',exact:true}).click();
   await page.mouse.move(cx,cy);
   await expectRaised();
+  await expect.poll(liningVisible,{message:'The lining must close the neck after reassembly'}).toBe(true);
 });
 
 test('eyes blink and brows respond locally while pause and reduced motion hold them still',async({page})=>{

@@ -8,6 +8,18 @@ export function poseVoxelPortrait(model, rotation) {
     layer.rotation.set(rotation.x * weight, rotation.y * weight, rotation.z * weight, 'YXZ');
     layer.position.set(0, layer.userData.restY, 0).sub(pivot).applyQuaternion(layer.quaternion).add(pivot);
   }
+  const skin=model.userData.neckSkin;
+  if(skin){
+    const {rings,rest,point}=skin.userData,positions=skin.geometry.attributes.position;
+    for(let ring=0;ring<rings.length;ring++)for(let side=0;side<32;side++){
+      const index=ring*32+side,layer=rings[ring];
+      point.fromArray(rest,index*3).applyQuaternion(layer.quaternion).add(layer.position).sub(model.children[0].position);
+      positions.setXYZ(index,point.x,point.y,point.z);
+    }
+    positions.needsUpdate=true;
+    skin.geometry.computeVertexNormals();
+    skin.geometry.computeBoundingSphere();
+  }
 }
 
 // Shared beveled cube geometry; each horizontal band rotates as one rigid assembly.
@@ -81,8 +93,32 @@ export function makeVoxelPortrait(data) {
     group.add(layer);
   });
   geometry.dispose();
+  // A continuous inset lining closes gaps between rigid voxel courses during bending.
+  const rings=group.children.filter(layer=>layer.userData.restY+centerY<=.90);
+  const liningPositions=[],liningIndices=[];
+  for(const [ring,layer] of rings.entries()){
+    const y=layer.userData.restY+centerY;
+    const width=y<=.78?THREE.MathUtils.mapLinear(y,.38,.78,.54,.46):.46-(y-.78)*.09;
+    const depth=y<=.78?THREE.MathUtils.mapLinear(y,.38,.78,.43,.36):.36-(y-.78)*.136;
+    for(let side=0;side<32;side++){
+      const angle=side/32*Math.PI*2;
+      liningPositions.push((width-.014)*Math.cos(angle),0,-.32+(depth-.014)*Math.sin(angle));
+      if(ring<rings.length-1){
+        const a=ring*32+side,b=ring*32+(side+1)%32;
+        liningIndices.push(a,a+32,b,b,a+32,b+32);
+      }
+    }
+  }
+  const liningGeometry=new THREE.BufferGeometry();
+  liningGeometry.setAttribute('position',new THREE.Float32BufferAttribute(liningPositions,3));
+  liningGeometry.setIndex(liningIndices);
+  const neckSkin=new THREE.Mesh(liningGeometry,material.clone());
+  neckSkin.material.color.setRGB(.68,.68,.68);
+  neckSkin.castShadow=neckSkin.receiveShadow=true;
+  Object.assign(neckSkin.userData,{rings,rest:new Float32Array(liningPositions),point:new THREE.Vector3()});
+  group.children[0].add(neckSkin);
   group.rotation.order='YXZ';
-  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
+  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,neckSkin,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
   group.userData.cubeCount = data.count;
   poseVoxelPortrait(group,group.userData.headRotation);
   return group;

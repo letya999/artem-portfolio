@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { makeVoxelPortrait, poseVoxelPortrait } from './voxel.js';
-import { Matrix4, Vector3 } from 'three';
+import { Matrix4, Vector3, Raycaster, Quaternion } from 'three';
 const data = JSON.parse(readFileSync(new URL('../public/voxel-portrait.json',import.meta.url)));
 test('voxel integration preserves every solid cube and its full-depth transform',()=>{
  const model=makeVoxelPortrait(data), matrix=new Matrix4();
@@ -47,6 +47,30 @@ test('raising the head leaves the neck base horizontal and rooted',()=>{
  assert.ok(Math.abs(a.y-b.y)<1e-6,'Chin elevation must not tilt the neck cap');
  assert.ok(Math.abs(base.matrixWorld.elements[13]-base.userData.restY)<1e-6,'Base must stay at its original height');
  model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
+});
+
+test('the front of the articulated neck has no see-through gaps when the chin rises',()=>{
+ const model=makeVoxelPortrait(data),centerY=(data.bounds.min[1]+data.bounds.max[1])/2;
+ const neck=model.children.filter(b=>b.userData.restY+centerY>=.46&&b.userData.restY+centerY<=.74);
+ const ray=new Raycaster(),normal=new Vector3(),surface=new Vector3(),next=new Vector3(),q=new Quaternion();
+ const gaps=[];
+ for(const pitch of [-.48,-.10,.32])for(const yaw of [-.95,0,.95]){
+  model.userData.headRotation.set(pitch,yaw,0);poseVoxelPortrait(model,model.userData.headRotation);model.updateMatrixWorld(true);
+  for(let i=0;i<neck.length-1;i++){
+   const a=neck[i],b=neck[i+1];
+   for(const [layer,out] of [[a,surface],[b,next]]){
+    const y=layer.userData.restY+centerY;
+    const depth=y<=.56?.43+(y-.38)/(.56-.38)*(.40-.43):.40+(y-.56)/(.78-.56)*(.36-.40);
+    out.set(0,0,-.32+depth).applyMatrix4(layer.matrixWorld);
+   }
+   surface.lerp(next,.5);q.copy(a.quaternion).slerp(b.quaternion,.5);
+   normal.set(0,0,1).applyQuaternion(q);ray.set(surface.clone().addScaledVector(normal,.30),normal.clone().negate());
+   const hit=ray.intersectObject(model,true)[0];
+   if(!hit||hit.distance>.35)gaps.push({pitch,yaw,row:i,distance:hit?.distance});
+  }
+ }
+ assert.deepEqual(gaps,[],'Neck surface must stay within one cube of its bent front contour');
+ model.traverse(o=>o.geometry?.dispose());model.children[0].material.dispose();
 });
 
 test('the head can look upward while fully turned to the side',()=>{
@@ -170,6 +194,9 @@ test('neck is slightly shorter with a straight axis and a gentle taper below the
 
 test('eyes and lips share the same light steel palette as all other cubes',()=>{
  const model=makeVoxelPortrait(data);
+ const liningColor=model.userData.neckSkin.material.color;
+ assert.ok(liningColor.r>=.60&&liningColor.r<=.76,'The neck lining must match the steel palette');
+ assert.equal(liningColor.r,liningColor.g);assert.equal(liningColor.g,liningColor.b);
  for(const band of model.children){
   for(let i=0;i<band.count;i++){
    const [r,g,b]=[0,1,2].map(c=>band.instanceColor.array[i*3+c]);
