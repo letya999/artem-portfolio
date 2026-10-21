@@ -158,3 +158,9 @@ Cube bevel ratio increased from 0.018 to 0.04, narrowing each flat square face f
 Cursor targeting now computes yaw/pitch angles from the portrait stage's actual center and height, including pointer positions outside the canvas. The head can turn up to 1.35 radians each way and tilt up/down by 0.60 radians around its raised rest pitch. YXZ rotation order keeps vertical gaze intact during a lateral turn. Leaving the document returns to the default pose; explicit 360 rotation, pause, reset and reduced-motion behavior retain control over automatic following.
 
 Validation: 18 unit checks, four browser scenarios and a production build. Browser assertions inspect real rendered object rotations and project every cube's bounds through the active camera at four cursor extremes. Local QA under ignored `qa/strong-neck/` includes eight static projections, six cursor directions including diagonals, and desktop/mobile screenshots without page errors or horizontal overflow. Real mobile hardware was not tested.
+
+## Broader neck with a flat horizontal termination
+
+At the owner's request, the oblique plane and sparse moving fringe are replaced by a closed horizontal cap at Y=0.30. All bottom cubes lie in one row; no loose or drifting edge cubes remain. Neck width and depth increase again, while the upper attachment continues tapering behind the measured chin. The asset now contains 12,381 cubes and retains the same face-depth residual, cube bevels, steel palette, framing and cursor controls.
+
+Validation: 19 unit checks, four browser scenarios, production build and staged secret scan. Geometry checks cover the broader/deeper neck, equal base heights in all four quadrants, absence of fringe motion and the closed head shell. Local `qa/flat-neck/` captures include eight projections, the underside, six cursor directions and desktop/mobile views. Real mobile hardware was not tested.

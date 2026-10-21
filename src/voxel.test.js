@@ -89,7 +89,7 @@ test('scan jaw has no oversized template arc and ears stay within captured heigh
 });
 
 
-test('short oblique neck replaces the shoulders and only its sparse edge moves',()=>{
+test('short broad neck replaces the shoulders without deforming the face features',()=>{
  const pupils=data.cubes.filter(c=>c.feature==='pupil');
  assert.equal(pupils.length,2);
  assert.ok(pupils.some(c=>c.position[0]<-.2)&&pupils.some(c=>c.position[0]>.2));
@@ -98,17 +98,11 @@ test('short oblique neck replaces the shoulders and only its sparse edge moves',
  assert.equal(data.cubes.filter(c=>c.region==='shoulder').length,0,'No shoulder shell may remain');
  const neck=data.cubes.filter(c=>c.position[1]<.70);
  assert.ok(neck.length>50);
- assert.ok(neck.every(c=>Math.abs(c.position[0])<=.50&&c.position[1]>=.15),'Only the short neck may remain below the head');
- assert.ok(neck.some(c=>Math.abs(c.position[0])>=.44),'Neck must have a stronger lateral silhouette');
- const bottom=side=>Math.min(...neck.filter(c=>c.position[0]*side>.25).map(c=>c.position[1]));
- assert.ok(Math.abs(bottom(1)-bottom(-1))>=.08,'Neck termination must be oblique');
- const edge=data.cubes.filter(c=>c.region==='neck-edge');
- assert.ok(edge.length>10&&edge.length<200);
- assert.ok(edge.every(c=>c.position[1]<.65),'Sparse cubes must stay at the neck cut');
- for(const cube of data.cubes){
-  if(cube.region==='neck-edge')assert.ok(cube.motion>0&&cube.motion<=.005);
-  else assert.equal(cube.motion,undefined,'The sealed head and neck must remain rigid');
- }
+ assert.ok(neck.every(c=>Math.abs(c.position[0])<=.58&&c.position[1]>=.15),'Only the short neck may remain below the head');
+ const profile=neck.filter(c=>c.position[1]>=.46&&c.position[1]<=.58&&Math.abs(c.position[0])<.08);
+ assert.ok(profile.length>10);
+ const depth=Math.max(...profile.map(c=>c.position[2]))-Math.min(...profile.map(c=>c.position[2]));
+ assert.deepEqual({broader:neck.some(c=>Math.abs(c.position[0])>=.52),deeper:depth>=.80},{broader:true,deeper:true});
  const model=makeVoxelPortrait(data);
  let pupilInstances=0,movingInstances=0;
  for(const band of model.children){
@@ -118,8 +112,21 @@ test('short oblique neck replaces the shoulders and only its sparse edge moves',
   for(let i=0;i<motion.count;i++)if(motion.getX(i)>0)movingInstances++;
   band.geometry.dispose();
  }
- assert.equal(pupilInstances,2);assert.equal(movingInstances,edge.length);
+ assert.equal(pupilInstances,2);assert.equal(movingInstances,0);
  model.children[0].material.dispose();
+});
+
+test('the closed neck base is horizontal in every quadrant without a moving fringe',()=>{
+ const neck=data.cubes.filter(c=>c.position[1]<.70);
+ assert.ok(neck.length>50);
+ const bottom=Math.min(...neck.map(c=>c.position[1]));
+ const quadrants=[[-1,-1],[-1,1],[1,-1],[1,1]].map(([sx,sz])=>
+  Math.min(...neck.filter(c=>c.position[0]*sx>.25&&(c.position[2]+.30)*sz>0).map(c=>c.position[1])));
+ assert.deepEqual({
+  baseHeights:quadrants,
+  fringe:data.cubes.some(c=>c.region==='neck-edge'),
+  moving:data.cubes.some(c=>(c.motion??0)>0),
+ },{baseHeights:Array(4).fill(bottom),fringe:false,moving:false});
 });
 
 test('eyes and lips share the same light steel palette as all other cubes',()=>{
