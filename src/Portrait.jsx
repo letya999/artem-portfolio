@@ -12,7 +12,7 @@ export default function Portrait() {
   useEffect(() => {
     const host = ref.current,
       scene = new THREE.Scene(),
-      camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+      camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 100);
     camera.position.set(0, 0.1, 6.15);
     let renderer;
     try {
@@ -31,18 +31,20 @@ export default function Portrait() {
     room.dispose();
     pmrem.dispose();
     scene.add(new THREE.HemisphereLight(0xffffff, 0x363c44, 0.65));
-    const light = new THREE.DirectionalLight(0xffffff, 2.6);
+    const light = new THREE.DirectionalLight(0xffffff, 0.9);
     light.position.set(-3, 3, 5);
     scene.add(light);
     const resize = new ResizeObserver(() => {
       const r = host.getBoundingClientRect();
       renderer.setSize(r.width, r.height);
-      camera.aspect = r.width / r.height;
+      camera.left = (-2 * r.width) / r.height;
+      camera.right = (2 * r.width) / r.height;
       camera.updateProjectionMatrix();
       renderer.render(scene, camera);
     });
     resize.observe(host);
     let sculpture,
+      texture,
       disposed = false,
       time = 0,
       last = performance.now(),
@@ -75,22 +77,33 @@ export default function Portrait() {
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
     const abort = new AbortController();
-    fetch("./head-contours.bin", { signal: abort.signal })
-      .then((r) => {
+    Promise.allSettled([
+      new THREE.TextureLoader().loadAsync("./artem-reference.png"),
+      fetch("./head-contours.bin", { signal: abort.signal }).then((r) => {
         if (!r.ok) throw new Error("Portrait geometry unavailable");
         return r.arrayBuffer();
-      })
-      .then((mesh) => {
-        if (disposed) return;
-        sculpture = makeSlices(new Float32Array(mesh));
+      }),
+    ]).then(([photo, mesh]) => {
+      if (photo.status === "fulfilled") texture = photo.value;
+      if (
+        disposed ||
+        photo.status !== "fulfilled" ||
+        mesh.status !== "fulfilled"
+      ) {
+        texture?.dispose();
+        return;
+      }
+      try {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        sculpture = makeSlices(new Float32Array(mesh.value), texture);
         sculpture.scale.setScalar(0.98);
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
-      })
-      .catch(() => {
-        if (!disposed) setReady(false);
-      });
+      } catch {
+        texture.dispose();
+      }
+    });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     renderer.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
@@ -103,8 +116,7 @@ export default function Portrait() {
       }
       if (c.paused) return;
       if (!reduced.matches) time += dt;
-      const scroll = Math.min(1, window.scrollY / (innerHeight * 1.2));
-      const target = reduced.matches ? 0 : c.spread ? 1 : scroll * 0.65;
+      const target = reduced.matches ? 0 : c.spread ? 1 : 0;
       amount += (target - amount) * (1 - Math.exp(-dt * 5));
       sculpture.children.forEach((layer, i) => {
         const p = layerPose(i, time, amount, reduced.matches);
@@ -114,16 +126,16 @@ export default function Portrait() {
         layer.position.y = layer.userData.restY * p.expansion;
       });
       sculpture.rotation.y +=
-        ((reduced.matches ? 0 : pointer.x * 0.38) - sculpture.rotation.y) *
+        ((reduced.matches ? 0 : pointer.x * 0.18) - sculpture.rotation.y) *
         (1 - Math.exp(-dt * 5));
       sculpture.rotation.x +=
-        ((reduced.matches ? 0 : pointer.y * 0.18) - sculpture.rotation.x) *
+        ((reduced.matches ? 0 : pointer.y * 0.1) - sculpture.rotation.x) *
         (1 - Math.exp(-dt * 5));
       const gaze = sculpture.userData.gaze.value;
       gaze.lerp(
         gazeTarget.set(
-          reduced.matches ? 0 : pointer.x * 0.012,
-          reduced.matches ? 0 : -pointer.y * 0.005,
+          reduced.matches ? 0 : pointer.x * 0.0035,
+          reduced.matches ? 0 : -pointer.y * 0.0015,
         ),
         1 - Math.exp(-dt * 9),
       );
@@ -147,6 +159,7 @@ export default function Portrait() {
         else if (o.material) mats.add(o.material);
       });
       mats.forEach((m) => m.dispose());
+      texture?.dispose();
       env.dispose();
       renderer.dispose();
       renderer.domElement.remove();
@@ -161,7 +174,7 @@ export default function Portrait() {
         aria-label="Кинетический объёмный портрет Артема"
       >
         <img
-          src="./portrait.png"
+          src="./artem-reference.png"
           className="portrait-fallback"
           alt="Артем Летюшев"
         />

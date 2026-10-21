@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import * as THREE from "three";
 import { makeSlices, SLICE_COUNT } from "./sculpture.js";
 const bytes = readFileSync(
   new URL("../public/head-contours.bin", import.meta.url),
@@ -9,14 +10,22 @@ const contours = new Float32Array(
   bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
 );
 test("baked portrait is made of closed, deep plates rather than rectangular photo strips", () => {
-  const sculpture = makeSlices(contours);
+  const texture = new THREE.Texture();
+  const sculpture = makeSlices(contours, texture);
   assert.equal(sculpture.children.length, SLICE_COUNT);
   assert.equal(SLICE_COUNT, 42);
   const materials = sculpture.children[0].children[0].material;
-  for (const m of materials) {
-    assert.equal(m.map, null, "steel must not carry a photographic face");
-    assert.ok(m.metalness >= 0.7);
-    assert.ok(m.roughness >= 0.55, "satin steel must not mirror the room");
+  assert.equal(
+    materials[0].map,
+    texture,
+    "the face must use the exact reference photograph",
+  );
+  assert.equal(materials[1].map, null, "the back remains untextured metal");
+  assert.ok(materials[0].roughness >= 0.5);
+  // Orthographic front projection must preserve the source photo coordinates exactly.
+  for (let i = 0; i < contours.length; i += 5) {
+    assert.ok(Math.abs(contours[i] / 7.8 + 0.49 - contours[i + 3]) < 1e-6);
+    assert.ok(Math.abs(contours[i + 1] / 7.8 + 0.611 - contours[i + 4]) < 1e-6);
   }
   let triangles = 0;
   for (const layer of sculpture.children) {

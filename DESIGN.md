@@ -7,3 +7,5 @@ Light monochrome editorial layout, oversized Oswald name and Manrope text, restr
 The previous image comps are rejected references, not implementation specifications. Content comes from the CV; estimates and projections remain labelled. Respect native scrolling, pause controls, reduced motion and portrait fallback.
 
 The latest face uses a neutral closed mouth. The frontal view drives proportions, secondary views inform depth, and the hand-occluded photograph is excluded from fitting. The scalp, ears and unseen back remain sculpted approximations.
+
+The owner rejected the inferred neutral-face model. Current visual authority is the exact smiling 400×400 reference: preserve its identity, tilt and expression through photo-registered geometry and a monochrome satin-metal shader. Only three slices turn occasionally; head and gaze tracking remain subtle. Continuous whole-head disassembly and synthetic eye slots are removed.

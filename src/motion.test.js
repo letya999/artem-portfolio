@@ -12,26 +12,22 @@ test("reduced motion keeps all plates assembled even in split mode", () => {
         expansion: 1,
       });
 });
-test("every plate completes one smooth revolution and returns to the face each cycle", () => {
-  for (let i = 0; i < SLICE_COUNT; i++) {
-    assert.equal(layerPose(i, 0, 0, false).rotation, 0);
-    assert.equal(layerPose(i, 17, 0, false).rotation, Math.PI * 2);
-    assert.equal(layerPose(i, 18, 0, false).rotation, 0);
-    let previous = 0;
-    for (let t = 0; t < 18; t += 0.1) {
-      const p = layerPose(i, t, 0, false);
-      assert.ok(p.rotation >= previous - 1e-12);
-      assert.ok(p.rotation - previous < 0.3, "no angular snapping");
-      assert.equal(Math.abs(p.x), 0);
-      assert.equal(Math.abs(p.z), 0);
-      previous = p.rotation;
+test("only three plates turn occasionally and all return to alignment", () => {
+  for (let cycle = 0; cycle < 2; cycle++) {
+    const offset = cycle * 24;
+    for (let i = 0; i < SLICE_COUNT; i++) {
+      assert.equal(layerPose(i, offset + 5, 0, false).rotation, 0);
+      assert.ok(
+        Math.abs(Math.sin(layerPose(i, offset + 18, 0, false).rotation)) <
+          1e-12,
+      );
     }
+    const moving = Array.from(
+      { length: SLICE_COUNT },
+      (_, i) => layerPose(i, offset + 11, 0, false).rotation,
+    ).filter((r) => r > 0 && r < Math.PI * 2);
+    assert.equal(moving.length, 3);
   }
-  assert.ok(
-    Math.abs(
-      layerPose(8, 8, 0, false).rotation - layerPose(36, 8, 0, false).rotation,
-    ) > 1,
-  );
 });
 test("manual disassembly increases separation without unbounded drift", () => {
   const a = layerPose(8, 5, 1, false),

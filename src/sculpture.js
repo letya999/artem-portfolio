@@ -5,7 +5,7 @@ export const SLICE_COUNT = head.slices;
 export const CONTOUR_FLOATS =
   (head.slices * head.rows + 1) * (head.segments + 1) * head.stride;
 
-export function makeSlices(contours) {
+export function makeSlices(contours, texture) {
   if (contours.length !== CONTOUR_FLOATS || !contours.every(Number.isFinite)) {
     throw new Error("Invalid portrait contour asset");
   }
@@ -13,36 +13,38 @@ export function makeSlices(contours) {
   const gaze = { value: new THREE.Vector2() };
   group.userData.gaze = gaze;
   const steel = new THREE.MeshStandardMaterial({
-    color: 0x727b82,
-    metalness: 0.78,
-    roughness: 0.62,
-    envMapIntensity: 0.28,
+    map: texture,
+    color: 0xffffff,
+    metalness: 0.4,
+    roughness: 0.56,
+    envMapIntensity: 0.45,
   });
-  // Procedural recessed eye slots and movable pupils; no photographic surface map.
+  // The exact source photograph supplies identity. Only local iris UVs move.
   steel.onBeforeCompile = (shader) => {
     shader.uniforms.portraitGaze = gaze;
-    shader.vertexShader = "varying vec2 portraitUv;\n" + shader.vertexShader;
-    shader.vertexShader = shader.vertexShader.replace(
-      "#include <uv_vertex>",
-      "#include <uv_vertex>\nportraitUv = uv;",
-    );
     shader.fragmentShader =
-      "varying vec2 portraitUv;\nuniform vec2 portraitGaze;\n" +
-      shader.fragmentShader;
+      "uniform vec2 portraitGaze;\n" + shader.fragmentShader;
     const eyes = head.eyes
       .map(
         (eye, i) => `
-      vec2 eye${i} = portraitUv - vec2(${eye.center.join(",")});
-      eye${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * eye${i};
-      float socket${i} = 1.0 - smoothstep(0.72, 1.0, length(eye${i} / vec2(${eye.radius[0]}, ${eye.radius[1]})));
-      float pupil${i} = 1.0 - smoothstep(0.65, 1.0, length((eye${i} - portraitGaze) / vec2(0.004, 0.005)));
-      diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(0.035), vec3(0.34, 0.39, 0.30), pupil${i}), socket${i});
+      vec2 d${i} = vMapUv - vec2(${eye.center.join(",")});
+      d${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * d${i};
+      float mask${i} = 1.0 - smoothstep(.4,1.0,length(d${i}/vec2(${eye.radius.join(",")})));
     `,
       )
       .join("\n");
     shader.fragmentShader = shader.fragmentShader.replace(
-      "#include <color_fragment>",
-      "#include <color_fragment>\n" + eyes,
+      "#include <map_fragment>",
+      eyes +
+        THREE.ShaderChunk.map_fragment
+          .replace(
+            "texture2D( map, vMapUv )",
+            "texture2D( map, vMapUv - portraitGaze * max(mask0,mask1) )",
+          )
+          .replace(
+            "diffuseColor *= sampledDiffuseColor;",
+            "float grey = dot(sampledDiffuseColor.rgb,vec3(.2126,.7152,.0722)); diffuseColor *= vec4(vec3(grey),sampledDiffuseColor.a);",
+          ),
     );
   };
   const metal = new THREE.MeshStandardMaterial({
@@ -51,7 +53,7 @@ export function makeSlices(contours) {
     roughness: 0.48,
     envMapIntensity: 0.45,
   });
-  const rear = steel.clone();
+  const rear = metal;
   const width = head.segments + 1;
   for (let slice = 0; slice < head.slices; slice++) {
     const positions = [],
@@ -63,7 +65,7 @@ export function makeSlices(contours) {
     const top = contours[offset + 1];
     const bottom = contours[offset + head.rows * width * head.stride + 1];
     const center = (top + bottom) / 2;
-    const gap = Math.min(0.012, (top - bottom) * 0.16);
+    const gap = Math.min(0.003, (top - bottom) * 0.05);
     for (let row = 0; row <= head.rows; row++) {
       for (let col = 0; col < width; col++) {
         const k = offset + (row * width + col) * head.stride;
