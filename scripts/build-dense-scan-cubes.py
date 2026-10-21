@@ -104,16 +104,13 @@ def build(template, scan, frame, pitch):
     connected,components=label(solid,generate_binary_structure(3,1))
     counts=np.bincount(connected.ravel());counts[0]=0;solid=connected==counts.argmax()
     assert solid.any() and np.array_equal(binary_fill_holes(solid),solid)
-    # Two voxel courses shield the inside at every recess and scan/template transition.
-    core=binary_erosion(solid,structure=generate_binary_structure(3,1),iterations=2)
+    # Keep the entire volume so articulation exposes steel cubes, never an empty shell.
     outer_count=int((solid&~binary_erosion(solid,structure=generate_binary_structure(3,1))).sum())
     assert outer_count>=5704, "Visible outer skin must also double its resolution"
-    shell=solid&~core
-    assert np.array_equal(binary_fill_holes(shell),solid), 'Render shell leaks into the interior'
-    rendered=shell
+    rendered=solid
     grid=np.argwhere(rendered);points=np.c_[xs[grid[:,0]],ys[grid[:,1]],zs[grid[:,2]]]
     order=np.lexsort((points[:,0],points[:,2],points[:,1]));points=points[order];grid=grid[order]
-    assert 5704<=len(points)<=20000, 'Require at least twice the preceding 2,852 cubes'
+    assert 5704<=len(points)<=60000, 'Require a dense filled volume within the instance budget'
     assert pitch*1.045<.07245
     sdf=gaussian_filter(distance_transform_edt(~solid)-distance_transform_edt(solid),.8)
     gradients=np.gradient(sdf)
@@ -146,7 +143,7 @@ def build(template, scan, frame, pitch):
     assert sum(c.get('feature')=='pupil' for c in cubes)==2
     assert sum(c.get('feature') in ('lip','lip-seam') for c in cubes)>10
     positions,n=template.cube_mesh(.04)
-    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw and mirrored scanned ear relief, with a broad flat-cut neck.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed head/neck shell with a horizontal cap.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.04,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'neckCutHeight':cut,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
+    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw and mirrored scanned ear relief, with a broad flat-cut neck.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; fully filled head/neck volume with a horizontal cap.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.04,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'neckCutHeight':cut,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
     # Report actual quantization error against measured triangles, not a likeness percentage.
     strong=(weight>.99)&np.isfinite(measured)&~edited
     surface=np.max(np.where(solid,Z,-np.inf),axis=2)

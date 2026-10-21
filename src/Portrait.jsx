@@ -140,7 +140,7 @@ export default function Portrait() {
       if (!reduced.matches) time += dt;
       const target = reduced.matches ? 0 : c.spread ? 1 : 0;
       amount = stepSpring(assembly, target, dt, 7);
-      sculpture.userData.neckSkin.visible = amount < .01;
+      sculpture.userData.neckFill.visible = amount < .01;
       if (reduced.matches && !c.spinning) {
         yaw.value = -.60; pitch.value = sculpture.userData.restPitch;
         yaw.velocity = pitch.velocity = 0;

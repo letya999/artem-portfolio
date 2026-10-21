@@ -7,7 +7,8 @@ const data = JSON.parse(readFileSync(new URL('../public/voxel-portrait.json',imp
 test('voxel integration preserves every solid cube and its full-depth transform',()=>{
  const model=makeVoxelPortrait(data), matrix=new Matrix4();
  assert.equal(model.children.reduce((n,m)=>n+m.count,0),data.count);
- assert.ok(data.count>=2852*2 && data.count<=20000);
+ model.traverse(o=>{if(o.isMesh)assert.ok(o.isInstancedMesh,'All portrait surfaces must consist of cubes, without smooth inserts');});
+ assert.ok(data.count>=2852*2 && data.count<=60000);
  assert.ok(data.cubeSize<.07245 && data.pitch<=.05);
  assert.ok(data.bounds.max[2]-data.bounds.min[2]>1.5);
  for(const band of model.children){
@@ -65,7 +66,7 @@ test('the front of the articulated neck has no see-through gaps when the chin ri
    }
    surface.lerp(next,.5);q.copy(a.quaternion).slerp(b.quaternion,.5);
    normal.set(0,0,1).applyQuaternion(q);ray.set(surface.clone().addScaledVector(normal,.30),normal.clone().negate());
-   const hit=ray.intersectObject(model,true)[0];
+   const hit=ray.intersectObject(model,true).find(hit=>hit.object.isInstancedMesh);
    if(!hit||hit.distance>.35)gaps.push({pitch,yaw,row:i,distance:hit?.distance});
   }
  }
@@ -114,9 +115,10 @@ test('the rendered lattice encloses the left temple and head core without a hole
  }
  for(const [x,y,z] of [[-.35,1.85,0],[0,1.90,-.30]]){
   const core=index(Math.round(x/data.pitch),Math.round(y/data.pitch-.5),Math.round(z/data.pitch));
-  assert.equal(occupied[core],0,'Probe must lie inside the hollow core');
+  assert.equal(occupied[core],1,'The interior must be filled with cubes');
   assert.equal(outside[core],0,'Exterior air must not reach the head interior');
  }
+ assert.equal(occupied.filter((value,i)=>!value&&!outside[i]).length,0,'No enclosed empty voxel may remain inside the head or neck');
 });
 
 
@@ -194,9 +196,6 @@ test('neck is slightly shorter with a straight axis and a gentle taper below the
 
 test('eyes and lips share the same light steel palette as all other cubes',()=>{
  const model=makeVoxelPortrait(data);
- const liningColor=model.userData.neckSkin.material.color;
- assert.ok(liningColor.r>=.60&&liningColor.r<=.76,'The neck lining must match the steel palette');
- assert.equal(liningColor.r,liningColor.g);assert.equal(liningColor.g,liningColor.b);
  for(const band of model.children){
   for(let i=0;i<band.count;i++){
    const [r,g,b]=[0,1,2].map(c=>band.instanceColor.array[i*3+c]);

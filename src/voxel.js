@@ -8,23 +8,23 @@ export function poseVoxelPortrait(model, rotation) {
     layer.rotation.set(rotation.x * weight, rotation.y * weight, rotation.z * weight, 'YXZ');
     layer.position.set(0, layer.userData.restY, 0).sub(pivot).applyQuaternion(layer.quaternion).add(pivot);
   }
-  const skin=model.userData.neckSkin;
-  if(skin){
-    const {rings,rest,point}=skin.userData,positions=skin.geometry.attributes.position;
-    for(let ring=0;ring<rings.length;ring++)for(let side=0;side<32;side++){
-      const index=ring*32+side,layer=rings[ring];
-      point.fromArray(rest,index*3).applyQuaternion(layer.quaternion).add(layer.position).sub(model.children[0].position);
-      positions.setXYZ(index,point.x,point.y,point.z);
+  const fill=model.userData.neckFill;
+  if(fill){
+    const {rest,weights,point,euler,quaternion,matrix,scale}=fill.userData;
+    for(let i=0;i<fill.count;i++){
+      const weight=weights[i];
+      quaternion.setFromEuler(euler.set(rotation.x*weight,rotation.y*weight,rotation.z*weight,'YXZ'));
+      point.fromArray(rest,i*3).sub(pivot).applyQuaternion(quaternion).add(pivot).sub(model.children[0].position);
+      matrix.compose(point,quaternion,scale);fill.setMatrixAt(i,matrix);
     }
-    positions.needsUpdate=true;
-    skin.geometry.computeVertexNormals();
-    skin.geometry.computeBoundingSphere();
+    fill.instanceMatrix.needsUpdate=true;
+    fill.computeBoundingSphere();
   }
 }
 
 // Shared beveled cube geometry; each horizontal band rotates as one rigid assembly.
 export function makeVoxelPortrait(data) {
-  if (!data || data.count !== data.cubes?.length || data.count > 20000 || !Number.isFinite(data.pitch) || !(data.pitch > 0) || !Number.isFinite(data.cubeSize) || !(data.cubeSize > 0)) throw new Error('Invalid voxel portrait');
+  if (!data || data.count !== data.cubes?.length || data.count > 60000 || !Number.isFinite(data.pitch) || !(data.pitch > 0) || !Number.isFinite(data.cubeSize) || !(data.cubeSize > 0)) throw new Error('Invalid voxel portrait');
   const geometry = new THREE.BufferGeometry();
   for (const [key, field] of [['position', 'positions'], ['normal', 'normals']]) {
     const values = data.geometry?.[field]?.flat();
@@ -93,32 +93,26 @@ export function makeVoxelPortrait(data) {
     group.add(layer);
   });
   geometry.dispose();
-  // A continuous inset lining closes gaps between rigid voxel courses during bending.
-  const rings=group.children.filter(layer=>layer.userData.restY+centerY<=.90);
-  const liningPositions=[],liningIndices=[];
-  for(const [ring,layer] of rings.entries()){
-    const y=layer.userData.restY+centerY;
-    const width=y<=.78?THREE.MathUtils.mapLinear(y,.38,.78,.54,.46):.46-(y-.78)*.09;
-    const depth=y<=.78?THREE.MathUtils.mapLinear(y,.38,.78,.43,.36):.36-(y-.78)*.136;
-    for(let side=0;side<32;side++){
-      const angle=side/32*Math.PI*2;
-      liningPositions.push((width-.014)*Math.cos(angle),0,-.32+(depth-.014)*Math.sin(angle));
-      if(ring<rings.length-1){
-        const a=ring*32+side,b=ring*32+(side+1)%32;
-        liningIndices.push(a,a+32,b,b,a+32,b+32);
-      }
-    }
+  // Inset intermediate cube courses overlap as the outer neck courses bend apart.
+  const fillCubes=data.cubes.filter(c=>c.position[1]>=.46&&c.position[1]<.74).flatMap(c=>[.25,.5,.75].map(step=>({
+    position:[c.position[0]*.96,c.position[1]+data.pitch*step,c.position[2]*.96-.32*.04],normal:c.normal??[0,0,1],
+  })));
+  const fillGeometry=group.children[0].geometry.clone(),fillCount=fillCubes.length;
+  fillGeometry.setAttribute('instanceSurfaceNormal',new THREE.InstancedBufferAttribute(new Float32Array(fillCubes.flatMap(c=>c.normal)),3));
+  fillGeometry.setAttribute('instanceMotion',new THREE.InstancedBufferAttribute(new Float32Array(fillCount*2),2));
+  fillGeometry.setAttribute('instancePupil',new THREE.InstancedBufferAttribute(new Float32Array(fillCount),1));
+  fillGeometry.setAttribute('instanceFace',new THREE.InstancedBufferAttribute(new Float32Array(fillCount*4),4));
+  const neckFill=new THREE.InstancedMesh(fillGeometry,material,fillCount),rest=[],weights=[];
+  for(const [i,cube] of fillCubes.entries()){
+    rest.push(cube.position[0],cube.position[1]-centerY,cube.position[2]);
+    const t=THREE.MathUtils.clamp((cube.position[1]-.46)/(.74-.46),0,1);weights.push(t*t*(3-2*t));
+    const shade=.68+.05*Math.sin(i*12.9898);neckFill.setColorAt(i,color.setRGB(shade,shade,shade));
   }
-  const liningGeometry=new THREE.BufferGeometry();
-  liningGeometry.setAttribute('position',new THREE.Float32BufferAttribute(liningPositions,3));
-  liningGeometry.setIndex(liningIndices);
-  const neckSkin=new THREE.Mesh(liningGeometry,material.clone());
-  neckSkin.material.color.setRGB(.68,.68,.68);
-  neckSkin.castShadow=neckSkin.receiveShadow=true;
-  Object.assign(neckSkin.userData,{rings,rest:new Float32Array(liningPositions),point:new THREE.Vector3()});
-  group.children[0].add(neckSkin);
+  neckFill.castShadow=neckFill.receiveShadow=true;
+  Object.assign(neckFill.userData,{rest:new Float32Array(rest),weights:new Float32Array(weights),point:new THREE.Vector3(),euler:new THREE.Euler(),quaternion:new THREE.Quaternion(),matrix:new THREE.Matrix4(),scale:new THREE.Vector3().setScalar(data.cubeSize)});
+  group.children[0].add(neckFill);
   group.rotation.order='YXZ';
-  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,neckSkin,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
+  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,neckFill,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
   group.userData.cubeCount = data.count;
   poseVoxelPortrait(group,group.userData.headRotation);
   return group;
