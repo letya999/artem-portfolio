@@ -98,3 +98,32 @@ The rear mesh depth was restored to 0.92, shoulder width reduced, and excessive 
 At the owner's explicit request, the hero now uses `makeVoxelPortrait` and `public/voxel-portrait.json`, starting from the unmodified `portrait-detail.json` inside the supplied voxel archive (verified byte-for-byte). `scripts/fit-original-cubes.py BASE SCAN_FACE OUTPUT` aligns the cleaned owner scan to the original head coordinates and changes only face-region cube depth with a feathered transition. 279 original cubes move; 558 internal cubes support the relief; total 2,852. Original skull, forehead, ears, rear and neck cubes keep their exact positions and orientations, checked during generation. This prevents incomplete scan topology from determining the rest of the head.
 
 This is depth transfer onto the original XY cube layout, not full nonrigid anatomical registration. Original proportions and stylized ear shapes remain. Existing 360 overview, cursor-driven head rotation, horizontal layer animation and pause/reset are retained. The previous per-tile expression shader does not apply to the instanced cube renderer; no independent eye/brow animation is claimed for this version. The previous scan tile asset remains on disk for comparison but is not displayed by the hero. The archive's MIT notice is retained at `public/voxel-LICENSE.txt`.
+
+## Dense closed scan-driven cube volume (current)
+
+The previous 2,852-cube depth transfer left disconnected steps and retained the template's facial arrangement. The replacement `scripts/build-dense-scan-cubes.py` resamples a connected volume rather than displacing isolated surface cubes.
+
+Inputs are the original archive's analytic `tools/build_model.py`, the measured world-space triangle mesh emitted by `prepare-owner-scan.py`, and an ignored local scan-frame JSON. The frame is computed from 3D eye/mouth anchors recovered from an orthographic textured scan view: X follows the eye line, Y follows the eye-to-mouth direction orthogonal to X, and Z is their cross product. The original scan has a lateral offset, roll and pitch; all three are removed before rasterization. Landmark detections and source images stay in ignored `qa/`.
+
+Reproduce with:
+
+```text
+python scripts/build-dense-scan-cubes.py --template-code qa/voxel-portrait-preview/voxel-portrait/tools/build_model.py --scan qa/scan-2026-10-21/scan-measured-world.json --frame qa/scan-2026-10-21/scan-frame.json --output public/voxel-portrait.json --aligned-scan qa/scan-2026-10-21/aligned-scan.json
+```
+
+The current model has 15,269 unique cubes, including 8,108 on its outer skin, versus 2,852 in the rejected model. Pitch is 0.04 and cube side 0.0418 (42.3% smaller than the archive's 0.07245). A two-course shell overlaps slightly on a regular unrotated lattice, shielding the interior at recesses and depth transitions. Generation verifies one solid component, no enclosed voids in the solid, and that filling the hollow render shell recovers exactly that solid. A separate JavaScript flood-fill test verifies that exterior air cannot reach the left temple or head core in the committed display asset.
+
+The front is rasterized from actual scan triangles over 1,416 XY columns. Head width and chin height are fitted to the measured footprint. The 95th percentile frontal quantization error is 0.03827 design units, within one 0.04 voxel. This measures rasterization accuracy in the fitted region, not portrait similarity or unseen anatomy. The original complete template supplies the unmeasured rear, neck and stylized ears. No BFM model or photo texture is used.
+
+The instanced renderer combines square/bevel geometry normals with continuous surface normals for facial lighting; geometry remains discrete and closed. Frame-only shader attributes are validated, and per-band cloned geometries are disposed by the portrait's existing traversal cleanup. The 360, cursor response, pause, reset and reduced-motion behavior remain available.
+
+The final build, 12 unit checks and 3 browser tests pass. A separate live-browser check verified left/back views, mobile overflow, pause/reset and no page/network errors. A local desktop requestAnimationFrame sample was about 6.9 ms median; this is local cadence, not a mobile GPU benchmark. The ignored `qa/scan-2026-10-21/compare-dense.html` shows the aligned scan and cube head at matching angles and lighting. The scan's holes at the rear are intentionally visible only in that comparison's source panels; they are not copied into the complete cube model.
+
+
+## Follow-up: remove inherited jaw and replace oversized ears (current final geometry)
+
+The user correctly identified a second defect during the dense rebuild: the measured face was still merged into the template's lower jaw, leaving a visible outer arc. The retained procedural ears were oversized and too circular. The current builder discards that template jaw/ear volume entirely. Per-height head widths now come from the measured scan silhouette. Measured triangle depths supply the full facial surface; only unseen side strips blend into the template-derived rear depth. A narrower neck attaches behind the measured chin and cannot project through its front.
+
+The ear surface is reconstructed by rasterizing the well-preserved right scan ear in the YZ plane and filling its lateral relief into the skull. The other ear is mirrored because the scan's left side is incomplete. This is measured ear relief with a shallow backing, not an independently captured left ear. Its exposed voxel height is checked against the captured position. The jaw regression test rejects an oversized frontal arc below the scanned chin.
+
+Final asset: 13,144 unique cubes, 6,902 outer-skin cubes, side 0.0418 and pitch 0.04. The older 15,269 count above describes the rejected intermediate candidate. It is superseded by this jaw/ear correction. The current quantization residual is 0.03781 design units at the 95th percentile over 1,446 scanned face columns. One connected solid and a closed two-course render shell remain enforced; no face texture or BFM geometry is used. Rear geometry is estimated, not scanned. Final validation is 13 unit checks, 3 browser tests, build, and a live browser inspection of front/profile/back/mobile plus rotation/pause/reset.

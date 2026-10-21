@@ -25,6 +25,8 @@ f=f[mask[f].all(1)];edges=np.concatenate([f[:,[0,1]],f[:,[1,2]],f[:,[2,0]]]);gra
 e=np.concatenate([f[:,[0,1]],f[:,[1,2]],f[:,[2,0]]]);e=np.r_[e,e[:,::-1]];adj=coo_matrix((np.ones(len(e)),(e[:,0],e[:,1])),shape=(len(v),len(v))).tocsr();degree=np.asarray(adj.sum(1)).ravel()
 for _ in range(2):
  for factor in [.30,-.31]:v+=factor*((adj@v)/degree[:,None]-v)
+a.output.mkdir(parents=True,exist_ok=True)
+(a.output/'scan-measured-world.json').write_text(json.dumps({'vertices':v.round(8).ravel().tolist(),'indices':f.ravel().tolist()},separators=(',',':')))
 # Keep measured scalp height; only close the open back of the scan.
 v[:,0]-=(v[:,0].max()+v[:,0].min())/2;v[:,1]-=v[:,1].min();v*=2.35/np.ptp(v[:,1]);v[:,1]-=1.10;v[:,2]-=.10
 out=a.output;out.mkdir(parents=True,exist_ok=True);(out/'scan-face.json').write_text(json.dumps({'vertices':v.round(6).ravel().tolist(),'indices':f.ravel().tolist()},separators=(',',':')))
