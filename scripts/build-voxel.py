@@ -21,9 +21,9 @@ MOUTH_Y = 2.055 + (LANDMARKS[13,1]+LANDMARKS[14,1])*.5*FACE_SCALE
 MOUTH_HALF = abs(LANDMARKS[61,0])*FACE_SCALE
 
 # Axis convention: Y up; face looks along +Z. All dimensions are design units.
-YS=np.array([.72,.80,.94,1.14,1.40,1.72,2.05,2.30,2.57,2.80,3.00,3.16,3.24])
-WS=np.array([.08,.34,.52,.67,.75,.80,.82,.83,.80,.72,.57,.31,.01])
-FS=np.array([.37,.53,.64,.62,.62,.63,.63,.69,.69,.58,.40,.17,-.04])
+YS=np.array([.82,.88,1.00,1.17,1.40,1.72,2.05,2.30,2.57,2.80,3.00,3.16,3.24])
+WS=np.array([.20,.39,.56,.70,.76,.78,.79,.81,.80,.73,.59,.32,.01])
+FS=np.array([.43,.58,.65,.61,.60,.62,.63,.66,.66,.57,.40,.17,-.04])
 BS=np.array([-.24,-.38,-.51,-.65,-.78,-.88,-.94,-.96,-.94,-.84,-.68,-.40,-.06])
 width=PchipInterpolator(YS,WS)
 front=PchipInterpolator(YS,FS)
@@ -38,7 +38,7 @@ def volume(x,y,z):
     r=np.abs(x)/(w+1e-9)
     center=-.12
     edge=np.maximum(0.,1.-r*r)
-    ff=center+(front(yy)-center)*edge**.40
+    ff=center+(front(yy)-center)*edge**.32
     bb=center+(back(yy)-center)*edge**.50
     # Photo-derived landmark proportions: preserve the longer lower face and low mouth.
     # Depth remains a sculpted estimate; landmark depth is not a metrical scan.
@@ -47,30 +47,30 @@ def volume(x,y,z):
     for side in [-1., 1.]:
         dx = x - side*eye_x
         lid_y = eye_y + .025*(dx*side/.20)
-        ff -= .19*gauss(x,y,side*eye_x,eye_y,.24,.115)
-        ff += .090*gauss(x,y,side*.36,2.205,.28,.065)
+        ff -= .135*gauss(x,y,side*eye_x,eye_y,.24,.115)
+        ff += .055*gauss(x,y,side*.36,2.205,.28,.065)
         # Almond-shaped eyelids instead of circular orbital craters.
         lens = np.maximum(0,1-(dx/.22)**2)
         ff += .075*np.exp(-(dx/.21)**4-((y-lid_y)/(.035+.025*lens))**2)
         ff += .045*np.exp(-(dx/.23)**4-((y-lid_y-.064*lens)/.023)**2)
         ff += .035*np.exp(-(dx/.23)**4-((y-lid_y+.053*lens)/.024)**2)
-        ff += .075*gauss(x,y,side*.54,1.79,.23,.20)
-        ff -= .030*gauss(x,y,side*.55,1.40,.23,.20)
+        ff += .045*gauss(x,y,side*.54,1.79,.23,.20)
+        ff -= .012*gauss(x,y,side*.55,1.40,.23,.20)
     # Feature centers use the measured ratios from the owner's neutral views.
-    ff += .255*gauss(x,y,0.,1.91,.110,.28)
-    ff += .35*gauss(x,y,0.,NOSE_Y,.145,.105)
+    ff += .165*gauss(x,y,0.,1.91,.095,.235)
+    ff += .215*gauss(x,y,0.,NOSE_Y+.035,.123,.086)
     for side in [-1.,1.]:
-        ff += .12*gauss(x,y,side*.155,NOSE_Y-.04,.077,.063)
-        ff -= .13*gauss(x,y,side*.125,NOSE_Y-.092,.051,.032)
+        ff += .085*gauss(x,y,side*.130,NOSE_Y-.015,.064,.052)
+        ff -= .075*gauss(x,y,side*.108,NOSE_Y-.059,.043,.027)
     ff -= .035*gauss(x,y,0.,1.45,.065,.075)
     # Defined vermilion planes, cupid's bow and closed lip seam.
     lip_line=MOUTH_Y + .026*np.exp(-(x/.11)**2) - .015*(x/.32)**2
     envelope=np.exp(-(x/MOUTH_HALF)**6)
     ff += .085*envelope*np.exp(-((y-lip_line-.036)/.033)**2)
-    ff += .115*envelope*np.exp(-((y-lip_line+.064)/.044)**2)
+    ff += .085*envelope*np.exp(-((y-lip_line+.064)/.044)**2)
     ff -= .070*envelope*np.exp(-((y-lip_line)/.018)**2)
     ff -= .040*gauss(x,y,0.,1.10,.30,.050)
-    ff += .075*gauss(x,y,0.,.94,.33,.10)
+    ff += .055*gauss(x,y,0.,1.01,.37,.105)
     head=(y>=YS[0])&(y<=YS[-1])&(r<=1)&(z<=ff)&(z>=bb)
     # Short neck behind the jaw, with a modest flat bottom rather than shoulders.
     head_y=y; y=world_y
@@ -78,7 +78,7 @@ def volume(x,y,z):
     neck_d=np.interp(y,[0,.12,.30,.60,1.05,1.20],[.52,.52,.46,.44,.46,.40])
     neck=((x/neck_w)**2+((z+.20)/neck_d)**2<=1)&(y>=0)&(y<1.17)
     y=head_y
-    ear=((np.abs(x)-.855)/.17)**2+((y-1.88)/.315)**2+((z+.15)/.205)**2<=1
+    ear=((np.abs(x)-.825)/.145)**2+((y-1.88)/.285)**2+((z+.15)/.205)**2<=1
     # Lateral concha carved into each ear, not a smooth separate component.
     ear&=~((np.abs(x)>.89)&(((y-1.91)/.15)**2+((z+.10)/.10)**2<1))
     return head|neck|ear
