@@ -12,7 +12,7 @@ export function makeIdentityPortrait(data) {
   }
   if(count!==data.tileCount)throw new Error('Portrait tile count mismatch');
   const group=new THREE.Group();
-  const material=new THREE.MeshStandardMaterial({vertexColors:true,metalness:1,roughness:.28});
+  const material=new THREE.MeshStandardMaterial({vertexColors:true,metalness:1,roughness:.36});
   let seed=0;
   for(const band of data.bands) {
     const positions=[],colors=[];
@@ -21,10 +21,10 @@ export function makeIdentityPortrait(data) {
       const q=Array.from({length:4},(_,i)=>new THREE.Vector3().fromArray(values,i*3));
       const center=q.reduce((sum,v)=>sum.add(v),new THREE.Vector3()).multiplyScalar(.25);
       const normal=new THREE.Vector3().subVectors(q[1],q[0]).cross(new THREE.Vector3().subVectors(q[3],q[0])).normalize();
-      const top=q.map(v=>v.clone().sub(center).multiplyScalar(.955).add(center).addScaledVector(normal,.002));
+      const top=q.map(v=>v.clone().sub(center).multiplyScalar(.93).add(center).addScaledVector(normal,.002));
       const rim=q.map(v=>v.clone().addScaledVector(normal,-.002));
       const bottom=q.map(v=>v.clone().addScaledVector(normal,-.045));
-      const shade=.62+.12*Math.sin(seed++*12.9898);
+      const shade=.65+.07*Math.sin(seed++*12.9898);
       tri(top[0],top[1],top[2],shade);tri(top[0],top[2],top[3],shade);
       for(let k=0;k<4;k++) {
         const j=(k+1)%4;

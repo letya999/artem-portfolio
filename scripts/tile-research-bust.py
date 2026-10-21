@@ -23,12 +23,14 @@ def section(y):
   along=(aa[None,:,0]*direction[:,1,None]-aa[None,:,1]*direction[:,0,None])/denominator
  valid=(abs(denominator)>1e-10)&(distance>=0)&(along>=-1e-6)&(along<=1+1e-6)
  radius=np.max(np.where(valid,distance,0),axis=1)
- assert np.count_nonzero(radius)>len(radius)*.8, 'Slice origin must be inside the bust'
+ assert np.count_nonzero(radius)>len(radius)*.25, f'Insufficient contour at height {y}'
+ if np.count_nonzero(radius)<len(radius):
+  good=radius>0;radius=np.interp(angles,angles[good],radius[good],period=2*np.pi)
  return radius,origin
-heights=np.linspace(.003,2.997,73);slices=[section(y) for y in heights];sections=[s[0] for s in slices];origins=[s[1] for s in slices];bands=[];count=0
+heights=np.linspace(.003,2.997,61);slices=[section(y) for y in heights];sections=[s[0] for s in slices];origins=[s[1] for s in slices];bands=[];count=0
 for i,(lo,hi) in enumerate(zip(heights[:-1],heights[1:])):
  r=(sections[i]+sections[i+1])/2;curve=np.c_[r*np.sin(angles),r*np.cos(angles)];arc=np.r_[0,np.cumsum(np.linalg.norm(np.diff(curve,axis=0),axis=1))]
- n=max(12,round(arc[-1]/.052));edges=np.interp(np.linspace(0,arc[-1],n+1),arc,angles);quads=[]
+ n=max(12,round(arc[-1]/.058));edges=np.interp(np.linspace(0,arc[-1],n+1),arc,angles);quads=[]
  def point(theta,level,y):
   r=np.interp(theta,angles,sections[level]);return [origins[level][0]+r*np.sin(theta),y,origins[level][1]+r*np.cos(theta)]
  for aa,bb in zip(edges[:-1],edges[1:]):
@@ -41,5 +43,5 @@ for i,(lo,hi) in enumerate(zip(heights[:-1],heights[1:])):
   quads.append(q.round(6).ravel().tolist());count+=1
  bands.append({'y':float((lo+hi)/2),'quads':quads})
 assert 0<count<=12000 and all(np.isfinite(b['quads']).all() for b in bands)
-a.output.write_text(json.dumps({'format':'portrait-tiles/1','tileCount':count,'height':3,'bands':bands,'source':'Four-photo fitted research bust; radial mesh sections; evaluation only'},separators=(',',':')))
+a.output.write_text(json.dumps({'format':'portrait-tiles/1','tileCount':count,'height':3,'bands':bands,'source':'Mesh-derived radial sections; source provenance documented separately'},separators=(',',':')))
 print(count,'tiles',len(bands),'layers')

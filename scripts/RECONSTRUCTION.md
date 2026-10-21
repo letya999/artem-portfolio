@@ -67,3 +67,16 @@ The viewer offers full-bust/face-only comparison, neutral/smile, matte/metal and
 `python scripts/tile-research-bust.py qa/reconstruction/fitted-head.json qa/reconstruction/portrait-tiles.json` intersects the actual fitted bust mesh with 73 horizontal planes. For each plane, ray/segment intersection selects the outer contour, avoiding inner neck and face intersections. Adjacent contours form planar, inset quadrilateral tiles consumed by the existing closed/bevelled tile renderer. The current output has 5,872 tiles in 72 animated bands. Tile projection approximates the source mesh; undercuts and cavities cannot all survive a radial contour representation.
 
 The portfolio dev server loads this ignored research asset. Production builds continue using the previous distributable asset, because BFM-derived geometry has not been cleared for publication. No photo texture is applied to the tiles. Desktop/mobile browser rendering reported no console errors; existing motion, validation and browser interaction tests were rerun. The full smooth bust remains available in the research viewer.
+
+
+## Owner GLB scan (current production asset)
+
+Checkpoint `9f99ade` preserves the approved pre-scan code; the corresponding ignored research geometry is backed up at `qa/scan-2026-10-21/approved-portrait-tiles.json`.
+
+The user supplied `21.10.2026.glb` in a ZIP. SHA-256: `f0c6fd938a5f190045087c013cba1f37f080f33a3678ceb3dd0d34bfa84a7442`. The source has 221,422 vertices and 390,900 triangles, with a photo texture, background and shoulders. It is a front-facing scan with an open rear, not a complete watertight head.
+
+Run `python scripts/prepare-owner-scan.py INPUT.glb OUTPUT_DIRECTORY`, then `python scripts/tile-research-bust.py OUTPUT_DIRECTORY/scan-bust.json OUTPUT_DIRECTORY/portrait-tiles.json`. Preparation validates this GLB's simple untransformed triangle layout, welds texture-seam duplicates, removes background and lower-neck fragments with scan-specific bounds, keeps the largest connected component, and applies two light Taubin denoising passes. It retains 32,016 measured vertices. The open rear is closed approximately; the neck and pedestal are procedural. Ear anatomy comes from the scan, not the previous synthetic ear shells.
+
+The resulting distributable `public/portrait-tiles.json` contains 4,239 closed tile elements in 60 bands. It replaces the BFM-derived local-only experiment in both dev and production. No BFM mesh, basis, or photo texture is used in this new asset. Source GLB and personal photographs remain ignored; only the derived display geometry is committed. This does not constitute a general licensing review of the user's scanner application.
+
+Radial slicing interpolates small contour gaps and simplifies ear cavities and other undercuts. The preview is an artistic metal bust, not a fabrication-ready scan. Tiles have more visible bevels and reduced random shade variation. Original landmark-fit assertions were replaced by volumetric-depth and full-height assertions, since this asset is measured scan geometry rather than a 468-landmark reconstruction.

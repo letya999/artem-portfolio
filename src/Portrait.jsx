@@ -102,8 +102,7 @@ export default function Portrait() {
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
     const abort = new AbortController();
-    // BFM-derived geometry is restricted to local evaluation, not the published build.
-    fetch(import.meta.env.DEV ? "/qa/reconstruction/portrait-tiles.json" : "./portrait-tiles.json", { signal: abort.signal })
+    fetch("./portrait-tiles.json", { signal: abort.signal })
       .then(r => { if (!r.ok) throw new Error("Portrait unavailable"); return r.json(); })
       .then(data => {
         if (disposed) return;

@@ -3,11 +3,14 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {makeIdentityPortrait} from './identity-portrait.js';
 const data=JSON.parse(readFileSync(new URL('../public/portrait-tiles.json',import.meta.url)));
-test('measured face retains full depth, closed bevelled tiles and finite normals',()=>{
+test('scanned bust retains full depth, closed bevelled tiles and finite normals',()=>{
  const model=makeIdentityPortrait(data);
  assert.equal(model.userData.tileCount,data.tileCount);
- assert.ok(data.landmarkDepthRMSE<.025);
- assert.equal(data.landmarks,468);
+ const points=data.bands.flatMap(b=>b.quads.flat());
+ const depths=points.filter((_,i)=>i%3===2);
+ const heights=points.filter((_,i)=>i%3===1);
+ assert.ok(Math.max(...depths)-Math.min(...depths)>.8, 'Bust must retain volumetric depth');
+ assert.ok(Math.max(...heights)-Math.min(...heights)>2.9, 'Bust must retain head, neck and base');
  let triangles=0;
  for(const layer of model.children){
   const p=layer.geometry.attributes.position.array,n=layer.geometry.attributes.normal.array;
