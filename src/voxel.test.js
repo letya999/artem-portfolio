@@ -7,7 +7,7 @@ const data = JSON.parse(readFileSync(new URL('../public/voxel-portrait.json',imp
 test('voxel integration preserves every solid cube and its full-depth transform',()=>{
  const model=makeVoxelPortrait(data), matrix=new Matrix4();
  assert.equal(model.children.reduce((n,m)=>n+m.count,0),data.count);
- assert.ok(data.count>4000);
+ assert.ok(data.count>2000 && data.count<10000);
  assert.ok(data.bounds.max[2]-data.bounds.min[2]>1.5);
  for(const band of model.children){
   assert.equal(band.material.map,null);

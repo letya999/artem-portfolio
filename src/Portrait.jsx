@@ -27,13 +27,14 @@ export default function Portrait() {
     host.appendChild(renderer.domElement);
     const pmrem = new THREE.PMREMGenerator(renderer);
     const studio = new THREE.Scene();
-    studio.background = new THREE.Color().setScalar(.32);
+    studio.background = new THREE.Color().setScalar(.19);
     const panelGeometry = new THREE.PlaneGeometry(1, 1);
     const panels = [
       {position: [-3, 2, 4], size: [3, 5], intensity: 5},
-      {position: [4, 1, 2], size: [1.2, 4], intensity: 2.5},
+      {position: [4, 1, 2], size: [3, 4], intensity: 2.5},
       {position: [0, 5, 0], size: [4, 3], intensity: 3},
       {position: [-2, 0, -4], size: [2, 4], intensity: 2},
+      {position: [0, -1, 5], size: [5, 3], intensity: .9},
     ];
     for (const p of panels) {
       const material = new THREE.MeshBasicMaterial({color: new THREE.Color().setScalar(p.intensity), side: THREE.DoubleSide});
@@ -43,7 +44,7 @@ export default function Portrait() {
       panel.lookAt(0, 0, 0);
       studio.add(panel);
     }
-    const env = pmrem.fromScene(studio, .025);
+    const env = pmrem.fromScene(studio, .012);
     scene.environment = env.texture;
     scene.environmentIntensity = .85;
     studio.children.forEach(p => p.material.dispose());
@@ -75,7 +76,7 @@ export default function Portrait() {
       replay = 0,
       visible = true;
     const pointer = { x: 0, y: 0 };
-    const yaw = {value: -.18, velocity: 0}, pitch = {value: 0, velocity: 0};
+    const yaw = {value: -.60, velocity: 0}, pitch = {value: 0, velocity: 0};
     const assembly = {value: 0, velocity: 0};
     const move = (e) => {
       Object.assign(
@@ -107,6 +108,7 @@ export default function Portrait() {
         if (disposed) return;
         sculpture = makeVoxelPortrait(data);
         sculpture.scale.setScalar(1.12);
+        sculpture.rotation.y = -.60;
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
@@ -133,11 +135,11 @@ export default function Portrait() {
         layer.position.y = layer.userData.restY * p.expansion;
       });
       if (reduced.matches) {
-        yaw.value = -.18; pitch.value = 0;
+        yaw.value = -.60; pitch.value = 0;
         yaw.velocity = pitch.velocity = 0;
         assembly.value = assembly.velocity = 0;
       }
-      sculpture.rotation.y = stepSpring(yaw, -.18 + (reduced.matches ? 0 : pointer.x * .42), dt, 9);
+      sculpture.rotation.y = stepSpring(yaw, -.60 + (reduced.matches ? 0 : pointer.x * .26), dt, 9);
       sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .16, dt, 9);
       renderer.render(scene, camera);
     });

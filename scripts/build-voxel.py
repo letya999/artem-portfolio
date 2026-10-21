@@ -47,7 +47,7 @@ def volume(x,y,z):
     for side in [-1., 1.]:
         dx = x - side*eye_x
         lid_y = eye_y + .025*(dx*side/.20)
-        ff -= .135*gauss(x,y,side*eye_x,eye_y,.24,.115)
+        ff -= .165*gauss(x,y,side*eye_x,eye_y,.24,.115)
         ff += .055*gauss(x,y,side*.36,2.205,.28,.065)
         # Almond-shaped eyelids instead of circular orbital craters.
         lens = np.maximum(0,1-(dx/.22)**2)
@@ -68,7 +68,7 @@ def volume(x,y,z):
     envelope=np.exp(-(x/MOUTH_HALF)**6)
     ff += .085*envelope*np.exp(-((y-lip_line-.036)/.033)**2)
     ff += .085*envelope*np.exp(-((y-lip_line+.064)/.044)**2)
-    ff -= .070*envelope*np.exp(-((y-lip_line)/.018)**2)
+    ff -= .125*envelope*np.exp(-((y-lip_line)/.032)**2)
     ff -= .040*gauss(x,y,0.,1.10,.30,.050)
     ff += .055*gauss(x,y,0.,1.01,.37,.105)
     head=(y>=YS[0])&(y<=YS[-1])&(r<=1)&(z<=ff)&(z>=bb)
@@ -103,7 +103,7 @@ def surface_normals(points):
         axes=[np.arange(-1.2,1.21,step),np.arange(-.15,3.5,step),np.arange(-1.2,1.4,step)]
         x,y,z=np.meshgrid(*axes,indexing='ij');v=volume(x,y,z)
         sdf=(distance_transform_edt(~v)-distance_transform_edt(v))*step
-        sdf=gaussian_filter(sdf,1.6)
+        sdf=gaussian_filter(sdf,.8)
         gradients=np.gradient(sdf,step)
         _NORMAL_FIELD=(axes,gradients,step,sdf)
     axes,gradient,step,sdf=_NORMAL_FIELD
@@ -119,7 +119,7 @@ def orientations(normals,points):
     cross=np.cross(axes,normals);dot=np.sum(axes*normals,axis=1)
     quat=np.column_stack([cross,1+dot]);quat/=np.linalg.norm(quat,axis=1,keepdims=True)
     # Face-aligned cubes: same size, subtle rotation to follow the relief.
-    rv=Rotation.from_quat(quat).as_rotvec()*.90
+    rv=Rotation.from_quat(quat).as_rotvec()*.80
     rv[points[:,1]<.25]=0
     return Rotation.from_rotvec(rv).as_quat()
 
@@ -140,7 +140,11 @@ def voxelize(pitch):
     normals,signed_distances=surface_normals(pts)
     offsets=-(signed_distances+pitch*.966*.49)
     offsets[pts[:,1]<.24]=0
-    pts+=normals*offsets[:,None]
+    # Preserve horizontal courses and suppress overlapping, shingle-like cube edges.
+    offsets=np.clip(offsets,-pitch*.35,pitch*.35)
+    offsets[pts[:,1]<.24]=0
+    pts[:,0]+=normals[:,0]*offsets
+    pts[:,2]+=normals[:,2]*offsets
     rotations=orientations(normals,pts)
     # Count 26-neighbour occupancy as a gentle cavity AO hint for the viewer.
     ao=[]
@@ -152,7 +156,7 @@ def voxelize(pitch):
         cubes.append({'id':i,'name':f'cube_{i:04d}','position':np.round(p,6).tolist(),
                       'normal':np.round(n,6).tolist(),'quaternion':np.round(q,8).tolist(),'region':region(p),'ao':a})
     return {
-        'format':'voxel-portrait/1.0','name':'Voxel portrait вЂ” cube study',
+        'format':'voxel-portrait/1.0','name':'Voxel portrait - cube study',
         'description':'Sculpted approximation calibrated to facial landmark proportions; not a biometric scan.',
         'construction':'Equal-size beveled cubes, slightly oriented to follow the relief. Cubes are separate closed meshes; the aggregate is not a fused watertight solid.',
         'axis':{'up':'+Y','front':'+Z'},'units':'design units',
@@ -208,7 +212,7 @@ def export_glb(data,path):
                      struct.pack('<I4s',len(binary),b'BIN\0')+binary)
 
 if __name__ == '__main__':
-    d = voxelize(.043)
+    d = voxelize(.064)
     p, n = cube_mesh(d['bevelRatio'])
     d['geometry'] = {'positions': p.round(7).tolist(), 'normals': n.round(7).tolist()}
     (OUT/'public'/'voxel-portrait.json').write_text(json.dumps(d, separators=(',', ':')), encoding='utf-8')

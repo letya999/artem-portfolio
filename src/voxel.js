@@ -9,7 +9,7 @@ export function makeVoxelPortrait(data) {
     if (!values?.length || values.length % 3 || !values.every(Number.isFinite)) throw new Error('Invalid cube geometry');
     geometry.setAttribute(key, new THREE.Float32BufferAttribute(values, 3));
   }
-  const material = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 1, roughness: .32, envMapIntensity: 1.1});
+  const material = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 1, roughness: .22, envMapIntensity: 1.1});
   const group = new THREE.Group(), bands = new Map();
   data.cubes.forEach(c => {
     if (!c.position?.every(Number.isFinite) || c.position.length !== 3 || !c.quaternion?.every(Number.isFinite) || c.quaternion.length !== 4) throw new Error('Invalid cube transform');
@@ -30,7 +30,7 @@ export function makeVoxelPortrait(data) {
       rotation.fromArray(c.quaternion).normalize();
       matrix.compose(position, rotation, scale); layer.setMatrixAt(i,matrix);
       // Small deterministic steel variations and cavity occlusion, never a face texture.
-      const shade = (.70 + .035 * Math.sin(c.id * 12.9898)) * (c.ao ?? 1);
+      const shade = (.68 + .07 * Math.sin(c.id * 12.9898)) * (c.ao ?? 1);
       layer.setColorAt(i,color.setRGB(shade,shade,shade));
     });
     group.add(layer);
