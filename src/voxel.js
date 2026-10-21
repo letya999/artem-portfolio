@@ -7,7 +7,7 @@ function applyCubeWave(shader,wave,cubeSize){
     uniform vec3 portraitWaveOrigin,portraitWaveAxis;
     float cubeWavePhase(){
       if(portraitWaveEnabled<.5||instanceWavePosition.w<.5)return -1.0;
-      return (portraitWaveTime-portraitWaveStart-distance(instanceWavePosition.xyz,portraitWaveOrigin)*.62)/.48;
+      return ((portraitWaveTime-portraitWaveStart)/3.0-distance(instanceWavePosition.xyz,portraitWaveOrigin)*.62)/.48;
     }
     mat3 cubeWaveRotation(float phase){
       float angle=6.28318530718*phase*phase*(3.0-2.0*phase);
@@ -32,13 +32,13 @@ function applyCubeWave(shader,wave,cubeSize){
 
 export function updateCubeWave(model,time,enabled,random=Math.random){
   const wave=model.userData.cubeWave,state=wave.state;
-  if(enabled&&wave.sources.length&&time>=state.next){
+  if(enabled&&wave.sources.length&&time>=state.next&&(state.started<0||time-state.started>=8.1)){
     state.source=Math.floor(random()*wave.sources.length);
     state.started=time;state.next=time+3+random()*7;
     wave.start.value=time;wave.origin.value.fromArray(wave.sources[state.source]);
     wave.axis.value.set(wave.origin.value.z+.1,.25,-wave.origin.value.x).normalize();
   }
-  wave.enabled.value=enabled&&state.started>=0&&time-state.started<2.7?1:0;
+  wave.enabled.value=enabled&&state.started>=0&&time-state.started<8.1?1:0;
 }
 
 // The neck cap stays rooted; cervical rotation reaches the rigid skull gradually.

@@ -296,14 +296,18 @@ test('cube ripples travel across the surface, restore the cubes and recur every 
     const target=new WebGLRenderTarget(512,512),previous=renderer.getRenderTarget(),frames=[];
     try{
       renderer.setRenderTarget(target);
-      for(const time of [0,.9,3]){
+      for(const time of [0,2.7,9]){
         model.userData.motionTime.value=time;renderer.render(scene,window.portraitCamera);
         const pixels=new Uint8Array(512*512*4);renderer.readRenderTargetPixels(target,0,0,512,512,pixels);frames.push(pixels);
       }
       const changes=frame=>{
         let changed=0;for(let i=0;i<frame.length;i+=4)if(Math.abs(frame[i]-frames[0][i])+Math.abs(frame[i+1]-frames[0][i+1])+Math.abs(frame[i+2]-frames[0][i+2])>20)changed++;return changed;
       };
-      return {peak:changes(frames[1]),restored:changes(frames[2])};
+      const {updateCubeWave}=await import('/src/voxel.js');
+      wave.state.started=0;wave.state.next=10;wave.start.value=0;
+      updateCubeWave(model,3,true,()=>0);const active=wave.enabled.value;
+      wave.state.next=3;updateCubeWave(model,3,true,()=>0);
+      return {peak:changes(frames[1]),restored:changes(frames[2]),active,held:wave.state.started};
     }finally{
       renderer.setRenderTarget(previous);target.dispose();
       if(wave){wave.state.started=-10;wave.state.next=3;wave.start.value=-10;wave.enabled.value=0;}
@@ -311,6 +315,8 @@ test('cube ripples travel across the surface, restore the cubes and recur every 
   });
   expect.soft(pixels.peak,'A travelling wave must visibly flip individual cubes').toBeGreaterThan(100);
   expect.soft(pixels.restored,'Cubes must return exactly to their resting geometry').toBe(0);
+  expect.soft(pixels.active,'The slower ripple must remain active after three seconds').toBe(1);
+  expect.soft(pixels.held,'A new ripple must wait until the current one finishes').toBe(0);
   const events=[];
   for(let i=0;i<14;i++){
     await page.clock.runFor(1000);const current=await state();
