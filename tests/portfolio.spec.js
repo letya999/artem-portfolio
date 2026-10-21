@@ -86,7 +86,7 @@ test("portrait responds to a cursor outside its canvas and preserves the photo o
   await page.mouse.move(500, 600);
   await page.clock.runFor(450);
   expect((await stage.screenshot()).equals(lookingLeft)).toBe(false);
-  await page.route("**/portrait-tiles.json", (route) =>
+  await page.route("**/voxel-portrait.json", (route) =>
     route.fulfill({ status: 503, body: "Unavailable" }),
   );
   await page.goto("/");

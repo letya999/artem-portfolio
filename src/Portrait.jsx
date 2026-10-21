@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { makeIdentityPortrait } from "./identity-portrait.js";
+import { makeVoxelPortrait } from "./voxel.js";
 import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
@@ -104,11 +104,11 @@ export default function Portrait() {
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
     const abort = new AbortController();
-    fetch("./portrait-tiles.json", { signal: abort.signal })
+    fetch("./voxel-portrait.json", { signal: abort.signal })
       .then(r => { if (!r.ok) throw new Error("Portrait unavailable"); return r.json(); })
       .then(data => {
         if (disposed) return;
-        sculpture = makeIdentityPortrait(data);
+        sculpture = makeVoxelPortrait(data);
         sculpture.scale.setScalar(1.12);
         sculpture.rotation.y = -.60;
         scene.add(sculpture);
@@ -146,7 +146,7 @@ export default function Portrait() {
       else spinAngle = Math.round((yaw.value + .60) / (Math.PI * 2)) * Math.PI * 2;
       sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * .70), dt, 7);
       sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .18, dt, 9);
-      sculpture.userData.expression.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
+      sculpture.userData.expression?.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
       renderer.render(scene, camera);
     });
     return () => {

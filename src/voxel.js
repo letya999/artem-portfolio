@@ -9,7 +9,7 @@ export function makeVoxelPortrait(data) {
     if (!values?.length || values.length % 3 || !values.every(Number.isFinite)) throw new Error('Invalid cube geometry');
     geometry.setAttribute(key, new THREE.Float32BufferAttribute(values, 3));
   }
-  const material = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 1, roughness: .22, envMapIntensity: 1.1});
+  const material = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 1, roughness: .32, envMapIntensity: 1.1});
   const group = new THREE.Group(), bands = new Map();
   data.cubes.forEach(c => {
     if (!c.position?.every(Number.isFinite) || c.position.length !== 3 || !c.quaternion?.every(Number.isFinite) || c.quaternion.length !== 4) throw new Error('Invalid cube transform');
