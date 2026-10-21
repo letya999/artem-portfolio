@@ -25,6 +25,7 @@ test('malformed voxel payload fails safely',()=>{
  assert.throws(()=>makeVoxelPortrait({...data,count:0}));
  assert.throws(()=>makeVoxelPortrait({...data,cubes:[{position:[NaN,0,0]}],count:1}));
  assert.throws(()=>makeVoxelPortrait({...data,pitch:Infinity}));
+ assert.throws(()=>makeVoxelPortrait({...data,cubes:[{...data.cubes[0],motion:Infinity}],count:1}));
  assert.throws(()=>makeVoxelPortrait({...data,cubes:[{...data.cubes[0],normal:[NaN,0,1]}],count:1}));
 });
 
@@ -69,4 +70,32 @@ test('scan jaw has no oversized template arc and ears stay within captured heigh
   assert.ok(ear.length>10);
   assert.ok(ear.every(c=>c.position[1]>=1.58&&c.position[1]<=2.06),'Exposed ears must match the captured ear position');
  }
+});
+
+
+test('cube pupils, expressive lips and shoulder motion are bounded away from the head',()=>{
+ const pupils=data.cubes.filter(c=>c.feature==='pupil');
+ assert.equal(pupils.length,2);
+ assert.ok(pupils.some(c=>c.position[0]<-.2)&&pupils.some(c=>c.position[0]>.2));
+ assert.ok(data.cubes.filter(c=>c.feature==='lip-seam').length>=4);
+ assert.ok(data.cubes.filter(c=>c.feature==='lip').length>=10);
+ const shoulders=data.cubes.filter(c=>c.region==='shoulder');
+ assert.ok(shoulders.length>500);
+ assert.ok(Math.max(...shoulders.map(c=>c.position[1]))>=.46,'Shoulders must rise to the neck base');
+ assert.ok(Math.max(...shoulders.map(c=>Math.abs(c.position[0])))>1.1);
+ for(const cube of data.cubes){
+  if(cube.region==='shoulder')assert.ok(cube.motion>0&&cube.motion<=.0261);
+  else assert.equal(cube.motion,undefined,'Head and neck must not inherit shoulder drift');
+ }
+ const model=makeVoxelPortrait(data);
+ let pupilInstances=0,movingInstances=0;
+ for(const band of model.children){
+  const pupil=band.geometry.attributes.instancePupil,motion=band.geometry.attributes.instanceMotion;
+  assert.equal(pupil.count,band.count);assert.equal(motion.count,band.count);
+  pupilInstances+=[...pupil.array].filter(v=>v===1).length;
+  for(let i=0;i<motion.count;i++)if(motion.getX(i)>0)movingInstances++;
+  band.geometry.dispose();
+ }
+ assert.equal(pupilInstances,2);assert.equal(movingInstances,shoulders.length);
+ model.children[0].material.dispose();
 });

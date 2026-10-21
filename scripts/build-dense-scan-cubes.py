@@ -4,7 +4,7 @@ The retained render shell encloses a connected solid; face samples never move is
 import argparse, importlib.util, json
 from pathlib import Path
 import numpy as np
-from scipy.ndimage import binary_erosion, binary_fill_holes, distance_transform_edt, gaussian_filter, generate_binary_structure, label
+from scipy.ndimage import binary_opening, median_filter, binary_erosion, binary_fill_holes, distance_transform_edt, gaussian_filter, generate_binary_structure, label
 
 
 def raster_front(vertices, triangles, xs, ys):
@@ -41,10 +41,25 @@ def build(template, scan, frame, pitch):
     scale=(2.94-.72)/np.ptp(vertices[:,1])
     eye_height=.72-vertices[:,1].min()*scale
     vertices=vertices*scale+np.array([0,eye_height,.48])
-    xs=np.arange(-27,28)*pitch;ys=(np.arange(75)+.5)*pitch;zs=np.arange(-27,31)*pitch
+    xs=np.arange(-35,36)*pitch;ys=(np.arange(75)+.5)*pitch;zs=np.arange(-27,31)*pitch
     X,Y,Z=np.meshgrid(xs,ys,zs,indexing='ij')
     measured=raster_front(vertices,triangles,xs,ys)
     valid=np.isfinite(measured)
+    landmarks=(np.array(frame['landmarks'])-origin)@basis*scale+np.array([0,eye_height,.48])
+    nearest_skin=distance_transform_edt(~valid,return_distances=False,return_indices=True)
+    filled=measured[tuple(nearest_skin)]
+    scalp_blend=np.clip((Y[:,:,0]-eye_height-.22)/.22,0,1)
+    scalp_blend=scalp_blend*scalp_blend*(3-2*scalp_blend)
+    clean_scalp=gaussian_filter(median_filter(filled,size=3),1.65)
+    measured=np.where(valid,filled*(1-scalp_blend)+clean_scalp*scalp_blend,np.nan)
+    mouth=landmarks[[13,14]].mean(0)
+    mx=X[:,:,0]-mouth[0];ratio_mouth=mx/.235
+    seam=mouth[1]+.025*ratio_mouth*ratio_mouth
+    dy=Y[:,:,0]-seam
+    lip_width=np.maximum(0,1-ratio_mouth*ratio_mouth)
+    lip_relief=lip_width*(.025*np.exp(-((dy-.032)/.025)**2)+.038*np.exp(-((dy+.038)/.028)**2)-.020*np.exp(-(dy/.013)**2))
+    measured+=np.where(abs(ratio_mouth)<1,lip_relief,0)
+    edited=(scalp_blend>.05)|((abs(ratio_mouth)<1)&(abs(dy)<.10))
     # Construct the jaw and cheeks from the measured silhouette, never from the old jaw.
     widths=np.full(len(ys),np.nan)
     for row,y in enumerate(ys):
@@ -52,7 +67,7 @@ def build(template, scan, frame, pitch):
         if len(sample)>8:widths[row]=np.quantile(abs(sample[:,0]),.995)
     known=np.isfinite(widths)
     widths=np.interp(ys,ys[known],widths[known])
-    widths=gaussian_filter(widths,.75)
+    widths=gaussian_filter(median_filter(widths,size=3),1.15)
     crown=float(vertices[:,1].max());chin=float(vertices[:,1].min())
     widths*=np.sqrt(np.clip((crown-ys)/.09,0,1))
     ratio=abs(X[:,:,0])/np.maximum(widths[None,:],1e-6)
@@ -66,7 +81,7 @@ def build(template, scan, frame, pitch):
     back=-.10+(back_center[None,:]+.10)*np.sqrt(np.maximum(0,1-ratio*ratio))
     solid=footprint[:,:,None]&(Z>=back[:,:,None])&(Z<=new_front[:,:,None])
     # A narrower neck meets behind the chin instead of projecting through it.
-    neck_w=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.62,.60,.46,.40,.43,.40])
+    neck_w=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.38,.38,.38,.40,.43,.40])
     neck_d=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.45,.45,.36,.32,.34,.32])
     neck_center=np.interp(Y,[0,.5,1.16],[-.20,-.32,-.36])
     neck=((X/neck_w)**2+((Z-neck_center)/neck_d)**2<=1)&(Y>=0)&(Y<1.16)
@@ -81,6 +96,9 @@ def build(template, scan, frame, pitch):
     solid|=ear_valid[None,:,:]&(abs(X)>.55)&(abs(X)<=np.nan_to_num(ear_x,nan=0)[None,:,:])
     weight=(valid&footprint).astype(float)
     replace=valid&footprint
+    # Upper head opening removes isolated scan spikes without modifying eyelids or lips.
+    scalp_clean=binary_opening(solid,structure=generate_binary_structure(3,1))
+    solid=np.where(Y>eye_height+.40,scalp_clean,solid)
     solid=binary_fill_holes(solid)
     connected,components=label(solid,generate_binary_structure(3,1))
     counts=np.bincount(connected.ravel());counts[0]=0;solid=connected==counts.argmax()
@@ -91,13 +109,29 @@ def build(template, scan, frame, pitch):
     assert outer_count>=5704, "Visible outer skin must also double its resolution"
     shell=solid&~core
     assert np.array_equal(binary_fill_holes(shell),solid), 'Render shell leaks into the interior'
-    grid=np.argwhere(shell);points=np.c_[xs[grid[:,0]],ys[grid[:,1]],zs[grid[:,2]]]
+    # Trapezius and shoulder cap rise into the neck, shortening its visible length.
+    shoulders=((X/1.27)**2+((Y+.12)/.65)**2+((Z+.20)/.54)**2<=1)&(Y>=0)
+    shoulder_skin=shoulders&~binary_erosion(shoulders,structure=generate_binary_structure(3,1),iterations=2)&~solid
+    density=.12+.82*np.clip(Y/.38,0,1)**2
+    density*=1-.50*np.clip((abs(X)-.60)/.67,0,1)
+    density=np.where((abs(X)<.48)|(Y>.36),1,density)
+    hashed=np.mod(np.sin(X*173.31+Y*91.17+Z*213.41)*43758.5453,1)
+    eligible_lower=shoulder_skin&(abs(X)>.65)&(Y<.18)
+    shoulder_skin&=hashed<density
+    lower_density=float((shoulder_skin&eligible_lower).sum()/max(1,eligible_lower.sum()))
+    assert .05<lower_density<.40
+    rendered=shell|shoulder_skin
+    grid=np.argwhere(rendered);points=np.c_[xs[grid[:,0]],ys[grid[:,1]],zs[grid[:,2]]]
     order=np.lexsort((points[:,0],points[:,2],points[:,1]));points=points[order];grid=grid[order]
     assert 5704<=len(points)<=20000, 'Require at least twice the preceding 2,852 cubes'
     assert pitch*1.045<.07245
     sdf=gaussian_filter(distance_transform_edt(~solid)-distance_transform_edt(solid),.8)
     gradients=np.gradient(sdf)
     normals=np.array([g[tuple(grid.T)] for g in gradients]).T
+    on_shoulder=shoulder_skin[tuple(grid.T)]
+    shoulder_sdf=gaussian_filter(distance_transform_edt(~shoulders)-distance_transform_edt(shoulders),.8)
+    shoulder_normals=np.array([g[tuple(grid.T)] for g in np.gradient(shoulder_sdf)]).T
+    normals[on_shoulder]=shoulder_normals[on_shoulder]
     normals/=np.maximum(np.linalg.norm(normals,axis=1,keepdims=True),1e-8)
     # Continuous measured normals retain facial lighting on the discrete square fronts.
     finite=np.isfinite(new_front);index=distance_transform_edt(~finite,return_distances=False,return_indices=True)
@@ -109,12 +143,28 @@ def build(template, scan, frame, pitch):
     facing=(points[:,2]>=surface_depth(solid,zs)[gx,gy]-.12)&(normals[:,2]>.1)&(weight[gx,gy]>.1)
     normals[facing]=front_normals[gx[facing],gy[facing]]
     cubes=[]
+    pupils=landmarks[[468,473]]
+    exposed_front=surface_depth(solid,zs)
     for i,(point,normal) in enumerate(zip(points,normals)):
-        cubes.append({'id':i,'name':f'cube_{i:05d}','position':point.round(6).tolist(),'normal':normal.round(6).tolist(),'quaternion':[0,0,0,1],'region':template.region(point),'ao':1})
+        cubes.append({'id':i,'name':f'cube_{i:05d}','position':point.round(6).tolist(),'normal':normal.round(6).tolist(),'quaternion':[0,0,0,1],'region':'shoulder' if on_shoulder[i] else template.region(point),'ao':1})
+        cube=cubes[-1]
+        if on_shoulder[i]:
+            cube['motion']=float(.008+.018*np.clip((.36-point[1])/.36,0,1))
+        elif point[2]>=exposed_front[grid[i,0],grid[i,1]]-.001:
+            for pupil in pupils:
+                if abs(point[0]-pupil[0])<.055 and abs(point[1]-pupil[1])<.034:
+                    cube['feature']='iris'
+                if abs(point[0]-pupil[0])<pitch*.56 and abs(point[1]-pupil[1])<pitch*.56:
+                    cube['feature']='pupil'
+            offset=point[1]-(mouth[1]+.025*((point[0]-mouth[0])/.235)**2)
+            if abs(point[0]-mouth[0])<.23 and abs(offset)<.085:
+                cube['feature']='lip-seam' if abs(offset)<.020 else 'lip'
+    assert sum(c.get('feature')=='pupil' for c in cubes)==2
+    assert sum(c.get('feature') in ('lip','lip-seam') for c in cubes)>10
     positions,n=template.cube_mesh(.018)
-    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw silhouette and mirrored scanned ear relief in a closed head volume.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed render shell.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.018,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'minimumPreviousCubeCount':2852}}
+    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw silhouette and mirrored scanned ear relief in a closed head volume.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed head/neck shell, with a sparse animated shoulder shell.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.018,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'shoulderCubes':int(on_shoulder.sum()),'lowerShoulderDensity':lower_density,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
     # Report actual quantization error against measured triangles, not a likeness percentage.
-    strong=(weight>.99)&np.isfinite(measured)
+    strong=(weight>.99)&np.isfinite(measured)&~edited
     surface=np.max(np.where(solid,Z,-np.inf),axis=2)
     error=np.abs(surface[strong]-measured[strong])
     assert len(error)>150 and np.quantile(error,.95)<=pitch*1.01

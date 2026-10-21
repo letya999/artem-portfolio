@@ -66,6 +66,7 @@ export default function Portrait() {
       camera.left = (-2 * r.width) / r.height;
       camera.right = (2 * r.width) / r.height;
       camera.updateProjectionMatrix();
+      if(sculpture)sculpture.scale.setScalar(Math.min(1.12,(camera.right-camera.left)*.90/sculpture.userData.width));
       renderer.render(scene, camera);
     });
     resize.observe(host);
@@ -109,7 +110,7 @@ export default function Portrait() {
       .then(data => {
         if (disposed) return;
         sculpture = makeVoxelPortrait(data);
-        sculpture.scale.setScalar(1.12);
+        sculpture.scale.setScalar(Math.min(1.12,(camera.right-camera.left)*.90/sculpture.userData.width));
         sculpture.rotation.y = -.60;
         scene.add(sculpture);
         host.classList.add("loaded");
@@ -147,6 +148,9 @@ export default function Portrait() {
       sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * .70), dt, 7);
       sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .18, dt, 9);
       sculpture.userData.expression?.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
+      sculpture.userData.motionTime.value=time;
+      sculpture.userData.motionAmount.value=reduced.matches?0:1;
+      sculpture.userData.gaze.value.set(reduced.matches||c.spinning?0:pointer.x,reduced.matches||c.spinning?0:pointer.y);
       renderer.render(scene, camera);
     });
     return () => {
