@@ -54,3 +54,9 @@ The active fitting manifest now requires `smile`, `outdoor`, `glasses`, and `occ
 The weighted in-sample residual changed from 0.03182 to 0.01636 face heights. This metric differs from the previous unweighted three-view metric and cannot be compared as a likeness improvement. The preview defaults to the facial surface again; rejected estimated skull/ears/iris overlays are removed. A toggle compares the saved previous fit under identical lighting. Old head exports remain available locally but are not the default. Completer no longer replaces the viewer.
 
 Before a new reconstruction, preserve the current `fitted.json` and `fitted-smile.json` as `fitted-previous.json` and `fitted-smile-previous.json` for the comparison viewer. The browser checks cover neutral/expression/material controls; visual inspection still finds incomplete likeness.
+
+## Bust on a plinth
+
+The current preview loads the four-photo fitted face completed with skull, ears, a shortened flared neck and a bevelled two-step plinth. Each export has 73,835 vertices and 146,822 triangles. Completion asserts that every original face vertex is unchanged. The rear cap uses one pole vertex, and the outer patch winding is matched to the source boundary. `plinthStart` separates the base material in the indexed JSON; OBJ exports contain the geometry without viewer materials.
+
+The viewer offers full-bust/face-only comparison, neutral/smile, matte/metal and pointer rotation. Desktop controls and a 390px mobile viewport were checked; horizontal overflow was fixed. Scalp/ear joins remain approximate, and the separate neck/ear components are not a watertight print mesh. No portrait accuracy claim or publication clearance is implied.
