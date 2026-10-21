@@ -26,28 +26,13 @@ export default function Portrait() {
     host.appendChild(renderer.domElement);
     const pmrem = new THREE.PMREMGenerator(renderer),
       room = new RoomEnvironment();
-    // Architectural reflection cards create the black/white bands of polished steel.
-    for (const [x, y, z, width, height, color] of [
-      [-3, 3, 6, 3, 12, 0x060708],
-      [3.5, 3, 5, 1.5, 12, 0xffffff],
-      [0, 7, 7, 8, 1.5, 0x111315],
-      [0.8, 2, 8, 1, 10, 0x101214],
-    ]) {
-      const card = new THREE.Mesh(
-        new THREE.PlaneGeometry(width, height),
-        new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide }),
-      );
-      card.position.set(x, y, z);
-      card.lookAt(0, 2, 0);
-      room.add(card);
-    }
-    const env = pmrem.fromScene(room, 0.015);
+    const env = pmrem.fromScene(room, 0.12);
     scene.environment = env.texture;
     room.dispose();
     pmrem.dispose();
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x888880, 0.8));
-    const light = new THREE.DirectionalLight(0xffffff, 0.85);
-    light.position.set(-3, 4, 5);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x363c44, 0.65));
+    const light = new THREE.DirectionalLight(0xffffff, 2.6);
+    light.position.set(-3, 3, 5);
     scene.add(light);
     const resize = new ResizeObserver(() => {
       const r = host.getBoundingClientRect();

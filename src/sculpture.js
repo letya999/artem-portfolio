@@ -13,10 +13,10 @@ export function makeSlices(contours) {
   const gaze = { value: new THREE.Vector2() };
   group.userData.gaze = gaze;
   const steel = new THREE.MeshStandardMaterial({
-    color: 0xc6ccd0,
-    metalness: 1,
-    roughness: 0.18,
-    envMapIntensity: 1.1,
+    color: 0x727b82,
+    metalness: 0.78,
+    roughness: 0.62,
+    envMapIntensity: 0.28,
   });
   // Procedural recessed eye slots and movable pupils; no photographic surface map.
   steel.onBeforeCompile = (shader) => {
@@ -34,7 +34,7 @@ export function makeSlices(contours) {
         (eye, i) => `
       vec2 eye${i} = portraitUv - vec2(${eye.center.join(",")});
       eye${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * eye${i};
-      float socket${i} = 1.0 - smoothstep(0.72, 1.0, length(eye${i} / vec2(${eye.radius[0]}, 0.0048)));
+      float socket${i} = 1.0 - smoothstep(0.72, 1.0, length(eye${i} / vec2(${eye.radius[0]}, 0.006)));
       float pupil${i} = 1.0 - smoothstep(0.65, 1.0, length((eye${i} - portraitGaze) / vec2(0.0032, 0.0032)));
       diffuseColor.rgb = mix(diffuseColor.rgb, mix(vec3(0.035), vec3(0.34, 0.39, 0.30), pupil${i}), socket${i});
     `,
@@ -47,9 +47,9 @@ export function makeSlices(contours) {
   };
   const metal = new THREE.MeshStandardMaterial({
     color: 0x919a9f,
-    metalness: 1,
-    roughness: 0.27,
-    envMapIntensity: 1,
+    metalness: 0.78,
+    roughness: 0.48,
+    envMapIntensity: 0.45,
   });
   const rear = steel.clone();
   const width = head.segments + 1;
