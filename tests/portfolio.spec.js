@@ -50,7 +50,7 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
     "false",
   );
   await page.getByRole("link", { name: "Опыт", exact: true }).click();
-  await page.getByText("МТС", { exact: true }).click();
+  await page.locator('#experience summary').getByText("МТС", { exact: true }).click();
   await expect(page.getByText(/LeSS на SAFe/)).toBeVisible();
   await expect(page.locator('a[href="https://t.me/artemletya"]')).toBeVisible();
   expect(

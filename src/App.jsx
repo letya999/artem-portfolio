@@ -67,6 +67,14 @@ const jobs = [
     ],
   ],
 ];
+const businesses = {
+  'Renewal Studio': 'Разработка ПО · проектная студия',
+  'Itis Team': 'IT-аутсорсинг · мобильная и веб-разработка',
+  'ЮMoney': 'Финтех · электронные платежи',
+  'МТС': 'Телеком · кассовые сервисы и франшиза',
+  'Финтех-холдинг': 'Финтех · международные мобильные продукты',
+  'Twinby': 'Дейтинг · платформа знакомств',
+};
 export default function App() {
   return (
     <>
@@ -119,67 +127,64 @@ export default function App() {
           </div>
         </section>
         <section className="results" id="results">
-          <div className="section-top">
-            <h2>
-              Сложность.
-              <br />
-              Система. Результат.
-            </h2>
-            <p>
-              За каждым запуском — решения,
-              <br />
-              договорённости и работа команд.
-              <br />
-              Вот что получилось в Twinby.
-            </p>
-          </div>
-          <div className="result-grid">
-            <article>
-              <div className="stat">
-                64<span>→</span>16
-              </div>
-              <h3>Дней от задачи до результата</h3>
-              <p>
-                Сформировал backend-команду, ввёл инженерные стандарты и
-                регулярные релизы. Lead time сократился в четыре раза.
-              </p>
-            </article>
-            <div className="result-secondary">
+          <h2 className="achievements-heading">Достижения в цифрах.</h2>
+          <div className="achievements-body">
+            <div className="achievement-list">
+              <article>
+                <strong>64<span>→</span>16</strong>
+                <h3>Дней от задачи до результата</h3>
+                <p>Twinby · Сформировал backend-команду, ввёл инженерные стандарты и регулярные релизы.</p>
+              </article>
               <article>
                 <strong>÷2,5</strong>
                 <h3>Снижение fraud rate</h3>
-                <p>
-                  Антифрод из 9 сервисов: ML-детекция, device fingerprinting,
-                  автомодерация и liveness.
-                </p>
+                <p>Twinby · Антифрод из 9 сервисов: ML-детекция, device fingerprinting, автомодерация и liveness.</p>
               </article>
               <article>
                 <strong>−60%</strong>
                 <h3>Time-to-market аналитики</h3>
-                <p>Docs-as-code, AI-флоу, ADR и архитектурный надзор.</p>
+                <p>Twinby · Docs-as-code, AI-флоу, ADR и архитектурный надзор.</p>
               </article>
+              <article>
+                <strong>+40%</strong>
+                <h3>Производительность команд</h3>
+                <p>Финтех-холдинг · Расширил отдел с 2 до 5 команд и сократил интервал релизов.</p>
+              </article>
+              <article>
+                <strong>12<span>→</span>34%</strong>
+                <h3>Маржинальность проектов</h3>
+                <p>Itis Team · Автоматизация и повторное использование кода.</p>
+              </article>
+            </div>
+            <div className="little-law" role="img" aria-label="Закон Литтла: Lead time равно WIP, делённому на Throughput">
+              <div className="equation-slot">
+                <div className="equation-typeset" aria-hidden="true">
+                  <span>Lead time</span><span>=</span>
+                  <span className="equation-fraction"><span>WIP</span><span>Throughput</span></span>
+                </div>
+              </div>
+              <p>Время выполнения = задачи в работе / пропускная способность</p>
             </div>
           </div>
         </section>
         <section className="experience" id="experience">
           <div className="section-top">
-            <h2>Опыт в действии.</h2>
+            <h2>Опыт работы</h2>
             <p>
-              От мобильной разработки
-              <br />
-              до сложных систем и нескольких команд.
+              2026 → 2019. Сначала последнее место работы.
+              Раскройте компанию, чтобы увидеть задачи и результаты.
             </p>
           </div>
+          <div className="experience-body">
           <div className="history">
             {jobs.map(([company, role, date, scope, points], i) => (
-              <details key={company} open={i === 0}>
+              <div className="career-entry" key={company}>
+              <details open={i === 0} data-company={company}>
                 <summary>
-                  <span className="company">{company}</span>
+                  <span className="company-line"><span className="company">{company}</span><span className="business">{businesses[company]}</span></span>
                   <span className="job">{role}</span>
                   <span className="date">{date}</span>
-                  <span className="plus" aria-hidden="true">
-                    +
-                  </span>
+                  <span className="disclosure"><span className="when-closed">Подробнее</span><span className="when-open">Свернуть</span><span className="plus" aria-hidden="true">+</span></span>
                 </summary>
                 <div className="job-content">
                   <p>{scope}</p>
@@ -190,7 +195,10 @@ export default function App() {
                   </ul>
                 </div>
               </details>
+              <div className="matryoshka-slot" role="img" aria-label={`Матрёшка: ${company}`}><p className="matryoshka-fallback">{company}</p></div>
+              </div>
             ))}
+          </div>
           </div>
         </section>
         <section className="about" id="about">

@@ -212,6 +212,7 @@ h1 > span {
   width: 100%;
   height: 100%;
 }
+.portrait-stage[data-equation-progress]:not([data-equation-progress="0"]) { z-index: 3; }
 .portrait-fallback {
   position: absolute;
   inset: 0;
@@ -267,7 +268,7 @@ h1 > span {
 .results {
   background: #20211f;
   color: var(--paper);
-  padding: 100px 6% 110px;
+  padding: 48px 6% 100px;
 }
 .section-top {
   display: flex;
@@ -275,30 +276,60 @@ h1 > span {
   gap: 40px;
   align-items: flex-end;
 }
+.achievements-heading { text-align: center; margin-bottom: 56px; white-space: nowrap; }
+.achievements-body {
+  display: grid;
+  grid-template-columns: .76fr 1.24fr;
+  align-items: start;
+  gap: 4%;
+}
+.achievement-list { display: grid; gap: 36px; }
+.achievement-list article { padding-bottom: 30px; border-bottom: 1px solid #45483e; }
+.achievement-list strong {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(64px, 6.3vw, 96px);
+  font-weight: 450;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+}
+.achievement-list strong span { color: var(--lime); margin: 0 .12em; }
+.results .achievement-list h3 { margin: 14px 0 8px; font-size: 20px; }
+.little-law { min-width: 0; position: sticky; top: 18svh; }
+.equation-slot {
+  position: relative;
+  aspect-ratio: 900 / 600;
+  display: grid;
+  align-items: center;
+}
+.equation-typeset {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: clamp(20px, 2.5vw, 40px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.equation-rendered .equation-typeset { visibility: hidden; }
+.equation-fraction { display: grid; text-align: center; line-height: 1.6; }
+.equation-fraction > span:first-child { border-bottom: 2px solid currentColor; }
+.little-law > p { text-align: center; margin-top: 18px; font-size: 12px; }
+@media (max-width: 680px) {
+  .achievements-heading { font-size: clamp(24px, 6.5vw, 40px); margin-bottom: 40px; }
+  .achievements-body { grid-template-columns: 1fr; gap: 40px; }
+  .little-law { position: static; grid-row: 1; }
+  .achievement-list { gap: 28px; }
+  .equation-typeset { font-size: clamp(18px, 5.3vw, 34px); }
+  .little-law > p { margin-top: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .equation-rendered .equation-typeset { visibility: visible; }
+}
 .section-top > p {
   font-size: 15px;
   max-width: 360px;
-}
-.result-grid {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 12%;
-  margin-top: 80px;
-}
-.stat {
-  font-family: var(--display);
-  font-size: clamp(90px, 13vw, 190px);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  font-variant-numeric: tabular-nums;
-}
-.stat span {
-  font-family: "Manrope Variable";
-  font-size: 0.45em;
-  color: var(--lime);
 }
 .results h3 {
   font-size: 19px;
@@ -310,21 +341,35 @@ h1 > span {
   color: #c1c4ba;
   max-width: 450px;
 }
-.result-secondary {
-  display: grid;
-  gap: 45px;
-}
-.result-secondary strong {
-  font-family: var(--display);
-  font-size: 70px;
-  font-weight: 400;
-  line-height: 1;
-}
-.result-secondary h3 {
-  margin: 15px 0 9px;
-}
 .experience {
-  padding: 110px 4%;
+  padding: 90px 2.5%;
+}
+.experience-body { margin-top: 48px; }
+.experience .history { margin-top: 0; min-width: 0; }
+.career-entry { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 5%; align-items: center; }
+.matryoshka-slot { height: clamp(200px, 19vw, 300px); position: relative; display: grid; place-items: center; }
+.matryoshka-fallback { color: var(--muted); text-align: center; }
+.sculpture-rendered .matryoshka-fallback { visibility: hidden; }
+.experience summary { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 20px; padding: 28px 20px; }
+.company-line { display: flex; align-items: baseline; gap: 12px 18px; flex-wrap: wrap; min-width: 0; }
+.business { font-size: 12px; line-height: 1.5; color: var(--muted); max-width: 250px; }
+.experience .job { grid-column: 1; grid-row: 2; }
+.experience .date { grid-column: 1; grid-row: 3; }
+.disclosure { display: flex; gap: 12px; align-items: center; grid-column: 2; grid-row: 1 / 4; font-size: 12px; }
+.when-open, details[open] .when-closed { display: none; }
+details[open] .when-open { display: inline; }
+.experience .job-content { display: block; padding: 0 20px 32px; }
+.experience .job-content > p { max-width: none; margin-bottom: 20px; }
+@media (max-width: 1000px) {
+  .career-entry { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 3%; }
+  .experience summary { padding: 24px 16px; gap: 10px; }
+  .disclosure { flex-direction: column-reverse; gap: 4px; }
+}
+@media (max-width: 680px) {
+  .career-entry { grid-template-columns: minmax(0, 1fr) 90px; gap: 10px; }
+  .matryoshka-slot { height: 180px; }
+  .experience .company { font-size: 26px; overflow-wrap: anywhere; }
+  .experience .job-content { padding: 0 16px 28px; }
 }
 .history {
   margin-top: 55px;
@@ -527,9 +572,6 @@ footer {
   .section-top {
     align-items: flex-start;
   }
-  .result-grid {
-    gap: 8%;
-  }
   .job-content {
     gap: 30px;
   }
@@ -633,21 +675,6 @@ footer {
   .section-top > p {
     margin-top: 25px;
     font-size: 14px;
-  }
-  .result-grid {
-    display: block;
-    margin-top: 40px;
-  }
-  .stat {
-    font-size: 28vw;
-  }
-  .result-secondary {
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-    margin-top: 50px;
-  }
-  .result-secondary strong {
-    font-size: 54px;
   }
   .results h3 {
     font-size: 16px;
