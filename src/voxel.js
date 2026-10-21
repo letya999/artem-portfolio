@@ -58,6 +58,7 @@ export function makeVoxelPortrait(data) {
     group.add(layer);
   });
   geometry.dispose();
+  group.rotation.order='YXZ';
   group.rotation.x=-.10;
   Object.assign(group.userData,{motionTime,motionAmount,gaze,restPitch:group.rotation.x,width:data.bounds.max[0]-data.bounds.min[0]});
   group.userData.cubeCount = data.count;

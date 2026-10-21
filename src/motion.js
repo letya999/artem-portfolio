@@ -22,10 +22,13 @@ export function layerPose(index, time, spread, reduced) {
   };
 }
 
-export function cursorTarget(clientX, clientY, width, height) {
+export function cursorTarget(clientX, clientY, width, height, left = 0, top = 0) {
+  const distance = Math.max(1, height / 2);
+  const x = (clientX - left - width / 2) / distance;
+  const y = (clientY - top - height / 2) / distance;
   return {
-    x: Math.max(-1, Math.min(1, (clientX / Math.max(1, width)) * 2 - 1)),
-    y: Math.max(-1, Math.min(1, (clientY / Math.max(1, height)) * 2 - 1)),
+    x: Math.max(-1.35, Math.min(1.35, Math.atan2(x, 1))),
+    y: Math.max(-.60, Math.min(.60, Math.atan2(y, Math.hypot(x, 1)))),
   };
 }
 

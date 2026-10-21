@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { makeVoxelPortrait } from './voxel.js';
-import { Matrix4 } from 'three';
+import { Matrix4, Vector3 } from 'three';
 const data = JSON.parse(readFileSync(new URL('../public/voxel-portrait.json',import.meta.url)));
 test('voxel integration preserves every solid cube and its full-depth transform',()=>{
  const model=makeVoxelPortrait(data), matrix=new Matrix4();
@@ -34,6 +34,14 @@ test('the resting portrait raises its chin slightly without rolling the head',()
  assert.ok(model.rotation.x<-.06&&model.rotation.x>-.14,'Resting chin must be raised by a few degrees');
  assert.equal(model.rotation.z,0);
  assert.equal(model.userData.restPitch,model.rotation.x);
+ model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
+});
+
+test('the head can look upward while fully turned to the side',()=>{
+ const model=makeVoxelPortrait(data);
+ model.rotation.set(-.55,1.05,0);
+ const direction=new Vector3(0,0,1).applyQuaternion(model.quaternion);
+ assert.ok(direction.y>.50,'Turning sideways must preserve the upward gaze angle');
  model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
 });
 
@@ -90,7 +98,8 @@ test('short oblique neck replaces the shoulders and only its sparse edge moves',
  assert.equal(data.cubes.filter(c=>c.region==='shoulder').length,0,'No shoulder shell may remain');
  const neck=data.cubes.filter(c=>c.position[1]<.70);
  assert.ok(neck.length>50);
- assert.ok(neck.every(c=>Math.abs(c.position[0])<=.44&&c.position[1]>=.15),'Only a short narrow neck may remain below the head');
+ assert.ok(neck.every(c=>Math.abs(c.position[0])<=.50&&c.position[1]>=.15),'Only the short neck may remain below the head');
+ assert.ok(neck.some(c=>Math.abs(c.position[0])>=.44),'Neck must have a stronger lateral silhouette');
  const bottom=side=>Math.min(...neck.filter(c=>c.position[0]*side>.25).map(c=>c.position[1]));
  assert.ok(Math.abs(bottom(1)-bottom(-1))>=.08,'Neck termination must be oblique');
  const edge=data.cubes.filter(c=>c.region==='neck-edge');
@@ -124,4 +133,11 @@ test('eyes and lips share the same light steel palette as all other cubes',()=>{
   band.geometry.dispose();
  }
  model.children[0].material.dispose();
+});
+
+test('cube fronts retain a square face and a visible bevel rim',()=>{
+ const front=data.geometry.positions.filter((p,i)=>data.geometry.normals[i][2]>.999);
+ const width=Math.max(...front.map(p=>p[0]))-Math.min(...front.map(p=>p[0]));
+ assert.ok(width>=.90&&width<=.94,'Flat faces must leave a visible bevel around each cube');
+ assert.ok(Math.abs(Math.max(...data.geometry.positions.map(p=>p[0]))-.5)<1e-6,'Bevel must retain full cube size');
 });

@@ -12,8 +12,8 @@ export default function Portrait() {
   useEffect(() => {
     const host = ref.current,
       scene = new THREE.Scene(),
-      camera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0.1, 100);
-    camera.position.set(0, 0.1, 6.15);
+      camera = new THREE.OrthographicCamera(-2.05, 2.05, 2.05, -2.05, 0.1, 100);
+    camera.position.set(0, -.075, 6.15);
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -63,10 +63,10 @@ export default function Portrait() {
     const resize = new ResizeObserver(() => {
       const r = host.getBoundingClientRect();
       renderer.setSize(r.width, r.height);
-      camera.left = (-2 * r.width) / r.height;
-      camera.right = (2 * r.width) / r.height;
+      camera.left = (-2.05 * r.width) / r.height;
+      camera.right = (2.05 * r.width) / r.height;
       camera.updateProjectionMatrix();
-      if(sculpture)sculpture.scale.setScalar(Math.min(1.12,(camera.right-camera.left)*.90/sculpture.userData.width));
+      if(sculpture)sculpture.scale.setScalar(Math.min(1.40,(camera.right-camera.left)*.90/sculpture.userData.width));
       renderer.render(scene, camera);
     });
     resize.observe(host);
@@ -78,17 +78,20 @@ export default function Portrait() {
       spinAngle = 0,
       replay = 0,
       visible = true;
-    const pointer = { x: 0, y: 0 };
+    const pointer = { x: 0, y: 0, active: false };
     const yaw = {value: -.60, velocity: 0}, pitch = {value: 0, velocity: 0};
     const assembly = {value: 0, velocity: 0};
     const move = (e) => {
+      const rect = host.getBoundingClientRect();
       Object.assign(
         pointer,
-        cursorTarget(e.clientX, e.clientY, innerWidth, innerHeight),
+        cursorTarget(e.clientX, e.clientY, rect.width, rect.height, rect.left, rect.top),
+        {active: true},
       );
     };
     const leave = () => {
       pointer.x = pointer.y = 0;
+      pointer.active = false;
     };
     window.addEventListener("pointermove", move, { passive: true });
     document.documentElement.addEventListener("pointerleave", leave);
@@ -111,7 +114,7 @@ export default function Portrait() {
         if (disposed) return;
         sculpture = makeVoxelPortrait(data);
         pitch.value = sculpture.userData.restPitch;
-        sculpture.scale.setScalar(Math.min(1.12,(camera.right-camera.left)*.90/sculpture.userData.width));
+        sculpture.scale.setScalar(Math.min(1.40,(camera.right-camera.left)*.90/sculpture.userData.width));
         sculpture.rotation.y = -.60;
         scene.add(sculpture);
         host.classList.add("loaded");
@@ -146,8 +149,9 @@ export default function Portrait() {
       }
       if(c.spinning) spinAngle += dt * .65;
       else spinAngle = Math.round((yaw.value + .60) / (Math.PI * 2)) * Math.PI * 2;
-      sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * .70), dt, 7);
-      sculpture.rotation.x = stepSpring(pitch, sculpture.userData.restPitch + (reduced.matches ? 0 : pointer.y * .18), dt, 9);
+      const following = pointer.active && !c.spinning && !reduced.matches;
+      sculpture.rotation.y = stepSpring(yaw, spinAngle + (following ? pointer.x : -.60), dt, 7);
+      sculpture.rotation.x = stepSpring(pitch, sculpture.userData.restPitch + (following ? pointer.y : 0), dt, 9);
       sculpture.userData.expression?.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
       sculpture.userData.motionTime.value=time;
       sculpture.userData.motionAmount.value=reduced.matches?0:1;

@@ -148,3 +148,13 @@ The owner requested removal of the entire shoulder shell. The narrow neck now en
 Pupils, iris and lip cubes now use the same light steel shade range as every other cube; the feature-specific dark inserts were removed. The resting head pitch is -0.10 radians (about 5.7 degrees chin-up), giving a calmer neutral presentation. The animation spring and reduced-motion reset both preserve that rest pitch. Cursor tracking and the existing 360/pause/reset controls remain available.
 
 Local before/after screenshots cover eight projections under ignored `qa/neck-cut/`. A pixel check confirms that only the cut fringe drifts while the head stays rigid, and that reduced motion freezes the effect. Validation includes 16 unit checks, four browser scenarios and the production build. The rear remains estimated and the incomplete left ear mirrored; real mobile hardware was not tested.
+
+## Stronger neck, visible cube bevels and cursor-relative turning
+
+Checkpoint `182a242` preserves the preceding oblique-cut head. The neck's midsection is roughly 18% wider and 11% deeper, tapering into its previous upper attachment. It retains the oblique closed cap without shoulders or a pedestal. The regenerated asset has 11,659 cubes, including 64 sparse edge cubes (75.3% of candidates). The measured face-depth residual remains unchanged.
+
+Cube bevel ratio increased from 0.018 to 0.04, narrowing each flat square face from 96.4% to 92% of cube width and making its rim visible. Cube centers, overlap, lattice pitch and the shared steel palette remain intact. Model scale increased from 1.12 to 1.40. The orthographic height was slightly relaxed from 4.0 to 4.1 units and vertically recentered to keep the enlarged head inside the frame during full turns; the resulting screen enlargement is about 22%.
+
+Cursor targeting now computes yaw/pitch angles from the portrait stage's actual center and height, including pointer positions outside the canvas. The head can turn up to 1.35 radians each way and tilt up/down by 0.60 radians around its raised rest pitch. YXZ rotation order keeps vertical gaze intact during a lateral turn. Leaving the document returns to the default pose; explicit 360 rotation, pause, reset and reduced-motion behavior retain control over automatic following.
+
+Validation: 18 unit checks, four browser scenarios and a production build. Browser assertions inspect real rendered object rotations and project every cube's bounds through the active camera at four cursor extremes. Local QA under ignored `qa/strong-neck/` includes eight static projections, six cursor directions including diagonals, and desktop/mobile screenshots without page errors or horizontal overflow. Real mobile hardware was not tested.

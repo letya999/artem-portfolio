@@ -115,12 +115,16 @@ test("360 overview can be paused and reset", async ({page}) => {
   await expect(page.getByRole('button',{name:'Обзор 360°',exact:true})).toHaveAttribute('aria-pressed','false');
 });
 
-test('resting chin stays slightly raised through animation and reset',async({page})=>{
+test('larger portrait keeps its raised rest pose and follows the cursor around its stage',async({page})=>{
   await page.addInitScript(()=>{
     window.portraitScenes=[];
     window.__THREE_DEVTOOLS__=new EventTarget();
     window.__THREE_DEVTOOLS__.addEventListener('observe',event=>{
       if(event.detail.isScene)window.portraitScenes.push(event.detail);
+      if(typeof event.detail.render==='function'){
+        const renderer=event.detail,render=renderer.render;
+        renderer.render=function(scene,camera){window.portraitCamera=camera;return render.call(this,scene,camera);};
+      }
     });
   });
   const pitch=()=>page.evaluate(()=>window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount)?.rotation.x);
@@ -132,13 +136,43 @@ test('resting chin stays slightly raised through animation and reset',async({pag
   await page.goto('/');
   await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/);
   await expectRaised();
+  const scale=await page.evaluate(()=>window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount).scale.x);
+  expect.soft(scale).toBeGreaterThanOrEqual(1.38);
+  expect.soft(scale).toBeLessThanOrEqual(1.42);
   await page.emulateMedia({reducedMotion:'no-preference'});
   const viewport=page.viewportSize();
-  await page.mouse.move(viewport.width/2,viewport.height/2);
+  const rect=await page.locator('.portrait-stage').boundingBox();
+  const cx=rect.x+rect.width/2,cy=rect.y+rect.height/2;
+  await page.mouse.move(cx,cy);
   await expectRaised();
-  await page.waitForTimeout(600);
-  await expectRaised();
+  const yaw=()=>page.evaluate(()=>window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount).rotation.y);
+  const tracking=expect.configure({soft:true,timeout:2000});
+  await tracking.poll(async()=>Math.abs(await yaw())).toBeLessThan(.04);
+  const expectInFrame=async()=>{
+    const extents=await page.evaluate(async()=>{
+      const {Matrix4,Vector3}=await import('/node_modules/three/build/three.module.js');
+      const model=window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount),camera=window.portraitCamera;
+      model.updateWorldMatrix(true,true);camera.updateMatrixWorld();
+      const matrix=new Matrix4(),p=new Vector3(),min=[Infinity,Infinity],max=[-Infinity,-Infinity];
+      for(const band of model.children)for(let i=0;i<band.count;i++){
+        band.getMatrixAt(i,matrix);matrix.premultiply(band.matrixWorld);
+        for(const x of [-.5,.5])for(const y of [-.5,.5])for(const z of [-.5,.5]){
+          p.set(x,y,z).applyMatrix4(matrix).project(camera);
+          min[0]=Math.min(min[0],p.x);min[1]=Math.min(min[1],p.y);
+          max[0]=Math.max(max[0],p.x);max[1]=Math.max(max[1],p.y);
+        }
+      }
+      return [...min,...max];
+    });
+    expect(extents.every(n=>Number.isFinite(n)&&Math.abs(n)<.995),`Projected bounds: ${extents.join(', ')}`).toBe(true);
+  };
+  for(const [x,y,axis,limit,direction] of [[10,cy,yaw,-.9,-1],[viewport.width-10,cy,yaw,.60,1],[cx,0,pitch,-.45,-1],[cx,viewport.height-1,pitch,.25,1]]){
+    await page.mouse.move(x,y);
+    await tracking.poll(async()=>direction*await axis()).toBeGreaterThan(direction*limit);
+    await page.waitForTimeout(500);
+    await expectInFrame();
+  }
   await page.getByRole('button',{name:'Заново',exact:true}).click();
-  await page.mouse.move(viewport.width/2,viewport.height/2);
+  await page.mouse.move(cx,cy);
   await expectRaised();
 });

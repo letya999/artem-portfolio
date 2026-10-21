@@ -81,8 +81,8 @@ def build(template, scan, frame, pitch):
     back=-.10+(back_center[None,:]+.10)*np.sqrt(np.maximum(0,1-ratio*ratio))
     solid=footprint[:,:,None]&(Z>=back[:,:,None])&(Z<=new_front[:,:,None])
     # A narrower neck meets behind the chin instead of projecting through it.
-    neck_w=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.38,.38,.38,.40,.43,.40])
-    neck_d=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.45,.45,.36,.32,.34,.32])
+    neck_w=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.44,.44,.45,.47,.46,.40])
+    neck_d=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.45,.45,.40,.36,.35,.32])
     neck_center=np.interp(Y,[0,.5,1.16],[-.20,-.32,-.36])
     neck=((X/neck_w)**2+((Z-neck_center)/neck_d)**2<=1)&(Y>=0)&(Y<1.16)
     cut=.40+.28*X+.18*(Z+.30)
@@ -158,8 +158,8 @@ def build(template, scan, frame, pitch):
                 cube['feature']='lip-seam' if abs(offset)<.020 else 'lip'
     assert sum(c.get('feature')=='pupil' for c in cubes)==2
     assert sum(c.get('feature') in ('lip','lip-seam') for c in cubes)>10
-    positions,n=template.cube_mesh(.018)
-    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw and mirrored scanned ear relief, with a short obliquely cut neck.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed head/neck shell and a slightly sparse animated neck-cut fringe.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.018,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'neckEdgeCubes':int(on_edge.sum()),'neckEdgeDensity':edge_density,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
+    positions,n=template.cube_mesh(.04)
+    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw and mirrored scanned ear relief, with a short obliquely cut neck.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed head/neck shell and a slightly sparse animated neck-cut fringe.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.04,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'neckEdgeCubes':int(on_edge.sum()),'neckEdgeDensity':edge_density,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
     # Report actual quantization error against measured triangles, not a likeness percentage.
     strong=(weight>.99)&np.isfinite(measured)&~edited
     surface=np.max(np.where(solid,Z,-np.inf),axis=2)

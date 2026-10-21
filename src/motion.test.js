@@ -37,11 +37,22 @@ test("manual disassembly increases separation without unbounded drift", () => {
   assert.ok(a.z > 0.05);
   assert.ok(Math.abs(a.x) <= 0.18);
 });
-test("gaze maps the entire viewport and clamps out-of-window coordinates", () => {
-  assert.deepEqual(cursorTarget(0, 0, 1440, 900), { x: -1, y: -1 });
-  assert.deepEqual(cursorTarget(720, 450, 1440, 900), { x: 0, y: 0 });
-  assert.deepEqual(cursorTarget(1440, 900, 1440, 900), { x: 1, y: 1 });
-  assert.deepEqual(cursorTarget(-20, 1000, 390, 844), { x: -1, y: 1 });
+test("gaze follows the cursor relative to the portrait, including outside its canvas", () => {
+  const target=(x,y)=>cursorTarget(x,y,600,600,700,50);
+  const failures=[];
+  const check=(condition,message)=>{if(!condition)failures.push(message);};
+  const center=target(1000,350);
+  check(center.x===0&&center.y===0,'Cursor over the portrait must look straight ahead');
+  check(target(0,350).x<-1,'Left cursor must turn the full head left');
+  check(target(1440,350).x>.7,'Right cursor must turn the full head right');
+  check(target(1000,0).y<-.45,'Top cursor must lift the head');
+  check(target(1000,900).y>.45,'Bottom cursor must lower the head');
+  for(const point of [[-10000,-10000],[10000,10000]]){
+    const a=target(...point);
+    check(Math.abs(a.x)<=1.35&&Math.abs(a.y)<=.60,'Distant cursor angles must remain bounded');
+  }
+  check(Object.values(cursorTarget(0,0,0,0)).every(Number.isFinite),'Empty viewport must remain finite');
+  assert.deepEqual(failures,[]);
 });
 
 
