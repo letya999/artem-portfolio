@@ -69,3 +69,30 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
   ).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test("portrait responds to a cursor outside its canvas and preserves the photo on asset failure", async ({
+  page,
+}) => {
+  await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
+  await page.goto("/");
+  const stage = page.locator(".portrait-stage");
+  await expect(stage).toHaveClass(/loaded/);
+  await page.clock.pauseAt(new Date("2026-01-01T00:00:10Z"));
+  await page.getByRole("button", { name: "Заново", exact: true }).click();
+  // Both positions are over the left text column, outside the portrait canvas.
+  await page.mouse.move(20, 140);
+  await page.clock.runFor(450);
+  const lookingLeft = await stage.screenshot();
+  await page.mouse.move(500, 600);
+  await page.clock.runFor(450);
+  expect((await stage.screenshot()).equals(lookingLeft)).toBe(false);
+  await page.route("**/head-contours.bin", (route) =>
+    route.fulfill({ status: 503, body: "Unavailable" }),
+  );
+  await page.goto("/");
+  await expect(stage).not.toHaveClass(/loaded/);
+  await expect(stage.locator("img")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Пауза", exact: true }),
+  ).toBeDisabled();
+});

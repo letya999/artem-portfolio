@@ -1,39 +1,49 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { layerPose } from "./motion.js";
-test("reduced motion always displays an assembled static portrait", () => {
-  for (const index of [0, 18, 37])
-    assert.deepEqual(layerPose(index, 0, 1, true), {
-      x: 0,
-      z: 0,
-      rotation: 0,
-      expansion: 1,
-    });
+import { layerPose, cursorTarget } from "./motion.js";
+import { SLICE_COUNT } from "./sculpture.js";
+test("reduced motion keeps all plates assembled even in split mode", () => {
+  for (const time of [0, 5, 10, 100])
+    for (let i = 0; i < SLICE_COUNT; i++)
+      assert.deepEqual(layerPose(i, time, 1, true), {
+        x: 0,
+        z: 0,
+        rotation: 0,
+        expansion: 1,
+      });
 });
-test("opening fragments travel and settle close to a readable portrait", () => {
-  const start = layerPose(9, 0, 0, false);
-  const end = layerPose(9, 5, 0, false);
-  assert.ok(Math.abs(start.x) > 1, "opening must scatter the layers");
-  assert.ok(Math.abs(start.z) > 0.2, "opening needs real depth");
-  assert.ok(Math.abs(start.rotation) > 0.3, "layers rotate on assembly");
-  assert.ok(start.expansion > 1.5, "layers separate vertically");
-  assert.equal(end.x, 0);
-  assert.equal(end.expansion, 1);
+test("every plate completes one smooth revolution and returns to the face each cycle", () => {
+  for (let i = 0; i < SLICE_COUNT; i++) {
+    assert.equal(layerPose(i, 0, 0, false).rotation, 0);
+    assert.equal(layerPose(i, 11, 0, false).rotation, Math.PI * 2);
+    assert.equal(layerPose(i, 12, 0, false).rotation, 0);
+    let previous = 0;
+    for (let t = 0; t < 12; t += 0.1) {
+      const p = layerPose(i, t, 0, false);
+      assert.ok(p.rotation >= previous - 1e-12);
+      assert.ok(p.rotation - previous < 0.3, "no angular snapping");
+      assert.equal(Math.abs(p.x), 0);
+      assert.equal(Math.abs(p.z), 0);
+      previous = p.rotation;
+    }
+  }
   assert.ok(
-    Math.abs(end.rotation) < 0.08,
-    "idle motion must preserve readability",
-  );
-  assert.notEqual(
-    end.rotation,
-    0,
-    "assembled sculpture remains subtly kinetic",
+    Math.abs(
+      layerPose(8, 5, 0, false).rotation - layerPose(54, 5, 0, false).rotation,
+    ) > 1,
   );
 });
-test("disassembly separates and independently rotates settled layers", () => {
-  const a = layerPose(4, 5, 1, false),
-    b = layerPose(28, 5, 1, false);
-  assert.ok(a.expansion > 1);
-  assert.ok(Math.abs(a.rotation - b.rotation) > 0.3);
-  assert.ok(Math.abs(a.z) > 0.05);
-  assert.notEqual(a.x, 0);
+test("manual disassembly increases separation without unbounded drift", () => {
+  const a = layerPose(8, 5, 1, false),
+    b = layerPose(54, 5, 1, false);
+  assert.equal(a.expansion, 1.25);
+  assert.notEqual(a.rotation, b.rotation);
+  assert.ok(a.z > 0.05);
+  assert.ok(Math.abs(a.x) <= 0.18);
+});
+test("gaze maps the entire viewport and clamps out-of-window coordinates", () => {
+  assert.deepEqual(cursorTarget(0, 0, 1440, 900), { x: -1, y: -1 });
+  assert.deepEqual(cursorTarget(720, 450, 1440, 900), { x: 0, y: 0 });
+  assert.deepEqual(cursorTarget(1440, 900, 1440, 900), { x: 1, y: 1 });
+  assert.deepEqual(cursorTarget(-20, 1000, 390, 844), { x: -1, y: 1 });
 });

@@ -1,77 +1,157 @@
 import * as THREE from "three";
-export function makeSlices(texture, pixels) {
+import head from "./head-data.json" with { type: "json" };
+
+export const SLICE_COUNT = head.slices;
+export const CONTOUR_FLOATS =
+  (head.slices * head.rows + 1) * (head.segments + 1) * head.stride;
+
+export function makeSlices(texture, contours) {
+  if (contours.length !== CONTOUR_FLOATS || !contours.every(Number.isFinite)) {
+    throw new Error("Invalid portrait contour asset");
+  }
   const group = new THREE.Group();
+  const gaze = { value: new THREE.Vector2() };
+  group.userData.gaze = gaze;
   const photo = new THREE.MeshStandardMaterial({
     map: texture,
-    roughness: 0.72,
-    metalness: 0.05,
-    envMapIntensity: 0.3,
-    alphaTest: 0.2,
-    side: THREE.DoubleSide,
+    color: 0xd8dadd,
+    roughness: 0.46,
+    metalness: 0.32,
+    envMapIntensity: 0.65,
   });
-  const metal = new THREE.MeshStandardMaterial({
-    color: 0xbfc3c1,
-    metalness: 1,
-    roughness: 0.22,
-    side: THREE.DoubleSide,
-  });
-  for (let i = 0; i < 38; i++) {
-    const v = 0.065 + ((i + 0.5) * 0.57) / 38,
-      row = Math.round(v * 255);
-    let left = 0,
-      right = 255;
-    while (left < 255 && pixels[(row * 256 + left) * 4 + 3] < 100) left++;
-    while (right > left && pixels[(row * 256 + right) * 4 + 3] < 100) right--;
-    const l = left / 255,
-      r = right / 255,
-      h = ((3.45 * 0.57) / 38) * 0.93;
-    const p = [],
-      uv = [],
-      ids = [],
-      walls = [];
-    for (let y = 0; y < 2; y++)
-      for (let x = 0; x <= 36; x++) {
-        const u = l + ((r - l) * x) / 36;
-        const z =
-          0.14 + 0.34 * Math.sqrt(Math.max(0, 1 - ((u - 0.49) / 0.5) ** 2));
-        p.push((u - 0.5) * 3.45, (0.5 - y) * h, z);
-        uv.push(u, 1 - v + ((0.5 - y) * h) / 3.45);
-        if (y === 0 && x < 36)
-          ids.push(x, x + 37, x + 1, x + 1, x + 37, x + 38);
-      }
-    const outline = [
-      ...Array.from({ length: 37 }, (_, x) => x),
-      ...Array.from({ length: 37 }, (_, x) => 73 - x),
-    ];
-    for (let j = 0; j < outline.length; j++) {
-      const a = p.slice(outline[j] * 3, outline[j] * 3 + 3),
-        b = p.slice(
-          outline[(j + 1) % outline.length] * 3,
-          outline[(j + 1) % outline.length] * 3 + 3,
-        );
-      const c = [a[0], a[1], -0.22],
-        d = [b[0], b[1], -0.22];
-      walls.push(...a, ...c, ...b, ...b, ...c, ...d);
-    }
-    const front = new THREE.BufferGeometry();
-    front.setAttribute("position", new THREE.Float32BufferAttribute(p, 3));
-    front.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
-    front.setIndex(ids);
-    front.computeVertexNormals();
-    const side = new THREE.BufferGeometry();
-    side.setAttribute("position", new THREE.Float32BufferAttribute(walls, 3));
-    side.computeVertexNormals();
-    const back = front.clone();
-    for (let j = 0; j < back.attributes.position.count; j++)
-      back.attributes.position.setZ(j, -0.22);
-    back.computeVertexNormals();
-    const layer = new THREE.Group();
-    layer.add(
-      new THREE.Mesh(front, photo),
-      new THREE.Mesh(side, metal),
-      new THREE.Mesh(back, metal),
+  // Shift iris sampling only inside the photographed eye openings; lids stay fixed.
+  photo.onBeforeCompile = (shader) => {
+    shader.uniforms.portraitGaze = gaze;
+    shader.fragmentShader =
+      `uniform vec2 portraitGaze;\n` + shader.fragmentShader;
+    const masks = head.eyes
+      .map(
+        (eye, i) => `
+      vec2 d${i} = vMapUv - vec2(${eye.center.join(",")});
+      d${i} = mat2(${Math.cos(head.eyeAngle)}, ${-Math.sin(head.eyeAngle)}, ${Math.sin(head.eyeAngle)}, ${Math.cos(head.eyeAngle)}) * d${i};
+      float mask${i} = 1.0 - smoothstep(0.45, 1.0, length(d${i} / vec2(${eye.radius.join(",")})));
+    `,
+      )
+      .join("\n");
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <map_fragment>",
+      masks +
+        THREE.ShaderChunk.map_fragment.replace(
+          "texture2D( map, vMapUv )",
+          "texture2D( map, vMapUv - portraitGaze * max(mask0, mask1) )",
+        ),
     );
-    layer.position.y = (0.35 - v) * 3.45;
+  };
+  const metal = new THREE.MeshStandardMaterial({
+    color: 0xaeb5b8,
+    metalness: 1,
+    roughness: 0.25,
+    envMapIntensity: 1.15,
+  });
+  const width = head.segments + 1;
+  for (let slice = 0; slice < head.slices; slice++) {
+    const positions = [],
+      normals = [],
+      uvs = [],
+      indices = [],
+      caps = [];
+    const offset = slice * head.rows * width * head.stride;
+    const top = contours[offset + 1];
+    const bottom = contours[offset + head.rows * width * head.stride + 1];
+    const center = (top + bottom) / 2;
+    const gap = Math.min(0.0035, (top - bottom) * 0.08);
+    for (let row = 0; row <= head.rows; row++) {
+      for (let col = 0; col < width; col++) {
+        const k = offset + (row * width + col) * head.stride;
+        positions.push(
+          contours[k],
+          (contours[k + 1] - center) * (1 - gap / (top - bottom)),
+          contours[k + 2],
+        );
+        uvs.push(contours[k + 3], contours[k + 4]);
+        // Neighbouring contours keep surface lighting continuous across the cut seams.
+        const globalRow = slice * head.rows + row;
+        const prev =
+          (globalRow * width + ((col + head.segments - 1) % head.segments)) *
+          head.stride;
+        const next =
+          (globalRow * width + ((col + 1) % head.segments)) * head.stride;
+        const above = (Math.max(0, globalRow - 1) * width + col) * head.stride;
+        const below =
+          (Math.min(head.slices * head.rows, globalRow + 1) * width + col) *
+          head.stride;
+        const tangent = new THREE.Vector3(
+          contours[next] - contours[prev],
+          0,
+          contours[next + 2] - contours[prev + 2],
+        );
+        const down = new THREE.Vector3(
+          contours[below] - contours[above],
+          contours[below + 1] - contours[above + 1],
+          contours[below + 2] - contours[above + 2],
+        );
+        normals.push(...tangent.cross(down).normalize().toArray());
+      }
+    }
+    const shell = new THREE.BufferGeometry();
+    // Two index ranges allow a photographic face and a polished, fully rounded back.
+    for (let half = 0; half < 2; half++) {
+      const start = indices.length;
+      for (let row = 0; row < head.rows; row++) {
+        for (
+          let col = (half * head.segments) / 2;
+          col < ((half + 1) * head.segments) / 2;
+          col++
+        ) {
+          const a = row * width + col,
+            b = a + width;
+          indices.push(a, a + 1, b, a + 1, b + 1, b);
+        }
+      }
+      shell.addGroup(start, indices.length - start, half);
+    }
+    shell.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(positions, 3),
+    );
+    shell.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+    shell.setIndex(indices);
+    shell.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+    for (const row of [0, head.rows]) {
+      let x = 0,
+        z = 0;
+      for (let col = 0; col < head.segments; col++) {
+        const k = (row * width + col) * 3;
+        x += positions[k];
+        z += positions[k + 2];
+      }
+      const middle = [
+        x / head.segments,
+        positions[row * width * 3 + 1],
+        z / head.segments,
+      ];
+      for (let col = 0; col < head.segments; col++) {
+        const a = (row * width + col) * 3,
+          b = a + 3;
+        const first = positions.slice(a, a + 3),
+          next = positions.slice(b, b + 3);
+        caps.push(
+          ...middle,
+          ...(row === 0 ? next : first),
+          ...(row === 0 ? first : next),
+        );
+      }
+    }
+    const cap = new THREE.BufferGeometry();
+    cap.setAttribute("position", new THREE.Float32BufferAttribute(caps, 3));
+    cap.computeVertexNormals();
+    const layer = new THREE.Group();
+    layer.userData.restY = center;
+    layer.position.y = center;
+    layer.add(
+      new THREE.Mesh(shell, [photo, metal]),
+      new THREE.Mesh(cap, metal),
+    );
     group.add(layer);
   }
   return group;

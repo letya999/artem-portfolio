@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { makeSlices } from "./sculpture.js";
-import { layerPose } from "./motion.js";
+import { layerPose, cursorTarget } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
     control = useRef({ paused: false, spread: false, replay: 0 });
@@ -13,7 +13,7 @@ export default function Portrait() {
     const host = ref.current,
       scene = new THREE.Scene(),
       camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
-    camera.position.set(0, 0.05, 6.15);
+    camera.position.set(0, 0.1, 6.15);
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -21,6 +21,8 @@ export default function Portrait() {
       return;
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
     host.appendChild(renderer.domElement);
     const pmrem = new THREE.PMREMGenerator(renderer),
       room = new RoomEnvironment(),
@@ -49,16 +51,19 @@ export default function Portrait() {
       replay = 0,
       visible = true;
     const pointer = { x: 0, y: 0 };
+    const gazeTarget = new THREE.Vector2();
     const move = (e) => {
-      const r = host.getBoundingClientRect();
-      pointer.x = (e.clientX - r.left) / r.width - 0.5;
-      pointer.y = (e.clientY - r.top) / r.height - 0.5;
+      Object.assign(
+        pointer,
+        cursorTarget(e.clientX, e.clientY, innerWidth, innerHeight),
+      );
     };
     const leave = () => {
       pointer.x = pointer.y = 0;
     };
-    host.addEventListener("pointermove", move);
-    host.addEventListener("pointerleave", leave);
+    window.addEventListener("pointermove", move, { passive: true });
+    document.documentElement.addEventListener("pointerleave", leave);
+    window.addEventListener("blur", leave);
     const visibleObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
     });
@@ -70,28 +75,40 @@ export default function Portrait() {
       renderer.setAnimationLoop(null);
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
-    new THREE.TextureLoader().load(
-      "./portrait.png",
-      (t) => {
-        if (disposed) {
-          t.dispose();
-          return;
-        }
-        texture = t;
-        t.colorSpace = THREE.SRGBColorSpace;
-        const c = document.createElement("canvas");
-        c.width = c.height = 256;
-        const ctx = c.getContext("2d");
-        ctx.drawImage(t.image, 0, 0, 256, 256);
-        sculpture = makeSlices(t, ctx.getImageData(0, 0, 256, 256).data);
-        sculpture.scale.setScalar(1.5);
+    const abort = new AbortController();
+    Promise.allSettled([
+      new THREE.TextureLoader().loadAsync("./portrait.png"),
+      fetch("./head-contours.bin", { signal: abort.signal }).then((r) => {
+        if (!r.ok) throw new Error("Portrait geometry unavailable");
+        return r.arrayBuffer();
+      }),
+    ]).then(([image, mesh]) => {
+      if (image.status === "fulfilled") texture = image.value;
+      if (
+        disposed ||
+        image.status !== "fulfilled" ||
+        mesh.status !== "fulfilled"
+      ) {
+        texture?.dispose();
+        if (!disposed) setReady(false);
+        return;
+      }
+      try {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = Math.min(
+          8,
+          renderer.capabilities.getMaxAnisotropy(),
+        );
+        sculpture = makeSlices(texture, new Float32Array(mesh.value));
+        sculpture.scale.setScalar(1.08);
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
-      },
-      undefined,
-      () => setReady(false),
-    );
+      } catch {
+        texture.dispose();
+        setReady(false);
+      }
+    });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     renderer.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
@@ -112,29 +129,40 @@ export default function Portrait() {
         layer.position.x = p.x;
         layer.position.z = p.z;
         layer.rotation.y = p.rotation;
-        layer.position.y =
-          (0.35 - (0.065 + ((i + 0.5) * 0.57) / 38)) * 3.45 * p.expansion;
+        layer.position.y = layer.userData.restY * p.expansion;
       });
       sculpture.rotation.y +=
-        ((reduced.matches ? 0 : pointer.x * 0.28) - sculpture.rotation.y) *
-        0.04;
+        ((reduced.matches ? 0 : pointer.x * 0.38) - sculpture.rotation.y) *
+        (1 - Math.exp(-dt * 5));
       sculpture.rotation.x +=
-        ((reduced.matches ? 0 : pointer.y * 0.12) - sculpture.rotation.x) *
-        0.04;
+        ((reduced.matches ? 0 : pointer.y * 0.18) - sculpture.rotation.x) *
+        (1 - Math.exp(-dt * 5));
+      const gaze = sculpture.userData.gaze.value;
+      gaze.lerp(
+        gazeTarget.set(
+          reduced.matches ? 0 : pointer.x * 0.006,
+          reduced.matches ? 0 : -pointer.y * 0.0025,
+        ),
+        1 - Math.exp(-dt * 9),
+      );
       renderer.render(scene, camera);
     });
     return () => {
       disposed = true;
+      abort.abort();
+      host.classList.remove("loaded");
       renderer.setAnimationLoop(null);
       resize.disconnect();
       visibleObserver.disconnect();
-      host.removeEventListener("pointermove", move);
-      host.removeEventListener("pointerleave", leave);
+      window.removeEventListener("pointermove", move);
+      document.documentElement.removeEventListener("pointerleave", leave);
+      window.removeEventListener("blur", leave);
       renderer.domElement.removeEventListener("webglcontextlost", lost);
       const mats = new Set();
       scene.traverse((o) => {
         o.geometry?.dispose();
-        if (o.material) mats.add(o.material);
+        if (Array.isArray(o.material)) o.material.forEach((m) => mats.add(m));
+        else if (o.material) mats.add(o.material);
       });
       mats.forEach((m) => m.dispose());
       texture?.dispose();
