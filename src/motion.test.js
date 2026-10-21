@@ -12,21 +12,18 @@ test("reduced motion keeps all plates assembled even in split mode", () => {
         expansion: 1,
       });
 });
-test("only three plates turn occasionally and all return to alignment", () => {
+test("assembled horizontal slices stay aligned while cube waves run", () => {
   for (let cycle = 0; cycle < 2; cycle++) {
     const offset = cycle * 24;
     for (let i = 0; i < SLICE_COUNT; i++) {
-      assert.equal(layerPose(i, offset + 5, 0, false).rotation, 0);
-      assert.ok(
-        Math.abs(Math.sin(layerPose(i, offset + 18, 0, false).rotation)) <
-          1e-12,
-      );
+      assert.equal(Math.abs(layerPose(i, offset + 5, 0, false).rotation), 0);
+      assert.equal(Math.abs(layerPose(i, offset + 18, 0, false).rotation),0);
     }
     const moving = Array.from(
       { length: SLICE_COUNT },
       (_, i) => layerPose(i, offset + 11, 0, false).rotation,
     ).filter((r) => r > 0 && r < Math.PI * 2);
-    assert.equal(moving.length, 3);
+    assert.equal(moving.length, 0);
   }
 });
 test("manual disassembly increases separation without unbounded drift", () => {

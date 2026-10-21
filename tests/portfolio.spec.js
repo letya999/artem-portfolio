@@ -264,3 +264,71 @@ test('eyes blink and brows respond locally while pause and reduced motion hold t
   expect(eyePixels,'Ocular movement must remain visible at a 512px preview size').toBeGreaterThan(50);
   expect(errors).toEqual([]);
 });
+
+test('cube ripples travel across the surface, restore the cubes and recur every 3 to 10 seconds',async({page})=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  await page.addInitScript(()=>{
+    window.portraitScenes=[];window.__THREE_DEVTOOLS__=new EventTarget();
+    window.__THREE_DEVTOOLS__.addEventListener('observe',event=>{
+      if(event.detail.isScene)window.portraitScenes.push(event.detail);
+      if(typeof event.detail.render==='function'){
+        const renderer=event.detail,render=renderer.render;
+        renderer.render=function(scene,camera){window.portraitRenderer=renderer;window.portraitCamera=camera;return render.call(this,scene,camera);};
+      }
+    });
+  });
+  await page.clock.install();await page.goto('/');
+  await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/);
+  await page.clock.pauseAt(new Date(Date.now()+1000));
+  const state=()=>page.evaluate(()=>{
+    const wave=window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount).userData.cubeWave;
+    return wave?{...wave.state,enabled:wave.enabled.value,sources:wave.sources.length}:{next:0,started:-10,source:-1,enabled:0,sources:0};
+  });
+  const initial=await state();
+  expect.soft(initial.next).toBeGreaterThanOrEqual(3);expect.soft(initial.next).toBeLessThanOrEqual(10);
+  const pixels=await page.evaluate(async()=>{
+    const {WebGLRenderTarget}=await import('/node_modules/three/build/three.module.js');
+    const scene=window.portraitScenes.find(s=>s.children.some(o=>o.userData.cubeCount));
+    const model=scene.children.find(o=>o.userData.cubeCount),renderer=window.portraitRenderer,wave=model.userData.cubeWave;
+    model.userData.expression.value.set(0,0);model.userData.gaze.value.set(0,0);
+    if(wave){wave.enabled.value=1;wave.start.value=0;wave.origin.value.set(0,1.8,.65);wave.axis.value.set(.9,.3,.1).normalize();}
+    const target=new WebGLRenderTarget(512,512),previous=renderer.getRenderTarget(),frames=[];
+    try{
+      renderer.setRenderTarget(target);
+      for(const time of [0,.9,3]){
+        model.userData.motionTime.value=time;renderer.render(scene,window.portraitCamera);
+        const pixels=new Uint8Array(512*512*4);renderer.readRenderTargetPixels(target,0,0,512,512,pixels);frames.push(pixels);
+      }
+      const changes=frame=>{
+        let changed=0;for(let i=0;i<frame.length;i+=4)if(Math.abs(frame[i]-frames[0][i])+Math.abs(frame[i+1]-frames[0][i+1])+Math.abs(frame[i+2]-frames[0][i+2])>20)changed++;return changed;
+      };
+      return {peak:changes(frames[1]),restored:changes(frames[2])};
+    }finally{
+      renderer.setRenderTarget(previous);target.dispose();
+      if(wave){wave.state.started=-10;wave.state.next=3;wave.start.value=-10;wave.enabled.value=0;}
+    }
+  });
+  expect.soft(pixels.peak,'A travelling wave must visibly flip individual cubes').toBeGreaterThan(100);
+  expect.soft(pixels.restored,'Cubes must return exactly to their resting geometry').toBe(0);
+  const events=[];
+  for(let i=0;i<14;i++){
+    await page.clock.runFor(1000);const current=await state();
+    if(current.started>=0&&events.at(-1)?.started!==current.started)events.push(current);
+  }
+  expect.soft(events.length,'Waves must recur rather than run once').toBeGreaterThanOrEqual(2);
+  for(const event of events){
+    expect.soft(event.next-event.started).toBeGreaterThanOrEqual(3);expect.soft(event.next-event.started).toBeLessThanOrEqual(10);
+    expect.soft(event.source).toBeGreaterThanOrEqual(0);expect.soft(event.source).toBeLessThan(event.sources);
+  }
+  await page.getByRole('button',{name:'Пауза',exact:true}).click();
+  const frozen=await state();await page.clock.runFor(1000);expect(await state()).toEqual(frozen);
+  await page.getByRole('button',{name:'Пуск',exact:true}).click();
+  await page.getByRole('button',{name:'Заново',exact:true}).click();await page.clock.runFor(100);
+  const reset=await state();
+  expect(reset.started,'Reset must cancel the previous ripple').toBeLessThan(0);
+  expect(reset.next).toBeGreaterThanOrEqual(3);expect(reset.next).toBeLessThanOrEqual(10);
+  await page.emulateMedia({reducedMotion:'reduce'});await page.clock.runFor(100);
+  expect((await state()).enabled).toBe(0);
+  expect(errors).toEqual([]);
+});

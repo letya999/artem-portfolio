@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { makeVoxelPortrait, poseVoxelPortrait } from "./voxel.js";
+import { makeVoxelPortrait, poseVoxelPortrait, updateCubeWave } from "./voxel.js";
 import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
@@ -132,6 +132,9 @@ export default function Portrait() {
       const c = control.current;
       if (c.replay !== replay) {
         time = 0;
+        const wave=sculpture.userData.cubeWave;
+        wave.state.started=wave.start.value=-10;
+        wave.state.next=3+Math.random()*7;
         spinAngle = 0;
         overview.value = overview.velocity = 0;
         replay = c.replay;
@@ -168,6 +171,7 @@ export default function Portrait() {
       sculpture.userData.expression.value.set(reduced.matches||c.spinning?0:blink,reduced.matches||c.spinning?0:browLift);
       sculpture.userData.motionTime.value=time;
       sculpture.userData.motionAmount.value=reduced.matches?0:1;
+      updateCubeWave(sculpture,time,!reduced.matches&&!c.spinning&&amount<.01);
       const eyeX=stepSpring(eyeYaw,following?THREE.MathUtils.clamp(pointer.x,-1.15,1.15):head.y,dt,24);
       const eyeY=stepSpring(eyePitch,following?THREE.MathUtils.clamp(pointer.y,-.52,.52):head.x-sculpture.userData.restPitch,dt,24);
       sculpture.userData.gaze.value.set(
@@ -190,6 +194,7 @@ export default function Portrait() {
       const mats = new Set();
       scene.traverse((o) => {
         o.geometry?.dispose();
+        if(o.customDepthMaterial)mats.add(o.customDepthMaterial);
         if (Array.isArray(o.material)) o.material.forEach((m) => mats.add(m));
         else if (o.material) mats.add(o.material);
       });

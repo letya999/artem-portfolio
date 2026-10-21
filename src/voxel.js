@@ -1,5 +1,46 @@
 import * as THREE from 'three';
 
+function applyCubeWave(shader,wave,cubeSize){
+  Object.assign(shader.uniforms,{portraitWaveTime:wave.time,portraitWaveStart:wave.start,portraitWaveEnabled:wave.enabled,portraitWaveOrigin:wave.origin,portraitWaveAxis:wave.axis,portraitWaveCubeSize:{value:cubeSize}});
+  shader.vertexShader=`attribute vec4 instanceWavePosition;
+    uniform float portraitWaveTime,portraitWaveStart,portraitWaveEnabled,portraitWaveCubeSize;
+    uniform vec3 portraitWaveOrigin,portraitWaveAxis;
+    float cubeWavePhase(){
+      if(portraitWaveEnabled<.5||instanceWavePosition.w<.5)return -1.0;
+      return (portraitWaveTime-portraitWaveStart-distance(instanceWavePosition.xyz,portraitWaveOrigin)*.62)/.48;
+    }
+    mat3 cubeWaveRotation(float phase){
+      float angle=6.28318530718*phase*phase*(3.0-2.0*phase);
+      float c=cos(angle),s=sin(angle),v=1.0-c;vec3 a=portraitWaveAxis;
+      return mat3(c+a.x*a.x*v,a.y*a.x*v+a.z*s,a.z*a.x*v-a.y*s,
+        a.x*a.y*v-a.z*s,c+a.y*a.y*v,a.z*a.y*v+a.x*s,
+        a.x*a.z*v+a.y*s,a.y*a.z*v-a.x*s,c+a.z*a.z*v);
+    }\n`+shader.vertexShader;
+  shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+    float vertexWavePhase=cubeWavePhase();
+    if(vertexWavePhase>0.0&&vertexWavePhase<1.0){
+      transformed=cubeWaveRotation(vertexWavePhase)*transformed;
+      float lift=sin(3.14159265359*vertexWavePhase);
+      vec3 outward=normalize(instanceWavePosition.xyz-vec3(0.0,1.8,-.1));
+      transformed+=(outward*.014+portraitWaveAxis*.004)*lift*lift/portraitWaveCubeSize;
+    }`);
+  shader.vertexShader=shader.vertexShader.replace('#include <defaultnormal_vertex>',`
+    float normalWavePhase=cubeWavePhase();
+    if(normalWavePhase>0.0&&normalWavePhase<1.0)objectNormal=cubeWaveRotation(normalWavePhase)*objectNormal;
+    #include <defaultnormal_vertex>`);
+}
+
+export function updateCubeWave(model,time,enabled,random=Math.random){
+  const wave=model.userData.cubeWave,state=wave.state;
+  if(enabled&&wave.sources.length&&time>=state.next){
+    state.source=Math.floor(random()*wave.sources.length);
+    state.started=time;state.next=time+3+random()*7;
+    wave.start.value=time;wave.origin.value.fromArray(wave.sources[state.source]);
+    wave.axis.value.set(wave.origin.value.z+.1,.25,-wave.origin.value.x).normalize();
+  }
+  wave.enabled.value=enabled&&state.started>=0&&time-state.started<2.7?1:0;
+}
+
 // The neck cap stays rooted; cervical rotation reaches the rigid skull gradually.
 export function poseVoxelPortrait(model, rotation) {
   const pivot = model.userData.neckPivot;
@@ -33,6 +74,9 @@ export function makeVoxelPortrait(data) {
   }
   const material = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 1, roughness: .32, envMapIntensity: 1.1});
   const motionTime={value:0},motionAmount={value:0},gaze={value:new THREE.Vector2()},expression={value:new THREE.Vector2()};
+  const cubeWave={time:motionTime,start:{value:-10},enabled:{value:0},origin:{value:new THREE.Vector3()},axis:{value:new THREE.Vector3(1,0,0)},sources:[],state:{started:-10,next:3+Math.random()*7,source:0}};
+  const depthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking});
+  depthMaterial.onBeforeCompile=shader=>applyCubeWave(shader,cubeWave,data.cubeSize);
   material.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,{portraitTime:motionTime,portraitMotion:motionAmount,portraitGaze:gaze,portraitExpression:expression,portraitCubeSize:{value:data.cubeSize}});
     shader.vertexShader='attribute vec3 instanceSurfaceNormal; attribute vec2 instanceMotion; attribute float instancePupil; attribute vec4 instanceFace; uniform float portraitTime; uniform float portraitMotion; uniform vec2 portraitGaze; uniform vec2 portraitExpression; uniform float portraitCubeSize;\n'+shader.vertexShader;
@@ -50,6 +94,7 @@ export function makeVoxelPortrait(data) {
       float facing = max(0.0, dot(objectNormal, instanceSurfaceNormal));
       float relief = objectNormal.z > 0.8 && instanceSurfaceNormal.z > 0.1 ? 0.95 : pow(facing, 4.0) * 0.85;
       objectNormal = normalize(mix(objectNormal, instanceSurfaceNormal, relief));`);
+    applyCubeWave(shader,cubeWave,data.cubeSize);
   };
   const group = new THREE.Group(), bands = new Map();
   data.cubes.forEach(c => {
@@ -62,12 +107,21 @@ export function makeVoxelPortrait(data) {
   });
   const matrix = new THREE.Matrix4(), position = new THREE.Vector3(), rotation = new THREE.Quaternion(), scale = new THREE.Vector3().setScalar(data.cubeSize), color = new THREE.Color();
   const centerY = (data.bounds.min[1] + data.bounds.max[1]) / 2;
+  const cells=data.cubes.map(c=>c.position.map((v,i)=>Math.round(v/data.pitch-(i===1?.5:0))));
+  const occupied=new Set(cells.map(cell=>cell.join(','))),surface=new Set();
+  data.cubes.forEach((cube,i)=>{
+    if(cube.position[1]<.78)return;
+    const [x,y,z]=cells[i];
+    if([[x-1,y,z],[x+1,y,z],[x,y-1,z],[x,y+1,z],[x,y,z-1],[x,y,z+1]].some(cell=>!occupied.has(cell.join(','))))surface.add(cube);
+  });
+  cubeWave.sources=[...surface].map(cube=>cube.position);
   const pupils = data.cubes.filter(c=>c.feature==='pupil');
   [...bands].sort((a,b) => a[0]-b[0]).forEach(([row, cubes]) => {
     const bandGeometry=geometry.clone();
     bandGeometry.setAttribute('instanceSurfaceNormal',new THREE.InstancedBufferAttribute(new Float32Array(cubes.flatMap(c=>c.normal??[0,0,1])),3));
     bandGeometry.setAttribute('instanceMotion',new THREE.InstancedBufferAttribute(new Float32Array(cubes.flatMap(c=>[c.motion??0,c.id*2.39996323])),2));
     bandGeometry.setAttribute('instancePupil',new THREE.InstancedBufferAttribute(new Float32Array(cubes.map(c=>c.feature==='pupil'?1:0)),1));
+    bandGeometry.setAttribute('instanceWavePosition',new THREE.InstancedBufferAttribute(new Float32Array(cubes.flatMap(c=>[...c.position,surface.has(c)?1:0])),4));
     bandGeometry.setAttribute('instanceFace',new THREE.InstancedBufferAttribute(new Float32Array(cubes.flatMap(c=>{
       const eye=pupils.find(p=>Math.abs(c.position[0]-p.position[0])<.14);
       if(!eye||c.position[2]<eye.position[2]-.04||(c.normal?.[2]??0)<.1)return [0,0,0,0];
@@ -78,6 +132,7 @@ export function makeVoxelPortrait(data) {
     const layer = new THREE.InstancedMesh(bandGeometry, material, cubes.length);
     const y = row * data.pitch;
     layer.castShadow = layer.receiveShadow = true;
+    layer.customDepthMaterial=depthMaterial;
     layer.position.y = y - centerY;
     layer.userData.restY = layer.position.y;
     const neckT=THREE.MathUtils.clamp((y-.46)/(.74-.46),0,1);
@@ -102,6 +157,7 @@ export function makeVoxelPortrait(data) {
   fillGeometry.setAttribute('instanceMotion',new THREE.InstancedBufferAttribute(new Float32Array(fillCount*2),2));
   fillGeometry.setAttribute('instancePupil',new THREE.InstancedBufferAttribute(new Float32Array(fillCount),1));
   fillGeometry.setAttribute('instanceFace',new THREE.InstancedBufferAttribute(new Float32Array(fillCount*4),4));
+  fillGeometry.setAttribute('instanceWavePosition',new THREE.InstancedBufferAttribute(new Float32Array(fillCount*4),4));
   const neckFill=new THREE.InstancedMesh(fillGeometry,material,fillCount),rest=[],weights=[];
   for(const [i,cube] of fillCubes.entries()){
     rest.push(cube.position[0],cube.position[1]-centerY,cube.position[2]);
@@ -109,10 +165,11 @@ export function makeVoxelPortrait(data) {
     const shade=.68+.05*Math.sin(i*12.9898);neckFill.setColorAt(i,color.setRGB(shade,shade,shade));
   }
   neckFill.castShadow=neckFill.receiveShadow=true;
+  neckFill.customDepthMaterial=depthMaterial;
   Object.assign(neckFill.userData,{rest:new Float32Array(rest),weights:new Float32Array(weights),point:new THREE.Vector3(),euler:new THREE.Euler(),quaternion:new THREE.Quaternion(),matrix:new THREE.Matrix4(),scale:new THREE.Vector3().setScalar(data.cubeSize)});
   group.children[0].add(neckFill);
   group.rotation.order='YXZ';
-  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,neckFill,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
+  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,neckFill,cubeWave,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
   group.userData.cubeCount = data.count;
   poseVoxelPortrait(group,group.userData.headRotation);
   return group;
