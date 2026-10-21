@@ -60,3 +60,10 @@ Before a new reconstruction, preserve the current `fitted.json` and `fitted-smil
 The current preview loads the four-photo fitted face completed with skull, ears, a shortened flared neck and a bevelled two-step plinth. Each export has 73,835 vertices and 146,822 triangles. Completion asserts that every original face vertex is unchanged. The rear cap uses one pole vertex, and the outer patch winding is matched to the source boundary. `plinthStart` separates the base material in the indexed JSON; OBJ exports contain the geometry without viewer materials.
 
 The viewer offers full-bust/face-only comparison, neutral/smile, matte/metal and pointer rotation. Desktop controls and a 390px mobile viewport were checked; horizontal overflow was fixed. Scalp/ear joins remain approximate, and the separate neck/ear components are not a watertight print mesh. No portrait accuracy claim or publication clearance is implied.
+
+
+## Metal tile transfer
+
+`python scripts/tile-research-bust.py qa/reconstruction/fitted-head.json qa/reconstruction/portrait-tiles.json` intersects the actual fitted bust mesh with 73 horizontal planes. For each plane, ray/segment intersection selects the outer contour, avoiding inner neck and face intersections. Adjacent contours form planar, inset quadrilateral tiles consumed by the existing closed/bevelled tile renderer. The current output has 5,872 tiles in 72 animated bands. Tile projection approximates the source mesh; undercuts and cavities cannot all survive a radial contour representation.
+
+The portfolio dev server loads this ignored research asset. Production builds continue using the previous distributable asset, because BFM-derived geometry has not been cleared for publication. No photo texture is applied to the tiles. Desktop/mobile browser rendering reported no console errors; existing motion, validation and browser interaction tests were rerun. The full smooth bust remains available in the research viewer.
