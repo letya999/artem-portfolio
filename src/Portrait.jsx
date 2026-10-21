@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { makeSlices } from "./sculpture.js";
+import { makeVoxelPortrait } from "./voxel.js";
 import { layerPose, cursorTarget } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
@@ -22,17 +22,24 @@ export default function Portrait() {
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = .88;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     host.appendChild(renderer.domElement);
     const pmrem = new THREE.PMREMGenerator(renderer),
       room = new RoomEnvironment();
-    const env = pmrem.fromScene(room, 0.12);
+    const env = pmrem.fromScene(room, 0.035);
     scene.environment = env.texture;
     room.dispose();
     pmrem.dispose();
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x363c44, 0.65));
-    const light = new THREE.DirectionalLight(0xffffff, 0.9);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x363c44, 0.25));
+    const light = new THREE.DirectionalLight(0xffffff, 2.4);
     light.position.set(-3, 3, 5);
+    light.castShadow = true;
+    light.shadow.mapSize.set(2048, 2048);
+    Object.assign(light.shadow.camera, {left: -3, right: 3, top: 3, bottom: -3, near: .1, far: 15});
+    light.shadow.normalBias = .008;
+    light.shadow.bias = -.0001;
     scene.add(light);
     const resize = new ResizeObserver(() => {
       const r = host.getBoundingClientRect();
@@ -44,7 +51,6 @@ export default function Portrait() {
     });
     resize.observe(host);
     let sculpture,
-      texture,
       disposed = false,
       time = 0,
       last = performance.now(),
@@ -52,7 +58,6 @@ export default function Portrait() {
       replay = 0,
       visible = true;
     const pointer = { x: 0, y: 0 };
-    const gazeTarget = new THREE.Vector2();
     const move = (e) => {
       Object.assign(
         pointer,
@@ -77,33 +82,16 @@ export default function Portrait() {
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
     const abort = new AbortController();
-    Promise.allSettled([
-      new THREE.TextureLoader().loadAsync("./artem-reference.png"),
-      fetch("./head-contours.bin", { signal: abort.signal }).then((r) => {
-        if (!r.ok) throw new Error("Portrait geometry unavailable");
-        return r.arrayBuffer();
-      }),
-    ]).then(([photo, mesh]) => {
-      if (photo.status === "fulfilled") texture = photo.value;
-      if (
-        disposed ||
-        photo.status !== "fulfilled" ||
-        mesh.status !== "fulfilled"
-      ) {
-        texture?.dispose();
-        return;
-      }
-      try {
-        texture.colorSpace = THREE.SRGBColorSpace;
-        sculpture = makeSlices(new Float32Array(mesh.value), texture);
-        sculpture.scale.setScalar(0.98);
+    fetch("./voxel-portrait.json", { signal: abort.signal })
+      .then(r => { if (!r.ok) throw new Error("Portrait unavailable"); return r.json(); })
+      .then(data => {
+        if (disposed) return;
+        sculpture = makeVoxelPortrait(data);
+        sculpture.scale.setScalar(1.12);
         scene.add(sculpture);
         host.classList.add("loaded");
         setReady(true);
-      } catch {
-        texture.dispose();
-      }
-    });
+      }).catch(() => { /* The original portrait remains visible on load failure. */ });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     renderer.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
@@ -119,26 +107,18 @@ export default function Portrait() {
       const target = reduced.matches ? 0 : c.spread ? 1 : 0;
       amount += (target - amount) * (1 - Math.exp(-dt * 5));
       sculpture.children.forEach((layer, i) => {
-        const p = layerPose(i, time, amount, reduced.matches);
+        const p = layerPose(Math.round(i / (sculpture.children.length - 1) * 41), time, amount, reduced.matches);
         layer.position.x = p.x;
         layer.position.z = p.z;
         layer.rotation.y = p.rotation;
         layer.position.y = layer.userData.restY * p.expansion;
       });
       sculpture.rotation.y +=
-        ((reduced.matches ? 0 : pointer.x * 0.18) - sculpture.rotation.y) *
+        ((reduced.matches ? 0 : pointer.x * 0.30) - sculpture.rotation.y) *
         (1 - Math.exp(-dt * 5));
       sculpture.rotation.x +=
-        ((reduced.matches ? 0 : pointer.y * 0.1) - sculpture.rotation.x) *
+        ((reduced.matches ? 0 : pointer.y * 0.14) - sculpture.rotation.x) *
         (1 - Math.exp(-dt * 5));
-      const gaze = sculpture.userData.gaze.value;
-      gaze.lerp(
-        gazeTarget.set(
-          reduced.matches ? 0 : pointer.x * 0.0035,
-          reduced.matches ? 0 : -pointer.y * 0.0015,
-        ),
-        1 - Math.exp(-dt * 9),
-      );
       renderer.render(scene, camera);
     });
     return () => {
@@ -159,7 +139,7 @@ export default function Portrait() {
         else if (o.material) mats.add(o.material);
       });
       mats.forEach((m) => m.dispose());
-      texture?.dispose();
+      light.shadow.dispose();
       env.dispose();
       renderer.dispose();
       renderer.domElement.remove();
