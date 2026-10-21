@@ -1,11 +1,7 @@
 # Visual direction
 
-Monochrome editorial engineering. User-pinned hybrid of typesafe.ai and olhalazarieva.com. Manrope, oversized name, strict alignment, black / white / light grey fields, rare electric lime accents. No portraits supplied; do not invent a person. Real CV content only.
+The owner rejected all three static mockups and requested a complex 3D hero inspired by the rotating Kafka head in Prague, combined with a big-bang assembly. Two owner-supplied photographs now replace the earlier absence of portrait assets. The follow-up authorizes a working browser prototype.
 
-The user's requested structural motion becomes a project delivery diagram assembling from separate workstreams into a shared release. Preserve native scrolling, readable static states and reduced motion. Hiring audience; contact and downloadable CV are primary actions.
+Light monochrome editorial layout, oversized Oswald name and Manrope text, restrained green accents. The central object is a photographic relief made from 38 separate rotating horizontal slices, with metallic sides. This is an art-directed relief, not anatomical 3D reconstruction. A generated monochrome cutout preserves the supplied portrait; the second photograph appears in the biography.
 
-Taste direction: Type and nothing else, seed 1505328196. Use its type scale and varied editorial compositions. The brief's engineering diagram replaces generic atmospheric stock photography; no fictitious work imagery. Impeccable seed 70989a42 is subordinate to the user's pinned references. Prepare three compositions of this same world for approval before UI implementation.
-
-## Composition round
-
-The owner explicitly requested image mockups before implementation. Three generated compositions were presented: light split hero, dark full-width hero, and light horizontal editorial hero. Awaiting the owner's selection. These are still images, not implemented or validated UI. Generated lettering is a direction reference; production will use real selectable text with licensed fonts and correct responsive behavior.
+The previous image comps are rejected references, not implementation specifications. Content comes from the CV; estimates and projections remain labelled. Respect native scrolling, pause controls, reduced motion and portrait fallback.

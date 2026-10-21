@@ -8,3 +8,5 @@ dist/
 .taste-skill/
 qa/
 *.log
+test-results/
+playwright-report/

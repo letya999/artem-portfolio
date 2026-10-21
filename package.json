@@ -1,1 +1,25 @@
-{"name":"artem-portfolio","private":true,"version":"1.0.0","type":"module","scripts":{"dev":"vite --host 127.0.0.1","build":"vite build","preview":"vite preview --host 127.0.0.1"},"dependencies":{"@fontsource-variable/manrope":"5.3.0","@fontsource-variable/oswald":"5.3.0","react":"19.3.1","react-dom":"19.3.1","three":"0.186.1"},"devDependencies":{"@playwright/test":"1.64.1","@vitejs/plugin-react":"6.1.2","vite":"8.3.4"}}
+{
+  "name": "artem-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test src/motion.test.js src/sculpture.test.js",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/oswald": "5.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@vitejs/plugin-react": "6.1.2",
+    "vite": "8.3.4"
+  }
+}
