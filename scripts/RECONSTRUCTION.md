@@ -80,3 +80,9 @@ Run `python scripts/prepare-owner-scan.py INPUT.glb OUTPUT_DIRECTORY`, then `pyt
 The resulting distributable `public/portrait-tiles.json` contains 4,239 closed tile elements in 60 bands. It replaces the BFM-derived local-only experiment in both dev and production. No BFM mesh, basis, or photo texture is used in this new asset. Source GLB and personal photographs remain ignored; only the derived display geometry is committed. This does not constitute a general licensing review of the user's scanner application.
 
 Radial slicing interpolates small contour gaps and simplifies ear cavities and other undercuts. The preview is an artistic metal bust, not a fabrication-ready scan. Tiles have more visible bevels and reduced random shade variation. Original landmark-fit assertions were replaced by volumetric-depth and full-height assertions, since this asset is measured scan geometry rather than a 468-landmark reconstruction.
+
+## Bust refinement and 360 controls
+
+Removed the pedestal and added a shallow shoulder termination. The unmeasured back now uses a smooth rounded contour with a crown blend, rather than inheriting the scan's torn posterior boundary. Ear-angle contours receive localized smoothing to suppress folded tile fans; deep concha/helix undercuts remain simplified by radial tiling. The current asset contains 4,671 elements in 60 bands.
+
+Cursor yaw range increased to +/-1.05 radians and pitch to +/-0.38. Per-tile eye/brow weights drive small shader offsets (0.012/0.016 model units); this is subtle mechanical expression, not an anatomical eyeball or facial-muscle rig. Reduced-motion disables automatic following/expression. The explicit 360-degree overview button starts/stops rotation; pause freezes it, and reset returns to the default controls. Tests cover feature-weight bounds, rotation changes, pause stability, reset state and mobile overflow.

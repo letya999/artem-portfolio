@@ -16,6 +16,9 @@ test('scanned bust retains full depth, closed bevelled tiles and finite normals'
   const p=layer.geometry.attributes.position.array,n=layer.geometry.attributes.normal.array;
   assert.ok([...p,...n].every(Number.isFinite));
   assert.equal(layer.material.map,null);
+  const features=layer.geometry.attributes.portraitFeature;
+  assert.equal(features.count,p.length/3);
+  assert.ok([...features.array].every(v=>Number.isFinite(v)&&v>=0&&v<=1));
   triangles+=p.length/9;
   layer.geometry.dispose();
  }

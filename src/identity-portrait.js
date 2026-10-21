@@ -13,13 +13,28 @@ export function makeIdentityPortrait(data) {
   if(count!==data.tileCount)throw new Error('Portrait tile count mismatch');
   const group=new THREE.Group();
   const material=new THREE.MeshStandardMaterial({vertexColors:true,metalness:1,roughness:.36});
+  const expression={value:new THREE.Vector2()};
+  material.onBeforeCompile=shader=>{
+    shader.uniforms.portraitLook=expression;
+    shader.vertexShader='attribute vec2 portraitFeature; uniform vec2 portraitLook;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+      transformed.x += portraitFeature.x * portraitLook.x * 0.012;
+      transformed.y += portraitFeature.y * portraitLook.y * 0.016;`);
+  };
+  group.userData.expression=expression;
   let seed=0;
   for(const band of data.bands) {
-    const positions=[],colors=[];
-    const tri=(a,b,c,shade)=>{for(const v of [a,b,c]){positions.push(v.x,v.y-band.y,v.z);colors.push(shade,shade,shade);}};
+    const positions=[],colors=[],features=[];
+    let feature=[0,0];
+    const tri=(a,b,c,shade)=>{for(const v of [a,b,c]){positions.push(v.x,v.y-band.y,v.z);colors.push(shade,shade,shade);features.push(...feature);}};
     for(const values of band.quads) {
       const q=Array.from({length:4},(_,i)=>new THREE.Vector3().fromArray(values,i*3));
       const center=q.reduce((sum,v)=>sum.add(v),new THREE.Vector3()).multiplyScalar(.25);
+      const faceY=center.y-data.height/2;
+      const front=Math.max(0,Math.min(1,(center.z-.10)*5));
+      const eye=Math.exp(-1*((Math.abs(center.x)-.30)/.17)**2-((faceY-.40)/.12)**2)*front;
+      const brow=Math.exp(-1*((Math.abs(center.x)-.30)/.22)**2-((faceY-.56)/.10)**2)*front;
+      feature=[eye,brow];
       const normal=new THREE.Vector3().subVectors(q[1],q[0]).cross(new THREE.Vector3().subVectors(q[3],q[0])).normalize();
       const top=q.map(v=>v.clone().sub(center).multiplyScalar(.93).add(center).addScaledVector(normal,.002));
       const rim=q.map(v=>v.clone().addScaledVector(normal,-.002));
@@ -35,6 +50,7 @@ export function makeIdentityPortrait(data) {
     }
     const geometry=new THREE.BufferGeometry();
     geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+    geometry.setAttribute('portraitFeature',new THREE.Float32BufferAttribute(features,2));
     geometry.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
     geometry.computeVertexNormals();
     const layer=new THREE.Mesh(geometry,material);

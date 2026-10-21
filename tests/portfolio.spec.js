@@ -20,7 +20,7 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
   ).toEqual({
     identity: true,
     portrait: true,
-    controls: ["Разобрать +", "Пауза", "Заново"],
+    controls: ["Разобрать +", "Обзор 360°", "Пауза", "Заново"],
     experience: true,
     contact: true,
     photo: true,
@@ -95,4 +95,22 @@ test("portrait responds to a cursor outside its canvas and preserves the photo o
   await expect(
     page.getByRole("button", { name: "Пауза", exact: true }),
   ).toBeDisabled();
+});
+
+
+test("360 overview can be paused and reset", async ({page}) => {
+  await page.goto('/');
+  await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/);
+  await page.getByRole('button',{name:'Обзор 360°',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Остановить 360°',exact:true})).toHaveAttribute('aria-pressed','true');
+  const canvas=page.locator('.portrait-stage canvas');
+  const start=await canvas.screenshot();
+  await page.waitForTimeout(650);
+  expect((await canvas.screenshot()).equals(start)).toBe(false);
+  await page.getByRole('button',{name:'Пауза',exact:true}).click();
+  const frozen=await canvas.screenshot();
+  await page.waitForTimeout(250);
+  expect((await canvas.screenshot()).equals(frozen)).toBe(true);
+  await page.getByRole('button',{name:'Заново',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Обзор 360°',exact:true})).toHaveAttribute('aria-pressed','false');
 });

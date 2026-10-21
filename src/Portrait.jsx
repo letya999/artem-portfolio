@@ -4,10 +4,11 @@ import { makeIdentityPortrait } from "./identity-portrait.js";
 import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
-    control = useRef({ paused: false, spread: false, replay: 0 });
+    control = useRef({ paused: false, spread: false, spinning: false, replay: 0 });
   const [paused, setPaused] = useState(false),
     [spread, setSpread] = useState(false),
-    [ready, setReady] = useState(false);
+    [ready, setReady] = useState(false),
+    [spinning, setSpinning] = useState(false);
   useEffect(() => {
     const host = ref.current,
       scene = new THREE.Scene(),
@@ -73,6 +74,7 @@ export default function Portrait() {
       time = 0,
       last = performance.now(),
       amount = 0,
+      spinAngle = 0,
       replay = 0,
       visible = true;
     const pointer = { x: 0, y: 0 };
@@ -121,6 +123,7 @@ export default function Portrait() {
       const c = control.current;
       if (c.replay !== replay) {
         time = 0;
+        spinAngle = 0;
         replay = c.replay;
       }
       if (c.paused) return;
@@ -134,13 +137,16 @@ export default function Portrait() {
         layer.rotation.y = p.rotation;
         layer.position.y = layer.userData.restY * p.expansion;
       });
-      if (reduced.matches) {
+      if (reduced.matches && !c.spinning) {
         yaw.value = -.60; pitch.value = 0;
         yaw.velocity = pitch.velocity = 0;
         assembly.value = assembly.velocity = 0;
       }
-      sculpture.rotation.y = stepSpring(yaw, -.60 + (reduced.matches ? 0 : pointer.x * .26), dt, 9);
-      sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .16, dt, 9);
+      if(c.spinning) spinAngle += dt * .65;
+      else spinAngle = Math.round((yaw.value + .60) / (Math.PI * 2)) * Math.PI * 2;
+      sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * 1.05), dt, 7);
+      sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .38, dt, 9);
+      sculpture.userData.expression.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
       renderer.render(scene, camera);
     });
     return () => {
@@ -194,6 +200,12 @@ export default function Portrait() {
           >
             {spread ? "Собрать −" : "Разобрать +"}
           </button>
+          <button disabled={!ready} aria-pressed={spinning} onClick={() => {
+            control.current.spinning = !spinning;
+            control.current.paused = false;
+            setPaused(false);
+            setSpinning(!spinning);
+          }}>{spinning ? "Остановить 360°" : "Обзор 360°"}</button>
           <button
             disabled={!ready}
             aria-pressed={paused}
@@ -208,6 +220,8 @@ export default function Portrait() {
             disabled={!ready}
             onClick={() => {
               control.current.replay++;
+              control.current.spinning = false;
+              setSpinning(false);
               control.current.paused = false;
               control.current.spread = false;
               setPaused(false);

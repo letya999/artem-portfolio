@@ -2,6 +2,8 @@
 import argparse,json
 from pathlib import Path
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
+from scipy.interpolate import PchipInterpolator
 p=argparse.ArgumentParser();p.add_argument('source',type=Path);p.add_argument('output',type=Path);a=p.parse_args()
 d=json.loads(a.source.read_text());v=np.asarray(d['vertices']).reshape(-1,3);f=np.asarray(d['indices']).reshape(-1,3)
 assert np.isfinite(v).all() and f.min()>=0 and f.max()<len(v)
@@ -26,13 +28,28 @@ def section(y):
  assert np.count_nonzero(radius)>len(radius)*.25, f'Insufficient contour at height {y}'
  if np.count_nonzero(radius)<len(radius):
   good=radius>0;radius=np.interp(angles,angles[good],radius[good],period=2*np.pi)
+ radius=gaussian_filter1d(radius,1.0,mode="wrap")
+ if 1.65<y<2.35:
+  ear=np.clip((abs(np.sin(angles))-.80)/.18,0,1)
+  radius=radius*(1-ear)+gaussian_filter1d(radius,5,mode="wrap")*ear
  return radius,origin
 heights=np.linspace(.003,2.997,61);slices=[section(y) for y in heights];sections=[s[0] for s in slices];origins=[s[1] for s in slices];bands=[];count=0
+knots=[0,.3,.6,.9,1.2,1.8,2.4,2.7,3]
+back_width=PchipInterpolator(knots,[1.30,1.0,.65,.55,.78,.90,.80,.60,.015])
+back_depth=PchipInterpolator(knots,[.62,.60,.55,.60,.80,.90,.80,.60,.015])
 for i,(lo,hi) in enumerate(zip(heights[:-1],heights[1:])):
  r=(sections[i]+sections[i+1])/2;curve=np.c_[r*np.sin(angles),r*np.cos(angles)];arc=np.r_[0,np.cumsum(np.linalg.norm(np.diff(curve,axis=0),axis=1))]
  n=max(12,round(arc[-1]/.058));edges=np.interp(np.linspace(0,arc[-1],n+1),arc,angles);quads=[]
  def point(theta,level,y):
-  r=np.interp(theta,angles,sections[level]);return [origins[level][0]+r*np.sin(theta),y,origins[level][1]+r*np.cos(theta)]
+  r=np.interp(theta,angles,sections[level]);measured=np.array([origins[level][0]+r*np.sin(theta),y,origins[level][1]+r*np.cos(theta)])
+  # The scan has no measured back. Use a rounded occiput instead of its ragged open rim.
+  knots=[0,.3,.6,.9,1.2,1.8,2.4,2.7,3]
+  width=float(back_width(y))
+  depth=float(back_depth(y))
+  completed=np.array([width*np.sin(theta),y,.10+depth*np.cos(theta)])
+  blend=np.clip((.10-np.cos(theta))/.45,0,1);blend=blend*blend*(3-2*blend)
+  blend=max(blend,np.clip((y-2.87)/.12,0,1))
+  return measured*(1-blend)+completed*blend
  for aa,bb in zip(edges[:-1],edges[1:]):
   q=np.array([point(aa,i,lo),point(bb,i,lo),point(bb,i+1,hi),point(aa,i+1,hi)])
   center=q.mean(0);normal=np.cross(q[1]-q[0],q[3]-q[0]);norm=np.linalg.norm(normal)

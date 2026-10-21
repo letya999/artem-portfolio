@@ -3,6 +3,7 @@ import argparse,json,struct
 from pathlib import Path
 import numpy as np
 from scipy.sparse import coo_matrix
+from scipy.ndimage import gaussian_filter1d
 from scipy.sparse.csgraph import connected_components
 p=argparse.ArgumentParser();p.add_argument('glb',type=Path);p.add_argument('output',type=Path);a=p.parse_args()
 b=a.glb.read_bytes();assert b[:4]==b'glTF';length=struct.unpack_from('<I',b,12)[0];d=json.loads(b[20:20+length]);start=28+length
@@ -43,17 +44,19 @@ rim=max(loops,key=len);directed=set(map(tuple,np.concatenate([f[:,[0,1]],f[:,[1,
 if (rim[0],rim[1]) in directed:rim=rim[::-1]
 vertices=v.tolist();faces=f.tolist();previous=rim;boundary=v[rim]
 for t in np.linspace(0,1,35)[1:-1]:
- q=boundary.copy();r=np.cos(t*np.pi/2);q[:,0]*=r;q[:,1]=.15+(q[:,1]-.15)*r;q[:,2]=q[:,2]*(1-t)-.92*np.sin(t*np.pi/2)
+ smooth=gaussian_filter1d(boundary,8,axis=0,mode='wrap');blend=min(1,t*5)
+ q=boundary*(1-blend)+smooth*blend;r=np.cos(t*np.pi/2)
+ q[:,0]*=r;q[:,1]=.20+(q[:,1]-.20)*r;q[:,2]=q[:,2]*(1-t)-1.02*np.sin(t*np.pi/2)
  current=list(range(len(vertices),len(vertices)+len(q)));vertices.extend(q.tolist())
  for i in range(len(q)):
   j=(i+1)%len(q);faces.extend([[previous[i],previous[j],current[j]],[previous[i],current[j],current[i]]])
  previous=current
-pole=len(vertices);vertices.append([0,.15,-.92])
+pole=len(vertices);vertices.append([0,.20,-1.02])
 for i in range(len(previous)):faces.append([previous[i],previous[(i+1)%len(previous)],pole])
 angles=np.linspace(0,2*np.pi,97)[:-1];previous=None
-profile=[(-.35,.55),(-.60,.55),(-.85,.53),(-1.05,.52),(-1.25,.52),(-1.45,.55),(-1.60,.65),(-1.70,.80),(-1.74,.87),(-1.80,.87),(-1.83,.96),(-1.96,.96),(-2,.92)]
+profile=[(-.35,.55),(-.60,.55),(-.85,.53),(-1.05,.52),(-1.20,.54),(-1.32,.61),(-1.43,.77),(-1.55,1.02),(-1.68,1.25),(-1.78,1.32)]
 for y,r in profile:
- q=[[r*np.sin(th),y,-.30+r*.85*np.cos(th)] for th in angles];current=list(range(len(vertices),len(vertices)+len(q)));vertices.extend(q)
+ q=[[r*np.sin(th),y,-.30+min(r*.85,.64)*np.cos(th)] for th in angles];current=list(range(len(vertices),len(vertices)+len(q)));vertices.extend(q)
  if previous is not None:
   for i in range(len(q)):
    j=(i+1)%len(q);faces.extend([[previous[i],current[j],previous[j]],[previous[i],current[i],current[j]]])
