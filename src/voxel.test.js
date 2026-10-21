@@ -102,7 +102,7 @@ test('short broad neck replaces the shoulders without deforming the face feature
  const profile=neck.filter(c=>c.position[1]>=.46&&c.position[1]<=.58&&Math.abs(c.position[0])<.08);
  assert.ok(profile.length>10);
  const depth=Math.max(...profile.map(c=>c.position[2]))-Math.min(...profile.map(c=>c.position[2]));
- assert.deepEqual({broader:neck.some(c=>Math.abs(c.position[0])>=.52),deeper:depth>=.80},{broader:true,deeper:true});
+ assert.deepEqual({broader:neck.some(c=>Math.abs(c.position[0])>=.52),deeper:depth>=.80-1e-6},{broader:true,deeper:true});
  const model=makeVoxelPortrait(data);
  let pupilInstances=0,movingInstances=0;
  for(const band of model.children){
@@ -127,6 +127,26 @@ test('the closed neck base is horizontal in every quadrant without a moving frin
   fringe:data.cubes.some(c=>c.region==='neck-edge'),
   moving:data.cubes.some(c=>(c.motion??0)>0),
  },{baseHeights:Array(4).fill(bottom),fringe:false,moving:false});
+});
+
+test('neck is slightly shorter with a straight axis and a gentle taper below the jaw',()=>{
+ const row=y=>data.cubes.filter(c=>Math.abs(c.position[1]-y)<1e-6);
+ const width=cubes=>Math.max(...cubes.map(c=>c.position[0]))-Math.min(...cubes.map(c=>c.position[0]));
+ const profile=cubes=>{
+  const center=cubes.filter(c=>Math.abs(c.position[0])<.08);
+  assert.ok(center.length>5);
+  const front=Math.max(...center.map(c=>c.position[2])),back=Math.min(...center.map(c=>c.position[2]));
+  return {center:(front+back)/2,depth:front-back};
+ };
+ const lower=row(.42),upper=row(.66),a=profile(lower),b=profile(upper);
+ const bottom=Math.min(...data.cubes.map(c=>c.position[1]));
+ assert.deepEqual({
+  shorter:bottom>=.37&&bottom<=.43,
+  tapered:width(lower)-width(upper)>=data.pitch*2-1e-6,
+  straight:Math.abs(a.center-b.center)<data.pitch/4,
+  lowerProfile:a.depth<=.80+1e-6,
+  upperProfile:b.depth>=.68&&b.depth<=.72+1e-6,
+ },{shorter:true,tapered:true,straight:true,lowerProfile:true,upperProfile:true});
 });
 
 test('eyes and lips share the same light steel palette as all other cubes',()=>{

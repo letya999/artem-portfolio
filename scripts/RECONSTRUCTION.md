@@ -164,3 +164,9 @@ Validation: 18 unit checks, four browser scenarios and a production build. Brows
 At the owner's request, the oblique plane and sparse moving fringe are replaced by a closed horizontal cap at Y=0.30. All bottom cubes lie in one row; no loose or drifting edge cubes remain. Neck width and depth increase again, while the upper attachment continues tapering behind the measured chin. The asset now contains 12,381 cubes and retains the same face-depth residual, cube bevels, steel palette, framing and cursor controls.
 
 Validation: 19 unit checks, four browser scenarios, production build and staged secret scan. Geometry checks cover the broader/deeper neck, equal base heights in all four quadrants, absence of fringe motion and the closed head shell. Local `qa/flat-neck/` captures include eight projections, the underside, six cursor directions and desktop/mobile views. Real mobile hardware was not tested.
+
+## Shorter upright neck with a gentler anatomical taper
+
+The horizontal cut rises by two voxel rows, from Y=0.30 to Y=0.38, shortening the visible front neck below the measured chin by about 19%. A constant front/back center replaces the previous leaning axis. Width and depth taper more gradually from the retained broad base toward the jaw, reducing the cylindrical upper-neck bulk. The closed flat cap, face geometry and cursor controls remain intact. The regenerated asset contains 11,903 cubes; the measured face-depth residual is unchanged.
+
+Validation: 20 unit checks, four browser scenarios and the production build. A geometric regression checks neck length, taper, aligned cross-section centers and profile depth. Local `qa/neck-anatomy/` includes eight projections, six cursor directions and desktop/mobile captures without page errors or horizontal overflow. Real mobile hardware was not tested.

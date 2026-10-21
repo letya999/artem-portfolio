@@ -81,11 +81,11 @@ def build(template, scan, frame, pitch):
     back=-.10+(back_center[None,:]+.10)*np.sqrt(np.maximum(0,1-ratio*ratio))
     solid=footprint[:,:,None]&(Z>=back[:,:,None])&(Z<=new_front[:,:,None])
     # The broader neck tapers behind the measured chin without projecting through it.
-    neck_w=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.56,.56,.55,.53,.47,.40])
-    neck_d=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.46,.46,.44,.40,.36,.32])
-    neck_center=np.interp(Y,[0,.5,1.16],[-.20,-.32,-.36])
+    neck_w=np.interp(Y,[.38,.56,.78,1.,1.16],[.54,.50,.46,.44,.40])
+    neck_d=np.interp(Y,[.38,.56,.78,1.,1.16],[.43,.40,.36,.33,.30])
+    neck_center=-.32
     neck=((X/neck_w)**2+((Z-neck_center)/neck_d)**2<=1)&(Y>=0)&(Y<1.16)
-    cut=.30
+    cut=.38
     solid|=neck&(Y>=cut)
     # The right ear is measured in the scan; mirror its actual relief to the missing side.
     ear_mask=(vertices[:,0]>.62)&(vertices[:,1]>1.38)&(vertices[:,1]<2.12)&(vertices[:,2]>-.48)&(vertices[:,2]<-.07)
