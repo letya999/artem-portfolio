@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { makeVoxelPortrait } from "./voxel.js";
+import { makeIdentityPortrait } from "./identity-portrait.js";
 import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 export default function Portrait() {
   const ref = useRef(null),
@@ -102,11 +102,11 @@ export default function Portrait() {
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
     const abort = new AbortController();
-    fetch("./voxel-portrait.json", { signal: abort.signal })
+    fetch("./portrait-tiles.json", { signal: abort.signal })
       .then(r => { if (!r.ok) throw new Error("Portrait unavailable"); return r.json(); })
       .then(data => {
         if (disposed) return;
-        sculpture = makeVoxelPortrait(data);
+        sculpture = makeIdentityPortrait(data);
         sculpture.scale.setScalar(1.12);
         sculpture.rotation.y = -.60;
         scene.add(sculpture);
