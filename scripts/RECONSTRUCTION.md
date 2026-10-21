@@ -45,3 +45,12 @@ Do not present this experiment as a successful identity reconstruction. More lan
 `python scripts/complete-research-head.py qa/reconstruction` extends the fitted face boundary into a smoothed bald cranium and adds estimated ear shells and a neck. It exports `fitted-head.obj` and `fitted-smile-head.obj`, each with 73,453 vertices and 145,673 triangles, plus a Three.js inspection page. The viewer adds separate cursor-responsive iris/pupil meshes; these are not included in the OBJ exports. Put the locally supplied neutral portrait at `qa/reconstruction/neutral-reference.png` for side-by-side inspection.
 
 The face remains the multi-view fit. Skull, ears and neck are artistic estimates, not a scan of unseen anatomy. The neck and ear surfaces intersect the head and are not a watertight fabrication mesh. Eye interiors and teeth remain incomplete. Model-data license restrictions still apply. No claim of verified portrait similarity is made.
+
+
+## Four-photo revision (current)
+
+The active fitting manifest now requires `smile`, `outdoor`, `glasses`, and `occluded`; the older hair/boat photo is no longer part of the fit. Only smile and outdoor estimates initialize shared identity. Glasses mask eye, brow and upper nose points. The hand-occluded view contributes only the visible right jaw, eyebrow and eye; masks are manually selected approximate correspondences, not automated occlusion confidence. Reattached copies depict the same photographs, so existing pixel landmarks were reused.
+
+The weighted in-sample residual changed from 0.03182 to 0.01636 face heights. This metric differs from the previous unweighted three-view metric and cannot be compared as a likeness improvement. The preview defaults to the facial surface again; rejected estimated skull/ears/iris overlays are removed. A toggle compares the saved previous fit under identical lighting. Old head exports remain available locally but are not the default. Completer no longer replaces the viewer.
+
+Before a new reconstruction, preserve the current `fitted.json` and `fitted-smile.json` as `fitted-previous.json` and `fitted-smile-previous.json` for the comparison viewer. The browser checks cover neutral/expression/material controls; visual inspection still finds incomplete likeness.

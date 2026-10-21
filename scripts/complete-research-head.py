@@ -57,5 +57,3 @@ for name in ['fitted','fitted-smile']:
  (a.directory/(name+'-head.obj')).write_text('\n'.join(['v %.6f %.6f %.6f'%tuple(x) for x in vertices]+['f %d %d %d'%tuple(x+1) for x in faces]))
  print(name,len(vertices),'vertices',len(faces),'faces')
 
-# Viewer is an evaluation artifact; it is never copied into public/.
-(a.directory/"index.html").write_text((Path(__file__).parent/"research-head-preview.html").read_text(encoding="utf-8"),encoding="utf-8")

@@ -60,10 +60,10 @@ ids=np.asarray(bfm['keypoints']).reshape(-1,3)[:,0]//3
 mean=bfm['u'].reshape(-1,3)/100000
 basis=(bfm['w_shp'][:,:40]*stats['std'][12:52]).reshape(-1,3,40)/100000
 expr=(bfm['w_exp'][:,:10]*stats['std'][52:62]).reshape(-1,3,10)/100000
-rows=[r for r in json.loads(a.manifest.read_text()) if r['name'] in ('smile','neutral','outdoor')]
-assert len(rows)==3, 'Manifest requires smile, neutral and outdoor views'
+rows=[r for r in json.loads(a.manifest.read_text()) if r['name'] in ('smile','outdoor','glasses','occluded')]
+assert len(rows)==4, 'Manifest requires smile, outdoor, glasses and occluded views'
 targets=[];initial=[]
-shared=np.mean([np.load(out/(r['name']+'-parameters.npy'))[12:52]/stats['std'][12:52] for r in rows],0)
+shared=np.mean([np.load(out/(r['name']+'-parameters.npy'))[12:52]/stats['std'][12:52] for r in rows if r['name'] in ('smile','outdoor')],0)
 for row in rows:
  points=np.asarray(row['points'],dtype=float);assert points.shape==(478,2) and np.isfinite(points).all()
  pts=points[mapping].copy();pts[:,1]*=-1;pts-=pts.mean(0);pts/=row['bbox'][3]-row['bbox'][1];targets.append(pts)
@@ -72,20 +72,28 @@ for row in rows:
  shape=mean[ids]+basis[ids]@shared+expr[ids]@e;proj=shape@rot.T;scale=np.ptp(pts[:,1])/np.ptp(proj[:,1]);offset=pts.mean(0)-scale*proj[:,:2].mean(0)
  initial.extend([*rv,np.log(scale),*offset,*e])
 weights=np.ones((68,1));weights[:17]=.45;weights[17:27]=.7
+view_weights=[]
+for row in rows:
+ w=weights.copy()
+ if row['name']=='glasses':w[17:31]=0;w[36:48]=0
+ if row['name']=='occluded':
+  w[:]=0;w[9:17]=.30;w[22:27]=.45;w[42:48]=.65
+ view_weights.append(w)
+assert all(np.count_nonzero(w)>10 for w in view_weights)
 x0=np.r_[shared,initial]
 def project(x,k):
  p=x[40+k*16:56+k*16];face=mean[ids]+basis[ids]@x[:40]+expr[ids]@p[6:];return np.exp(p[3])*(face@Rotation.from_rotvec(p[:3]).as_matrix().T)[:,:2]+p[4:6]
 def residual(x):
- terms=[((project(x,k)-target)*weights).ravel() for k,target in enumerate(targets)]
+ terms=[((project(x,k)-target)*view_weights[k]).ravel() for k,target in enumerate(targets)]
  terms.append(.012*(x[:40]-shared))
  for k in range(len(rows)):terms.append(.008*(x[46+k*16:56+k*16]-x0[46+k*16:56+k*16]))
  return np.concatenate(terms)
-start=np.mean([np.linalg.norm(project(x0,k)-t,axis=1).mean() for k,t in enumerate(targets)])
+start=np.mean([np.average(np.linalg.norm(project(x0,k)-t,axis=1),weights=view_weights[k].ravel()) for k,t in enumerate(targets)])
 fit=least_squares(residual,x0,max_nfev=160,loss='soft_l1',f_scale=.025,verbose=1)
 x=fit.x;v=mean+basis@x[:40];v-=v.mean(0);v*=2.5/np.ptp(v[:,1]);assert np.isfinite(v).all()
 (out/'fitted.obj').write_text('\n'.join(['v %.7f %.7f %.7f'%tuple(p) for p in v]+['f %d %d %d'%tuple(f+1) for f in tri]),encoding='utf-8')
 (out/'fitted.json').write_text(json.dumps(dict(vertices=v.round(6).ravel().tolist(),indices=tri.ravel().tolist()),separators=(',',':')),encoding='utf-8')
-report={'views':[r['name'] for r in rows],'excluded':['glasses: obscures eye landmarks','occluded: hand obscures nose and eye'],'beforeMeanNormalizedLandmarkError':float(start),'afterMeanNormalizedLandmarkError':float(np.mean([np.linalg.norm(project(x,k)-t,axis=1).mean() for k,t in enumerate(targets)])),'warning':'Landmark fit is not a verified likeness or 3D scan; BFM assets restricted to research/evaluation.'}
+report={'views':[r['name'] for r in rows],'excluded':['glasses: eye/brow/upper-nose landmarks masked','occluded: only visible right contour, eyebrow and eye used'],'beforeMeanNormalizedLandmarkError':float(start),'afterMeanNormalizedLandmarkError':float(np.mean([np.average(np.linalg.norm(project(x,k)-t,axis=1),weights=view_weights[k].ravel()) for k,t in enumerate(targets)])),'warning':'Landmark fit is not a verified likeness or 3D scan; BFM assets restricted to research/evaluation.'}
 (out/'fit-report.json').write_text(json.dumps(report,indent=2),encoding='utf-8');print(report)
 
 # Keep the measured expression separate from the neutral identity surface.
