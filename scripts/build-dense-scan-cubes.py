@@ -85,7 +85,8 @@ def build(template, scan, frame, pitch):
     neck_d=np.interp(Y,[0,.15,.4,.7,1.,1.16],[.45,.45,.36,.32,.34,.32])
     neck_center=np.interp(Y,[0,.5,1.16],[-.20,-.32,-.36])
     neck=((X/neck_w)**2+((Z-neck_center)/neck_d)**2<=1)&(Y>=0)&(Y<1.16)
-    solid|=neck
+    cut=.40+.28*X+.18*(Z+.30)
+    solid|=neck&(Y>=cut)
     # The right ear is measured in the scan; mirror its actual relief to the missing side.
     ear_mask=(vertices[:,0]>.62)&(vertices[:,1]>1.38)&(vertices[:,1]<2.12)&(vertices[:,2]>-.48)&(vertices[:,2]<-.07)
     ear_triangles=triangles[ear_mask[triangles].all(1)]
@@ -109,18 +110,14 @@ def build(template, scan, frame, pitch):
     assert outer_count>=5704, "Visible outer skin must also double its resolution"
     shell=solid&~core
     assert np.array_equal(binary_fill_holes(shell),solid), 'Render shell leaks into the interior'
-    # Trapezius and shoulder cap rise into the neck, shortening its visible length.
-    shoulders=((X/1.27)**2+((Y+.12)/.65)**2+((Z+.20)/.54)**2<=1)&(Y>=0)
-    shoulder_skin=shoulders&~binary_erosion(shoulders,structure=generate_binary_structure(3,1),iterations=2)&~solid
-    density=.12+.82*np.clip(Y/.38,0,1)**2
-    density*=1-.50*np.clip((abs(X)-.60)/.67,0,1)
-    density=np.where((abs(X)<.48)|(Y>.36),1,density)
+    # A slightly sparse outer fringe leaves the closed oblique cap intact behind it.
+    neck_skin=neck&~binary_erosion(neck,structure=generate_binary_structure(3,1))
+    edge_candidates=neck_skin&(Y<cut)&(Y>=cut-pitch*1.5)
     hashed=np.mod(np.sin(X*173.31+Y*91.17+Z*213.41)*43758.5453,1)
-    eligible_lower=shoulder_skin&(abs(X)>.65)&(Y<.18)
-    shoulder_skin&=hashed<density
-    lower_density=float((shoulder_skin&eligible_lower).sum()/max(1,eligible_lower.sum()))
-    assert .05<lower_density<.40
-    rendered=shell|shoulder_skin
+    neck_edge=edge_candidates&(hashed<.76)
+    edge_density=float(neck_edge.sum()/max(1,edge_candidates.sum()))
+    assert .60<edge_density<.90
+    rendered=shell|neck_edge
     grid=np.argwhere(rendered);points=np.c_[xs[grid[:,0]],ys[grid[:,1]],zs[grid[:,2]]]
     order=np.lexsort((points[:,0],points[:,2],points[:,1]));points=points[order];grid=grid[order]
     assert 5704<=len(points)<=20000, 'Require at least twice the preceding 2,852 cubes'
@@ -128,10 +125,10 @@ def build(template, scan, frame, pitch):
     sdf=gaussian_filter(distance_transform_edt(~solid)-distance_transform_edt(solid),.8)
     gradients=np.gradient(sdf)
     normals=np.array([g[tuple(grid.T)] for g in gradients]).T
-    on_shoulder=shoulder_skin[tuple(grid.T)]
-    shoulder_sdf=gaussian_filter(distance_transform_edt(~shoulders)-distance_transform_edt(shoulders),.8)
-    shoulder_normals=np.array([g[tuple(grid.T)] for g in np.gradient(shoulder_sdf)]).T
-    normals[on_shoulder]=shoulder_normals[on_shoulder]
+    on_edge=neck_edge[tuple(grid.T)]
+    neck_sdf=gaussian_filter(distance_transform_edt(~neck)-distance_transform_edt(neck),.8)
+    neck_normals=np.array([g[tuple(grid.T)] for g in np.gradient(neck_sdf)]).T
+    normals[on_edge]=neck_normals[on_edge]
     normals/=np.maximum(np.linalg.norm(normals,axis=1,keepdims=True),1e-8)
     # Continuous measured normals retain facial lighting on the discrete square fronts.
     finite=np.isfinite(new_front);index=distance_transform_edt(~finite,return_distances=False,return_indices=True)
@@ -146,10 +143,10 @@ def build(template, scan, frame, pitch):
     pupils=landmarks[[468,473]]
     exposed_front=surface_depth(solid,zs)
     for i,(point,normal) in enumerate(zip(points,normals)):
-        cubes.append({'id':i,'name':f'cube_{i:05d}','position':point.round(6).tolist(),'normal':normal.round(6).tolist(),'quaternion':[0,0,0,1],'region':'shoulder' if on_shoulder[i] else template.region(point),'ao':1})
+        cubes.append({'id':i,'name':f'cube_{i:05d}','position':point.round(6).tolist(),'normal':normal.round(6).tolist(),'quaternion':[0,0,0,1],'region':'neck-edge' if on_edge[i] else template.region(point),'ao':1})
         cube=cubes[-1]
-        if on_shoulder[i]:
-            cube['motion']=float(.008+.018*np.clip((.36-point[1])/.36,0,1))
+        if on_edge[i]:
+            cube['motion']=.004
         elif point[2]>=exposed_front[grid[i,0],grid[i,1]]-.001:
             for pupil in pupils:
                 if abs(point[0]-pupil[0])<.055 and abs(point[1]-pupil[1])<.034:
@@ -162,7 +159,7 @@ def build(template, scan, frame, pitch):
     assert sum(c.get('feature')=='pupil' for c in cubes)==2
     assert sum(c.get('feature') in ('lip','lip-seam') for c in cubes)>10
     positions,n=template.cube_mesh(.018)
-    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw silhouette and mirrored scanned ear relief in a closed head volume.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed head/neck shell, with a sparse animated shoulder shell.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.018,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'shoulderCubes':int(on_shoulder.sum()),'lowerShoulderDensity':lower_density,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
+    data={'format':'voxel-portrait/1.0','name':'Owner scan in complete dense cube head','description':'Pose-aligned scan face, measured jaw and mirrored scanned ear relief, with a short obliquely cut neck.','construction':'Overlapping axis-aligned bevelled cubes on a connected lattice; two-course closed head/neck shell and a slightly sparse animated neck-cut fringe.','axis':{'up':'+Y','front':'+Z'},'count':len(cubes),'pitch':pitch,'cubeSize':round(pitch*1.045,7),'bevelRatio':.018,'bounds':{'min':(points.min(0)-pitch*1.045/2).tolist(),'max':(points.max(0)+pitch*1.045/2).tolist()},'geometry':{'positions':positions.round(7).tolist(),'normals':n.round(7).tolist()},'cubes':cubes,'validation':{'outerCubeCount':outer_count,'solidComponents':1,'renderShellClosed':True,'sourceScanVertices':len(vertices),'faceColumns':int(replace.sum()),'eyeHeight':float(eye_height),'earSamples':int(ear_valid.sum()),'neckEdgeCubes':int(on_edge.sum()),'neckEdgeDensity':edge_density,'pupilCubes':sum(c.get('feature')=='pupil' for c in cubes),'lipCubes':sum(c.get('feature') in ('lip','lip-seam') for c in cubes),'minimumPreviousCubeCount':2852}}
     # Report actual quantization error against measured triangles, not a likeness percentage.
     strong=(weight>.99)&np.isfinite(measured)&~edited
     surface=np.max(np.where(solid,Z,-np.inf),axis=2)

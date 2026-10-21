@@ -52,14 +52,14 @@ export function makeVoxelPortrait(data) {
       rotation.fromArray(c.quaternion).normalize();
       matrix.compose(position, rotation, scale); layer.setMatrixAt(i,matrix);
       // Small deterministic steel variations and cavity occlusion, never a face texture.
-      const featureShade={pupil:.055,iris:.42,lip:.52,'lip-seam':.25}[c.feature];
-      const shade = featureShade??(.68 + .05 * Math.sin(c.id * 12.9898)) * (c.ao ?? 1);
+      const shade = (.68 + .05 * Math.sin(c.id * 12.9898)) * (c.ao ?? 1);
       layer.setColorAt(i,color.setRGB(shade,shade,shade));
     });
     group.add(layer);
   });
   geometry.dispose();
-  Object.assign(group.userData,{motionTime,motionAmount,gaze,width:data.bounds.max[0]-data.bounds.min[0]});
+  group.rotation.x=-.10;
+  Object.assign(group.userData,{motionTime,motionAmount,gaze,restPitch:group.rotation.x,width:data.bounds.max[0]-data.bounds.min[0]});
   group.userData.cubeCount = data.count;
   return group;
 }

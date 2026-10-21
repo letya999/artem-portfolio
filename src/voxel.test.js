@@ -29,6 +29,14 @@ test('malformed voxel payload fails safely',()=>{
  assert.throws(()=>makeVoxelPortrait({...data,cubes:[{...data.cubes[0],normal:[NaN,0,1]}],count:1}));
 });
 
+test('the resting portrait raises its chin slightly without rolling the head',()=>{
+ const model=makeVoxelPortrait(data);
+ assert.ok(model.rotation.x<-.06&&model.rotation.x>-.14,'Resting chin must be raised by a few degrees');
+ assert.equal(model.rotation.z,0);
+ assert.equal(model.userData.restPitch,model.rotation.x);
+ model.children.forEach(b=>b.geometry.dispose());model.children[0].material.dispose();
+});
+
 
 test('the rendered lattice encloses the left temple and head core without a hole',()=>{
  const cells=data.cubes.map(c=>{
@@ -73,19 +81,24 @@ test('scan jaw has no oversized template arc and ears stay within captured heigh
 });
 
 
-test('cube pupils, expressive lips and shoulder motion are bounded away from the head',()=>{
+test('short oblique neck replaces the shoulders and only its sparse edge moves',()=>{
  const pupils=data.cubes.filter(c=>c.feature==='pupil');
  assert.equal(pupils.length,2);
  assert.ok(pupils.some(c=>c.position[0]<-.2)&&pupils.some(c=>c.position[0]>.2));
  assert.ok(data.cubes.filter(c=>c.feature==='lip-seam').length>=4);
  assert.ok(data.cubes.filter(c=>c.feature==='lip').length>=10);
- const shoulders=data.cubes.filter(c=>c.region==='shoulder');
- assert.ok(shoulders.length>500);
- assert.ok(Math.max(...shoulders.map(c=>c.position[1]))>=.46,'Shoulders must rise to the neck base');
- assert.ok(Math.max(...shoulders.map(c=>Math.abs(c.position[0])))>1.1);
+ assert.equal(data.cubes.filter(c=>c.region==='shoulder').length,0,'No shoulder shell may remain');
+ const neck=data.cubes.filter(c=>c.position[1]<.70);
+ assert.ok(neck.length>50);
+ assert.ok(neck.every(c=>Math.abs(c.position[0])<=.44&&c.position[1]>=.15),'Only a short narrow neck may remain below the head');
+ const bottom=side=>Math.min(...neck.filter(c=>c.position[0]*side>.25).map(c=>c.position[1]));
+ assert.ok(Math.abs(bottom(1)-bottom(-1))>=.08,'Neck termination must be oblique');
+ const edge=data.cubes.filter(c=>c.region==='neck-edge');
+ assert.ok(edge.length>10&&edge.length<200);
+ assert.ok(edge.every(c=>c.position[1]<.65),'Sparse cubes must stay at the neck cut');
  for(const cube of data.cubes){
-  if(cube.region==='shoulder')assert.ok(cube.motion>0&&cube.motion<=.0261);
-  else assert.equal(cube.motion,undefined,'Head and neck must not inherit shoulder drift');
+  if(cube.region==='neck-edge')assert.ok(cube.motion>0&&cube.motion<=.005);
+  else assert.equal(cube.motion,undefined,'The sealed head and neck must remain rigid');
  }
  const model=makeVoxelPortrait(data);
  let pupilInstances=0,movingInstances=0;
@@ -96,6 +109,19 @@ test('cube pupils, expressive lips and shoulder motion are bounded away from the
   for(let i=0;i<motion.count;i++)if(motion.getX(i)>0)movingInstances++;
   band.geometry.dispose();
  }
- assert.equal(pupilInstances,2);assert.equal(movingInstances,shoulders.length);
+ assert.equal(pupilInstances,2);assert.equal(movingInstances,edge.length);
+ model.children[0].material.dispose();
+});
+
+test('eyes and lips share the same light steel palette as all other cubes',()=>{
+ const model=makeVoxelPortrait(data);
+ for(const band of model.children){
+  for(let i=0;i<band.count;i++){
+   const [r,g,b]=[0,1,2].map(c=>band.instanceColor.array[i*3+c]);
+   assert.ok(r>=.60&&r<=.76,'No dark pupil or lip inserts');
+   assert.equal(r,g);assert.equal(g,b);
+  }
+  band.geometry.dispose();
+ }
  model.children[0].material.dispose();
 });

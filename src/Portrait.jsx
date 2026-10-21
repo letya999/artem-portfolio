@@ -110,6 +110,7 @@ export default function Portrait() {
       .then(data => {
         if (disposed) return;
         sculpture = makeVoxelPortrait(data);
+        pitch.value = sculpture.userData.restPitch;
         sculpture.scale.setScalar(Math.min(1.12,(camera.right-camera.left)*.90/sculpture.userData.width));
         sculpture.rotation.y = -.60;
         scene.add(sculpture);
@@ -139,14 +140,14 @@ export default function Portrait() {
         layer.position.y = layer.userData.restY * p.expansion;
       });
       if (reduced.matches && !c.spinning) {
-        yaw.value = -.60; pitch.value = 0;
+        yaw.value = -.60; pitch.value = sculpture.userData.restPitch;
         yaw.velocity = pitch.velocity = 0;
         assembly.value = assembly.velocity = 0;
       }
       if(c.spinning) spinAngle += dt * .65;
       else spinAngle = Math.round((yaw.value + .60) / (Math.PI * 2)) * Math.PI * 2;
       sculpture.rotation.y = stepSpring(yaw, -.60 + spinAngle + (c.spinning || reduced.matches ? 0 : pointer.x * .70), dt, 7);
-      sculpture.rotation.x = stepSpring(pitch, reduced.matches ? 0 : pointer.y * .18, dt, 9);
+      sculpture.rotation.x = stepSpring(pitch, sculpture.userData.restPitch + (reduced.matches ? 0 : pointer.y * .18), dt, 9);
       sculpture.userData.expression?.value.set(reduced.matches || c.spinning ? 0 : pointer.x,reduced.matches || c.spinning ? 0 : -pointer.y);
       sculpture.userData.motionTime.value=time;
       sculpture.userData.motionAmount.value=reduced.matches?0:1;

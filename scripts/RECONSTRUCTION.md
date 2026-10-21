@@ -140,3 +140,11 @@ A curved shoulder cap rises to Y=0.50 below the measured chin at Y=0.72, shorten
 Current asset: 14,543 cubes, including 2,079 shoulder cubes, 2 pupil cubes and 50 lip/seam cubes. Head/neck outer shell: 6,527 cubes; pitch and side remain 0.04 and 0.0418. The core remains one connected closed solid. The incomplete left ear remains mirrored from the scanned right ear, and the rear is completed rather than scanned. The artistic mouth/scalp edits are excluded from the unchanged-face quantization check.
 
 Validation: 14 unit checks, 3 browser tests, production build, 360/pause/reset/mobile checks, and a pixel comparison confirming that shoulder animation changes the lower bust while leaving the head image unchanged. Reduced motion freezes the entire local effect. The viewport now fits the wider bust on mobile instead of clipping the shoulders. Real mobile hardware was not tested. The build still has the pre-existing large JavaScript chunk warning.
+
+## Head with an oblique neck cut (supersedes the shoulder bust)
+
+The owner requested removal of the entire shoulder shell. The narrow neck now ends at an inclined plane, with a closed two-course cap. A separate one-course fringe extends at most 0.06 units below that cap: 52 of 75 candidate cubes remain (69.3%), with only 0.004-unit drift. This provides a slightly sparse edge without opening the head/neck shell. Total display geometry is 11,351 cubes; pitch and cube size remain 0.04 and 0.0418. The measured face, jaw and ear geometry is retained.
+
+Pupils, iris and lip cubes now use the same light steel shade range as every other cube; the feature-specific dark inserts were removed. The resting head pitch is -0.10 radians (about 5.7 degrees chin-up), giving a calmer neutral presentation. The animation spring and reduced-motion reset both preserve that rest pitch. Cursor tracking and the existing 360/pause/reset controls remain available.
+
+Local before/after screenshots cover eight projections under ignored `qa/neck-cut/`. A pixel check confirms that only the cut fringe drifts while the head stays rigid, and that reduced motion freezes the effect. Validation includes 16 unit checks, four browser scenarios and the production build. The rear remains estimated and the incomplete left ear mirrored; real mobile hardware was not tested.

@@ -114,3 +114,31 @@ test("360 overview can be paused and reset", async ({page}) => {
   await page.getByRole('button',{name:'Заново',exact:true}).click();
   await expect(page.getByRole('button',{name:'Обзор 360°',exact:true})).toHaveAttribute('aria-pressed','false');
 });
+
+test('resting chin stays slightly raised through animation and reset',async({page})=>{
+  await page.addInitScript(()=>{
+    window.portraitScenes=[];
+    window.__THREE_DEVTOOLS__=new EventTarget();
+    window.__THREE_DEVTOOLS__.addEventListener('observe',event=>{
+      if(event.detail.isScene)window.portraitScenes.push(event.detail);
+    });
+  });
+  const pitch=()=>page.evaluate(()=>window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount)?.rotation.x);
+  const expectRaised=async()=>{
+    await expect.poll(pitch).toBeLessThan(-.06);
+    await expect.poll(pitch).toBeGreaterThan(-.14);
+  };
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/);
+  await expectRaised();
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const viewport=page.viewportSize();
+  await page.mouse.move(viewport.width/2,viewport.height/2);
+  await expectRaised();
+  await page.waitForTimeout(600);
+  await expectRaised();
+  await page.getByRole('button',{name:'Заново',exact:true}).click();
+  await page.mouse.move(viewport.width/2,viewport.height/2);
+  await expectRaised();
+});
