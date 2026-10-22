@@ -464,6 +464,37 @@ summary:hover {
 .about h2 {
   font-size: clamp(38px, 4.4vw, 65px);
 }
+.about .about-sticker {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  padding: 28px 34px 36px;
+  background: radial-gradient(ellipse at 20% 8%,#fff 0%,transparent 56%),linear-gradient(150deg,#fffefa 68%,#e6e4dc 91%,#faf9f4);
+  box-shadow: 2px 4px 5px #0002,8px 18px 19px -11px #0005,inset 0 1px 2px #fff;
+  border-radius: 2px 3px 20px 2px;
+  transform: rotate(-2deg);
+  font-size: clamp(29px,3.2vw,53px);
+  line-height: 1.12;
+}
+.about-sticker::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 42px;
+  height: 40px;
+  background: linear-gradient(135deg,#b6b4aa,#fffefa 56%,#d4d1c5);
+  clip-path: polygon(0 100%,100% 0,100% 100%);
+  filter: drop-shadow(-2px -2px 2px #0003);
+}
+.about-sticker::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .17;
+  background: repeating-linear-gradient(3deg,transparent 0 2px,#8882 3px 4px);
+}
 .about-copy > p {
   font-size: 15px;
   margin-top: 23px;
@@ -914,10 +945,17 @@ h2 > a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-
 .voxel-tag { width:auto; height:auto; font-size:15px; padding:4px; }
 .practice-ready .voxel-tag { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
 .practice-dialog h2 { white-space:normal; }
-.view-dock { position:fixed; bottom:18px; right:22px; z-index:50; display:flex; padding:5px; gap:4px; background:#eeefeb; border:1px solid #888a7f66; box-shadow:0 6px 24px #0003; border-radius:7px; font:12px ui-monospace,monospace; }
-.view-dock a { padding:11px 15px; border-radius:4px; color:#20211f; text-decoration:none; }
-.view-dock a[aria-current] { background:#20211f; color:#f0f0ea; }
-.view-dock a[aria-current] span { color:#c1f168; }
+.view-dock { position:fixed; bottom:18px; right:22px; z-index:50; display:flex; flex-direction:column; width:120px; padding:9px; gap:4px; border:2px solid #141316; border-radius:9px; background:linear-gradient(125deg,#36343a,#141317 30%,#2e2c31 75%,#0e0e11); box-shadow:inset 2px 2px 2px #ffffff32,inset -3px -4px 5px #0009,0 4px 0 #09090a,0 12px 19px #0005; perspective:500px; font:700 13px ui-monospace,monospace; }
+.view-dock a { position:relative; display:flex; min-height:49px; align-items:center; justify-content:center; gap:6px; border:1px solid #741d1c; border-radius:5px; color:#fff1e8; text-decoration:none; text-shadow:0 1px 2px #3d0202; background:linear-gradient(165deg,#ff6252 0%,#d52722 43%,#830d0f 100%); box-shadow:inset 0 2px 2px #ffffff7a,inset 0 -3px 4px #39000091,0 5px 0 #5e1112,0 7px 5px #000b; transform:rotateX(7deg) translateY(-2px); transition:transform .24s cubic-bezier(.2,.8,.2,1),box-shadow .24s,filter .24s; animation:rocker-release .4s ease-out; }
+.view-dock a::after { content:''; position:absolute; inset:3px 5px auto; height:31%; border-radius:50%; background:linear-gradient(#fff5,transparent); opacity:.75; pointer-events:none; }
+.view-dock a[aria-current] { background:linear-gradient(165deg,#cf261e,#a11413 53%,#e33b2d); box-shadow:inset 0 5px 9px #450000aa,inset 0 -1px 2px #fff6,0 1px 0 #3d0b0b; transform:rotateX(-7deg) translateY(3px); animation:rocker-engage .4s cubic-bezier(.2,.9,.25,1.25); }
+@keyframes rocker-engage { from { transform:rotateX(7deg) translateY(-2px); } to { transform:rotateX(-7deg) translateY(3px); } }
+@keyframes rocker-release { from { transform:rotateX(-7deg) translateY(3px); } to { transform:rotateX(7deg) translateY(-2px); } }
+.view-dock a[aria-current] .switch-state { color:#c1f168; text-shadow:0 0 7px #c1f168; }
+.view-dock a:hover { filter:brightness(1.13); text-decoration:none; }
+.view-dock a:active { transform:rotateX(-10deg) translateY(4px); }
+.view-dock a:focus-visible { outline:3px solid #c1f168; outline-offset:4px; }
+.switch-state { font-size:17px; line-height:1; color:#f8d7d0; }
 .md-link { white-space:nowrap; font-size:13px; }
 .agent-shell { min-height:100vh; color:#e7e8df; background:#151715; }
 .agent-shell header { background:#151715; color:inherit; border-bottom:1px solid #393c34; height:72px; gap:25px; justify-content:flex-end; }
@@ -976,7 +1014,7 @@ h2 > a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-
 .story-credit { font-size:11px; border-top:1px solid #aab19e; margin-top:28px; padding-top:18px; }
 @media(max-width:700px){
  .md-link{font-size:10px;} header{gap:7px;}.language-select{min-width:49px;padding:7px;}
- .view-dock{bottom:12px;right:12px;} .view-dock a{padding:10px 12px;}
+ .view-dock{bottom:12px;right:12px;}
  .portrait-sticker{position:absolute; width:135px;height:65px;left:0;bottom:65px;margin:0;}.sticker-paper{font-size:25px;}.sticker-arrow{width:82px;right:-73px;top:-85px;}
  .portrait-controls{padding-top:15px;}
  .story-dialog{padding:55px 22px 24px;}.story-grid{grid-template-columns:1fr;gap:30px;}.story-image{height:250px;}.story-image-model{height:auto;}.story-viewer{padding:55px 18px 24px;}.story-viewer-pair{grid-template-columns:1fr;}.story-viewer .scan-preview{height:330px;}.scan-preview{height:300px;}
@@ -984,4 +1022,4 @@ h2 > a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-
  .voxel-tags{height:280px;}
  .contact-top h2{font-size:clamp(48px,17vw,80px);}
 }
-@media(prefers-reduced-motion:reduce){.sticker-paper{transition:none;}.practice-dialog[open]{animation:none;}}
+@media(prefers-reduced-motion:reduce){.sticker-paper,.view-dock a{transition:none;animation:none;}.practice-dialog[open]{animation:none;}}

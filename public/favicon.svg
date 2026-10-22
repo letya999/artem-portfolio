@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#20211f"/><path d="M9 47 19 17h7l10 30h-7l-2-7H17l-2 7Zm10-13h6l-3-11Zm18 13V17h18v30h-6V23h-6v24Z" fill="#efefeb"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Artem Letyushev">
+  <rect width="128" height="128" rx="22" fill="#d9d0bf"/>
+  <path d="M22 128c1-25 13-37 29-42h27c18 5 29 20 30 42" fill="#252036" stroke="#1a152d" stroke-width="5"/>
+  <path d="M52 86l12 15 12-15" fill="#fff7e7" stroke="#1a152d" stroke-width="4"/>
+  <circle cx="43" cy="106" r="5" fill="#f5c64f"/><circle cx="83" cy="106" r="5" fill="#6bb5c3"/><circle cx="85" cy="121" r="5" fill="#f27a72"/>
+  <ellipse cx="21" cy="57" rx="11" ry="13" fill="#f2b691" stroke="#1a152d" stroke-width="5"/>
+  <ellipse cx="107" cy="57" rx="11" ry="13" fill="#f2b691" stroke="#1a152d" stroke-width="5"/>
+  <path d="M24 48c0-30 16-43 40-43s40 13 40 43v19c0 25-18 34-40 34S24 92 24 67Z" fill="#ffd6b4" stroke="#1a152d" stroke-width="6"/>
+  <path d="M33 26c11-15 35-19 53-10" fill="none" stroke="#fff8e8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M28 61c1-13 6-17 18-17s18 3 18 16c0 12-6 17-18 17S28 73 28 61Zm36-1c0-13 6-16 18-16s18 4 18 17c0 12-6 16-18 16S64 72 64 60Z" fill="#fff1dd" stroke="#1a152d" stroke-width="5"/>
+  <path d="M62 56h4" stroke="#1a152d" stroke-width="5"/>
+  <circle cx="46" cy="61" r="7" fill="#1a152d"/><circle cx="82" cy="61" r="7" fill="#1a152d"/>
+  <path d="M60 82q4-2 8 0" fill="none" stroke="#1a152d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M8 91h27v28H8z" fill="#fffdf5" stroke="#1a152d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M8 97H4c-6 0-6 14 4 14" fill="none" stroke="#1a152d" stroke-width="5"/>
+  <text x="10" y="112" fill="#1a152d" font-family="Arial,sans-serif" font-size="15" font-weight="900" letter-spacing="-2">JR</text>
+</svg>

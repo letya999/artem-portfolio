@@ -14,7 +14,7 @@ export default function App() {
     <>
       <a className="skip" href="#main">{t("К содержанию")}</a>
       <header>
-        <a className="mark" href="#top" aria-label={t("В начало")}>{t("АЛ")}<span>.</span>
+        <a className="mark" href="#top" aria-label={t("В начало")}><img src="./favicon.svg" alt="" width="48" height="48" />
         </a>
         <nav aria-label={t("Основная навигация")}>
           <a href="#experience">{t("Опыт")}</a>
@@ -131,7 +131,7 @@ export default function App() {
             <span>{t("Любопытство — часть работы.")}</span>
           </div>
           <div className="about-copy">
-            <h2><a href="#about">{t("Менеджер.")}<br />{t("С инженерной оптикой.")}</a></h2>
+            <h2 className="about-sticker"><a href="#about">{t("Менеджер.")}<br />{t("С инженерной оптикой.")}</a></h2>
             <p className="large-copy">{t("Мне важно понимать,")}<br />{t("как устроена система.")}<br />{t("И как работают люди внутри неё.")}</p>
             <p>{t("Начинал с Android-разработки. Сегодня управляю сроками, ресурсами, рисками и межкомандными зависимостями. Могу обсуждать с инженерами API и архитектуру, а с бизнесом — экономический эффект.")}</p>
             <p>{t("Развиваю open-source проекты и основал AI Engineers Guild — инженерное сообщество с 900+ участниками.")}</p>

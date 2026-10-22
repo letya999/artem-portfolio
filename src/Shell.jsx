@@ -12,8 +12,8 @@ export default function Shell(){
    <main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{resumeMarkdown(t)}</pre></main>
   </div>:<Human/>}
   <aside className="view-dock" aria-label={t('Формат сайта')}>
-   <a href="?view=human" aria-current={!agent?'page':undefined}><span aria-hidden="true">{agent?'○':'●'}</span> Human</a>
-   <a href="?view=agent" aria-current={agent?'page':undefined}><span aria-hidden="true">{agent?'●':'○'}</span> Agent</a>
+   <a href="?view=human" aria-current={!agent?'page':undefined}><span className="switch-state" aria-hidden="true">{agent?'○':'Ⅰ'}</span><span>Human</span></a>
+   <a href="?view=agent" aria-current={agent?'page':undefined}><span className="switch-state" aria-hidden="true">{agent?'Ⅰ':'○'}</span><span>Agent</span></a>
   </aside>
  </>;
 }
