@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-test('four voxel disciplines disclose grounded detail independently of the conveyor',async({page})=>{
+test('three voxel disciplines disclose grounded detail independently of the conveyor',async({page})=>{
   await page.goto('/');
   const section=page.locator('.practice');
   await section.scrollIntoViewIfNeeded();
@@ -12,11 +12,11 @@ test('four voxel disciplines disclose grounded detail independently of the conve
   }));
   // Expanded orbit vocabularies replace the former three fixed tags per area.
   // Their required terms and minimum size are checked in practice-orbit.spec.js.
-  expect.soft(contracts).toEqual({dialogs:true,detailButtons:4,renderer:true});
+  expect.soft(contracts).toEqual({dialogs:true,detailButtons:3,renderer:true});
   await expect.soft(section.locator(':scope > h2')).toHaveText('От общего языка к общему результату.');
   await expect.soft(section.locator('h2 br')).toHaveCount(0);
-  await expect.soft(section.locator('.practice-area')).toHaveCount(4);
-  for(const name of ['Менеджмент','Инженерия','Операционка','Продуктовка']){
+  await expect.soft(section.locator('.practice-area')).toHaveCount(3);
+  for(const name of ['Процессы','Инженерка','Продукт']){
     await section.locator('.practice-area').filter({has:page.getByRole('heading',{name,exact:true})}).getByRole('button',{name:'Узнать подробнее'}).click();
     const dialog=page.getByRole('dialog');
     await expect.soft(dialog).toBeVisible({timeout:500});

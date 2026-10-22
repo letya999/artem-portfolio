@@ -1,12 +1,11 @@
 export const areas = [
- ['Менеджмент','Гант','ИСР','Scrum','Kanban','Agile','SAFe','LeSS','Декомпозиция','Roadmap','Сетевое планирование','Квартальные планы','Риски','OKR','KPI','Delivery','Backlog'],
- ['Инженерия','React','Rust','Python','TypeScript','Next.js','FastAPI','LangGraph','RAG','API','SQL','ADR','MCP','DevOps','CI/CD','Docker','Git'],
- ['Операционка','P&L','Юнит-экономика','OPEX / CAPEX','Найм','Performance review','IT-активы','Flow','Релизы','Бюджеты','Автоматизация','Зависимости','Команды','SLA','FinOps','Capacity','Forecast'],
- ['Продуктовка','Финтех','HealthTech','Дейтинг','Телеком','CustDev','CJM','CDP','Антифрод','Retention','Конверсия','Гипотезы','Метрики','A/B','Growth','NPS','UX'],
+ ['Процессы','Гант','ИСР','Scrum','Kanban','Agile','SAFe','LeSS','Декомпозиция','Roadmap','Риски','OKR','KPI','Delivery','Backlog','P&L','OPEX / CAPEX','Найм','Flow','Релизы','Бюджеты','SLA','FinOps','Forecast'],
+ ['Инженерка','React','Rust','Python','TypeScript','Next.js','FastAPI','LangGraph','RAG','API','SQL','ADR','MCP','DevOps','CI/CD','Docker','Git'],
+ ['Продукт','Финтех','HealthTech','Дейтинг','Телеком','CustDev','CJM','CDP','Антифрод','Retention','Конверсия','Гипотезы','Метрики','A/B','Growth','NPS','UX'],
 ];
 export const education = 'СПбПУ, 2017–2024: приборостроение; управление качеством; инноватика — инновационный менеджмент программных продуктов.';
 export const certifications = 'SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.';
-export const content = [
+const sourceContent = [
  ['Собираю команды вокруг общего результата.',[
   ['Чем управлял','Twinby: четыре команды — Data Science, backend, рекламный кабинет и системный анализ. Финтех-холдинг: пять команд, около 50 специалистов. МТС: пять кросс-функциональных и две сервисные команды.'],
   ['Как управлял','Декомпозиция, roadmap, ресурсы, риски и межкомандные зависимости. Квартальное планирование и регулярные релизы. В МТС перевёл подразделение с LeSS на SAFe; в ЮMoney выполнение согласованных планов достигло 100%.'],
@@ -35,4 +34,9 @@ export const content = [
   ['Полученный и ожидаемый эффект','Антифрод снизил fraud rate в 2,5 раза; $800 тыс. в год — оценочный эффект. CDP для 10+ каналов доведена до этапа запуска; около $1 млн прибыли в год — прогноз, а не уже полученный результат.'],
   ['Образование и сертификаты',education+' '+certifications],
  ]],
+];
+export const content = [
+ [sourceContent[0][0],[...sourceContent[0][1].slice(0,-1),...sourceContent[2][1]]],
+ sourceContent[1],
+ sourceContent[3],
 ];

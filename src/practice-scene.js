@@ -4,14 +4,14 @@ export function createPracticeScene(root){
   try{renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});}catch{return ()=>{};}
   const canvas=renderer.domElement;canvas.className='practice-canvas';canvas.setAttribute('aria-hidden','true');root.prepend(canvas);
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-  const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera();camera.position.z=1800;
+  const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(),cameraDistance=Math.hypot(650,1800),screenY=1800/cameraDistance,depthY=650/cameraDistance;camera.position.set(0,-650,1800);camera.lookAt(0,0,0);
   scene.add(new THREE.HemisphereLight(0xffffff,0x6a7062,2.5));
   const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-300,600,1000);scene.add(light);
   const geometry=new THREE.BoxGeometry(.87,.87,.87),matrix=new THREE.Matrix4();
   const material=new THREE.MeshStandardMaterial({color:0x354238,metalness:.55,roughness:.36});
   let disposed=false, visible=false, frame=0, phase=0, last=0, lastWidth=0, lastHeight=0;
   const reduced=matchMedia("(prefers-reduced-motion: reduce)");
-  const words=[],galaxies=[],speeds=[.82,1.17,.96,1.31];let hover=null;
+  const words=[],galaxies=[],speeds=[.82,1.17,.96];let hover=null;
   const particleGeometry=new THREE.BoxGeometry(1,1,1),particleMaterial=new THREE.MeshStandardMaterial({color:0x435446,metalness:.3,roughness:.58});
   const particleCount=900;
   function galaxy(el,index){
@@ -31,35 +31,38 @@ export function createPracticeScene(root){
   }
   function layout(){
     const rect=root.getBoundingClientRect(),width=rect.width,height=rect.height;
-    if(width!==lastWidth||height!==lastHeight){renderer.setSize(width,height);lastWidth=width;lastHeight=height;}camera.left=-width/2;camera.right=width/2;camera.top=height/2;camera.bottom=-height/2;camera.near=.1;camera.far=3000;camera.updateProjectionMatrix();
+    if(width!==lastWidth||height!==lastHeight){renderer.setSize(width,height);lastWidth=width;lastHeight=height;}camera.left=-width/2;camera.right=width/2;camera.top=height*screenY/2;camera.bottom=-height*screenY/2;camera.near=.1;camera.far=3000;camera.updateProjectionMatrix();
     galaxies.forEach(({el,mesh,index})=>{
       const r=el.getBoundingClientRect(),cx=r.left-rect.left+r.width/2-width/2,cy=height/2-(r.top-rect.top+r.height/2);
       for(let i=0;i<particleCount;i++){
         const arm=i%2,t=(Math.floor(i/2)+.5)/Math.ceil(particleCount/2),seed=Math.sin(i*127.1)*43758.5453,jitter=(seed-Math.floor(seed)-.5)*.22;
         const angle=arm*Math.PI+t*Math.PI*3+phase*speeds[index]+index*.63+jitter,radius=Math.sqrt(t),core=i>particleCount-90;
-        const flutter=mesh.userData.radialWobble*Math.sin(phase*(2.2+index*.16)+i*1.37),orbitRadius=Math.max(0,(core?radius*.25:radius)+flutter);
-        const x=cx+Math.cos(angle)*r.width*.43*orbitRadius,y=cy+Math.sin(angle)*r.height*.30*orbitRadius;
-        const z=Math.sin(angle)*22+(core?4:0),size=core?2.7:1.35+(1-t)*1.25;
+        const flutter=mesh.userData.radialWobble*Math.sin(phase*(7+index*.6)+i*1.37),orbitRadius=Math.max(0,(core?radius*.25:radius)+flutter);
+        const x=cx+Math.cos(angle)*r.width*.47*orbitRadius,y=cy+Math.sin(angle)*r.height*.21*orbitRadius-(1-orbitRadius)**2*r.height*.34;
+        const z=Math.sin(angle)*65*orbitRadius-(1-orbitRadius)**2*110,size=core?4.2:2.6+(1-t)*1.3;
         matrix.makeScale(size,size,size).setPosition(x,y,z-18);mesh.setMatrixAt(i,matrix);
       }
       mesh.instanceMatrix.needsUpdate=true;
     });
     words.forEach(({el,mesh,galaxyIndex})=>{const parent=el.parentElement,r=parent.getBoundingClientRect(),index=[...parent.children].indexOf(el),count=parent.children.length;
       const ring=index%3,slot=Math.floor(index/3),slots=Math.ceil((count-ring)/3),angle=slot/slots*Math.PI*2+ring*1.18+phase*speeds[galaxyIndex]+galaxyIndex*.63;
-      const radius=[.99,.63,.29][ring],orbitX=Math.cos(angle)*r.width*.45*radius,orbitY=Math.sin(angle)*r.height*.28*radius;
+      const radius=[.99,.63,.29][ring],tier=((index*7)%5-2)*13,orbitX=Math.cos(angle)*r.width*(r.width<500?.31:.45)*radius,orbitY=Math.sin(angle)*r.height*.31*radius-(1-radius)**2*r.height*.14+tier;
       const depth=(Math.sin(angle)+1)/2,x=r.left-rect.left+r.width/2-width/2+orbitX,y=height/2-(r.top-rect.top+r.height/2)+orbitY;
       const focus=hover?Math.max(0,1-Math.hypot(hover.x-x,hover.y-y)/85):0;
-      const s=Math.min(r.width*.3/Math.max(mesh.userData.size.x,1),1.85)*(.88+.12*depth)*(1+focus*.48);
-      mesh.scale.setScalar(s);mesh.position.set(r.left-rect.left+r.width/2-width/2+orbitX,height/2-(r.top-rect.top+r.height/2)+orbitY,Math.sin(angle)*22);
+      const s=Math.min(r.width*(r.width<500?.27:.3)/Math.max(mesh.userData.size.x,1),1.85)*(.88+.12*depth)*(1+focus*.48);
+      mesh.scale.setScalar(s);mesh.position.set(r.left-rect.left+r.width/2-width/2+orbitX,height/2-(r.top-rect.top+r.height/2)+orbitY,Math.sin(angle)*70*radius-(1-radius)**2*105);
       mesh.rotation.set(-.12,Math.sin(angle)*.22,0);mesh.material.transparent=true;mesh.material.opacity=.66+.34*depth;mesh.visible=true;
     });
     for(const galaxy of galaxies){
       const labels=words.filter(word=>word.galaxyIndex===galaxy.index).map(word=>word.mesh);
-      for(let pass=0;pass<10;pass++)for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
-        const a=labels[i],b=labels[j],dx=Math.abs(a.position.x-b.position.x),dy=Math.abs(a.position.y-b.position.y);
+      for(let pass=0;pass<20;pass++)for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
+        const a=labels[i],b=labels[j],ay=a.position.y*screenY+a.position.z*depthY,by=b.position.y*screenY+b.position.z*depthY,dx=Math.abs(a.position.x-b.position.x),dy=Math.abs(ay-by);
         const xLimit=(a.userData.size.x*a.scale.x+b.userData.size.x*b.scale.x)/2+4;
         const yLimit=(a.userData.size.y*a.scale.y+b.userData.size.y*b.scale.y)/2+4;
-        if(dx<xLimit&&dy<yLimit){const shift=(yLimit-dy)/2+.5,direction=a.position.y>=b.position.y?1:-1;a.position.y+=shift*direction;b.position.y-=shift*direction;}
+        if(dx<xLimit&&dy<yLimit){
+          if(xLimit-dx<yLimit-dy){const shift=(xLimit-dx)/2+.5,direction=a.position.x>=b.position.x?1:-1;a.position.x+=shift*direction;b.position.x-=shift*direction;}
+          else{const shift=((yLimit-dy)/2+.5)/screenY,direction=ay>=by?1:-1;a.position.y+=shift*direction;b.position.y-=shift*direction;}
+        }
       }
     }
     renderer.render(scene,camera);

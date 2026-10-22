@@ -1077,6 +1077,9 @@
     "en": "The scan surface and cube shell are aligned in one coordinate system. The face is based on measurements; the back of the head, neck and missing regions are reconstructed. This is an artistic reconstruction.",
     "kk": "Скан беті мен текшелер қабығы ортақ координаттар жүйесінде сәйкестендірілген. Бет өлшемдерге негізделген; желке, мойын және жетіспейтін бөліктер толықтырылған. Бұл — көркем реконструкция."
   },
+  "Процессы": {"ru":"Процессы","en":"Processes","kk":"Процестер"},
+  "Инженерка": {"ru":"Инженерка","en":"Engineering","kk":"Инженерия"},
+  "Продукт": {"ru":"Продукт","en":"Product","kk":"Өнім"},
   "React и Three.js. InstancedMesh рисует тысячи кубиков; металлический материал и свет подчёркивают грани. Пружинная динамика реагирует на курсор, а прокрутка управляет распадом и сборкой следующих моделей.": {
     "ru": "React и Three.js. InstancedMesh рисует тысячи кубиков; металлический материал и свет подчёркивают грани. Пружинная динамика реагирует на курсор, а прокрутка управляет распадом и сборкой следующих моделей.",
     "en": "React and Three.js. InstancedMesh draws thousands of cubes; metallic materials and lighting define their edges. Spring dynamics respond to the cursor, while scrolling controls disassembly and reassembly into the next models.",

@@ -6,6 +6,7 @@ test('the brand, paper headline and exclusive rocker modes work in both views',a
  await expect(page.locator('.about-copy h2')).toHaveClass(/about-sticker/);
  await expect(page.locator('.view-dock a')).toHaveCount(2);
  expect(await page.locator('.view-dock').evaluate(element=>getComputedStyle(element).flexDirection)).toBe('column');
+ const dock=await page.locator('.view-dock').boundingBox();expect(dock.height).toBeGreaterThan(dock.width*1.4);
  expect(await page.locator('.view-dock a[aria-current]').evaluate(element=>getComputedStyle(element).animationName)).not.toBe('none');
  await expect(page.locator('.view-dock a').first()).toHaveAttribute('aria-current','page');
  await expect(page.locator('.view-dock a').last()).not.toHaveAttribute('aria-current','page');

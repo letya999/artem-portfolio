@@ -77,9 +77,9 @@ Transitioned from Android development to project management.
 
 - Brought the studio to break-even within two months. Formed three project teams and introduced Scrum.
 
-## Management
+## Processes
 
-Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Network planning · Quarterly planning · Risks · OKR · KPI · Delivery · Backlog
+Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Risks · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Hiring · Flow · Releases · Budgets · SLA · FinOps · Forecast
 
 Bringing teams together around a shared outcome.
 
@@ -98,6 +98,22 @@ CEOs, business stakeholders, Product Owners, analysts, designers, Data Science, 
 ### My toolkit
 
 Gantt charts, WBS and network scheduling for structure and dependencies; Scrum and Kanban for teamwork and flow; SAFe and LeSS for coordinating multiple teams.
+
+### Companies and roles
+
+Renewal Studio: a transition from development to managing studio projects. Itis Team: team growth from 5 to 18 people. Curestry: a COO role in HealthTech. In product companies: delivery management and cross-team coordination.
+
+### Responsibilities
+
+Resource planning, team growth, release organization, dependencies, reporting automation and OPEX/CAPEX tracking. I connected specialist work to business needs.
+
+### Economics and outcomes
+
+Renewal Studio broke even in two months. At Itis Team, project margins rose from 12% to 34% through automation and code reuse. At the fintech holding, release intervals fell by 20%.
+
+### An operations perspective
+
+P&L, unit economics, budgets, hiring, performance reviews and IT asset management are the language of operational decisions: cost, ownership, capacity and continuity. I distinguish the evidenced cases above from this toolkit.
 
 ### Education and certifications
 
@@ -124,32 +140,6 @@ I personally built tools for team and engineering metrics, OPEX/CAPEX tracking a
 ### How I approach quality
 
 API contracts, SQL, architectural constraints, observability and RAG evaluation. I introduced docs-as-code, ADR and AI workflows; analytics time-to-market fell by 60%.
-
-### Education and certifications
-
-Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instrumentation; quality management; innovation studies — innovation management of software products. SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.
-
-## Operations
-
-P&L · Unit economics · OPEX / CAPEX · Hiring · Performance review · IT assets · Flow · Releases · Budgets · Automation · Dependencies · Teams · SLA · FinOps · Capacity · Forecast
-
-Turning a busy workload into predictable delivery.
-
-### Companies and roles
-
-Renewal Studio: a transition from development to managing studio projects. Itis Team: team growth from 5 to 18 people. Curestry: a COO role in HealthTech. In product companies: delivery management and cross-team coordination.
-
-### Responsibilities
-
-Resource planning, team growth, release organization, dependencies, reporting automation and OPEX/CAPEX tracking. I connected specialist work to business needs.
-
-### Economics and outcomes
-
-Renewal Studio broke even in two months. At Itis Team, project margins rose from 12% to 34% through automation and code reuse. At the fintech holding, release intervals fell by 20%.
-
-### An operations perspective
-
-P&L, unit economics, budgets, hiring, performance reviews and IT asset management are the language of operational decisions: cost, ownership, capacity and continuity. I distinguish the evidenced cases above from this toolkit.
 
 ### Education and certifications
 
