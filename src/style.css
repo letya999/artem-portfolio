@@ -1023,3 +1023,7 @@ h2 > a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-
  .contact-top h2{font-size:clamp(48px,17vw,80px);}
 }
 @media(prefers-reduced-motion:reduce){.sticker-paper,.view-dock a{transition:none;animation:none;}.practice-dialog[open]{animation:none;}}
+
+astro-island[ssr] .portrait-sticker, astro-island[ssr] .practice-more { pointer-events: none; }
+
+astro-island { display: block; }

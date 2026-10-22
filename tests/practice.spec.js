@@ -4,6 +4,7 @@ test('four voxel disciplines disclose grounded detail independently of the conve
   await page.goto('/');
   const section=page.locator('.practice');
   await section.scrollIntoViewIfNeeded();
+  await expect(section.locator('canvas[data-voxel-count]')).toBeVisible();
   const contracts=await section.evaluate(s=>({
     dialogs:!!s.querySelector('dialog'),
     detailButtons:s.querySelectorAll('.practice-more').length,

@@ -4,11 +4,12 @@ test('a separate dark voxel machine carries uncaptioned metal logos continuously
   await page.addInitScript(()=>{window.scenes=[];window.__THREE_DEVTOOLS__=new EventTarget();window.__THREE_DEVTOOLS__.addEventListener('observe',({detail})=>{if(detail.isScene)window.scenes.push(detail);if(typeof detail.render==='function'){const render=detail.render;detail.render=function(s,c){if(s.children.some(m=>m.name==='conveyor:machine'))window.conveyorCamera=c;return render.call(this,s,c);};}});});
   await page.goto('/');
   const structure=await page.evaluate(()=>{
-    const s=document.querySelector('#conveyor');return {separate:!!s&&!s.closest('.practice'),afterPractice:s?.previousElementSibling?.id==='practice',pauseButtons:document.querySelectorAll('.conveyor-pause').length,links:s?.querySelectorAll('a').length||0};
+    const s=document.querySelector('#conveyor');return {separate:!!s&&!s.closest('.practice'),afterPractice:!!(s?.previousElementSibling?.id==='practice'||s?.closest('astro-island')?.previousElementSibling?.querySelector('#practice')),pauseButtons:document.querySelectorAll('.conveyor-pause').length,links:s?.querySelectorAll('.conveyor-link').length||0};
   });
   expect.soft(structure).toEqual({separate:true,afterPractice:true,pauseButtons:0,links:5});
   if(!structure.separate)return;
-  const section=page.locator('#conveyor');await section.scrollIntoViewIfNeeded();await expect.soft(section.locator('canvas')).toBeVisible({timeout:500});
+  const section=page.locator('#conveyor');await section.scrollIntoViewIfNeeded();await expect.soft(section.locator('canvas')).toBeVisible({timeout:10000});
+  await expect.poll(()=>page.evaluate(()=>window.scenes.flatMap(s=>s.children).filter(m=>m.name.startsWith('conveyor:logo:')).length)).toBe(5);
   const sculpture=await page.evaluate(()=>{
     const meshes=[];window.scenes.forEach(s=>s.traverse(m=>{if(m.name.startsWith('conveyor:'))meshes.push(m);}));
     const logos=meshes.filter(m=>m.name.startsWith('conveyor:logo:'));
@@ -19,7 +20,7 @@ test('a separate dark voxel machine carries uncaptioned metal logos continuously
   const mechanismLeft=await page.evaluate(async()=>{const {Vector3}=await import('/node_modules/three/build/three.module.js');const meshes=window.scenes.flatMap(s=>s.children).filter(m=>m.name==='conveyor:machine'||m.name.startsWith('conveyor:gear:'));return Math.min(...meshes.flatMap(m=>{m.computeBoundingBox();const b=m.boundingBox.clone().applyMatrix4(m.matrixWorld),points=[];for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z])points.push(new Vector3(x,y,z).project(window.conveyorCamera).x);return points;}));});
   expect.soft(mechanismLeft,'The machine and both gears must stay inside the stage').toBeGreaterThan(-1);
   const background=await section.evaluate(e=>getComputedStyle(e).backgroundColor);expect.soft(background).toBe('rgb(25, 28, 29)');
-  for(const link of await section.locator('a').all()){await expect(link).toHaveAttribute('target','_blank');expect.soft((await link.innerText()).trim()).toBe('');}
+  for(const link of await section.locator('.conveyor-link').all()){await expect(link).toHaveAttribute('target','_blank');expect.soft((await link.innerText()).trim()).toBe('');}
   const name='GitHub',read=()=>page.evaluate(name=>{const m=window.scenes.flatMap(s=>s.children).find(m=>m.name===`conveyor:logo:${name}`),g=window.scenes.flatMap(s=>s.children).find(m=>m.name==='conveyor:gear:0');return {x:m?.position.x||0,y:m?.position.y||0,gear:g?.rotation.z||0};},name);
   const before=await read();await section.getByRole('link',{name,exact:true}).dispatchEvent('pointerenter');await page.waitForTimeout(350);const hover=await read();
   expect.soft(hover.x).toBeGreaterThan(before.x+.02);expect.soft(hover.y).toBeGreaterThan(before.y+.1);expect.soft(hover.gear).not.toBe(before.gear);

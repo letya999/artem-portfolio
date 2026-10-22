@@ -10,3 +10,4 @@ qa/
 *.log
 test-results/
 playwright-report/
+.astro/

@@ -1,0 +1,6 @@
+---
+import Site from '../Site.astro';
+export function getStaticPaths(){return ['ru','en','kk'].map(locale=>({params:{locale}}));}
+const {locale}=Astro.params;
+---
+<Site locale={locale} />

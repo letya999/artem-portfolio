@@ -5,6 +5,7 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
+  await expect(page.locator(".portrait-stage")).toHaveClass(/loaded/);
   expect(
     await page.evaluate(() => ({
       identity:
@@ -15,7 +16,7 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
       ),
       experience: !!document.querySelector("#experience details"),
       contact: !!document.querySelector('a[href="https://t.me/artemletya"]'),
-      photo: !!document.querySelector('img[src="./artem-books.jpg"]'),
+      photo: !!document.querySelector('img[src$="/artem-books.jpg"]'),
     })),
   ).toEqual({
     identity: true,

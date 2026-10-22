@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Delegated by the user: React with Vite, a static single-page portfolio.
+Astro static pages with three React/Three.js islands, preserving the single-page portfolio.
 
 ## Users
 
