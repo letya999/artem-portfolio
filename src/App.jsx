@@ -1,4 +1,7 @@
+import {useI18n} from './i18n.jsx';
 import Portrait from "./Portrait.jsx";
+import Practice from "./Practice.jsx";
+import Conveyor from "./Conveyor.jsx";
 const Arrow = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path d="M5 19 19 5M5 5h14v14" stroke="currentColor" strokeWidth="1.5" />
@@ -76,104 +79,88 @@ const businesses = {
   'Twinby': 'Дейтинг · платформа знакомств',
 };
 export default function App() {
+ const {t,locale,changeLocale}=useI18n();
   return (
     <>
-      <a className="skip" href="#main">
-        К содержанию
-      </a>
+      <a className="skip" href="#main">{t("К содержанию")}</a>
       <header>
-        <a className="mark" href="#top" aria-label="В начало">
-          АЛ<span>.</span>
+        <a className="mark" href="#top" aria-label={t("В начало")}>{t("АЛ")}<span>.</span>
         </a>
-        <nav aria-label="Основная навигация">
-          <a href="#experience">Опыт</a>
-          <a href="#about">Обо мне</a>
-          <a href="#contact">Контакт</a>
+        <nav aria-label={t("Основная навигация")}>
+          <a href="#experience">{t("Опыт")}</a>
+          <a href="#about">{t("Обо мне")}</a>
+          <a href="#contact">{t("Контакт")}</a>
         </nav>
-        <a className="cv-link" href="./Artem-Letyushev-CV.pdf" download>
-          Резюме PDF <Arrow />
+        <a className="cv-link" href="./Artem-Letyushev-CV.pdf" download>{t("Резюме PDF")}<Arrow />
         </a>
+      <select className="language-select" aria-label={t("Язык")} value={locale} onChange={e=>changeLocale(e.target.value)}><option value="ru">RU</option><option value="en">EN</option><option value="kk">ҚАЗ</option></select>
       </header>
       <main id="main">
         <section className="hero" id="top">
           <div className="hero-copy">
             <h1>
-              <span>АРТЕМ</span>
-              <span>
-                ЛЕТЮШЕВ<span className="name-dot">.</span>
+              <span>{t("АРТЕМ")}</span>
+              <span>{t("ЛЕТЮШЕВ")}<span className="name-dot">.</span>
               </span>
             </h1>
-            <p className="role">Tech / Delivery Project Manager</p>
-            <p className="intro">
-              Соединяю инженерию,
-              <br />
-              команды и бизнес.
-            </p>
-            <a className="primary" href="#contact">
-              Обсудить работу <Arrow />
+            <p className="role">{t("Tech / Delivery Project Manager")}</p>
+            <p className="intro">{t("Соединяю инженерию,")}<br />{t("команды и бизнес.")}</p>
+            <a className="primary" href="#contact">{t("Обсудить работу")}<Arrow />
             </a>
-            <p className="hero-note">
-              7+ лет. Финтех, телеком, дейтинг.
-              <br />
-              От требований до запуска.
-            </p>
+            <p className="hero-note">{t("7+ лет. Финтех, телеком, дейтинг.")}<br />{t("От требований до запуска.")}</p>
           </div>
           <Portrait />
           <div className="hero-bottom">
-            <span>Инженерный подход. Человеческий контакт.</span>
-            <a href="#results">
-              Дальше — результаты <span aria-hidden="true">↓</span>
+            <span>{t("Инженерный подход. Человеческий контакт.")}</span>
+            <a href="#results">{t("Дальше — результаты")}<span aria-hidden="true">↓</span>
             </a>
           </div>
         </section>
         <section className="results" id="results">
-          <h2 className="achievements-heading">Достижения в цифрах.</h2>
+          <h2 className="achievements-heading"><a href="#results">{t("Достижения в цифрах.")}</a></h2>
           <div className="achievements-body">
             <div className="achievement-list">
               <article>
                 <strong>64<span>→</span>16</strong>
-                <h3>Дней от задачи до результата</h3>
-                <p>Twinby · Сформировал backend-команду, ввёл инженерные стандарты и регулярные релизы.</p>
+                <h3>{t("Дней от задачи до результата")}</h3>
+                <p>{t("Twinby · Сформировал backend-команду, ввёл инженерные стандарты и регулярные релизы.")}</p>
               </article>
               <article>
-                <strong>÷2,5</strong>
-                <h3>Снижение fraud rate</h3>
-                <p>Twinby · Антифрод из 9 сервисов: ML-детекция, device fingerprinting, автомодерация и liveness.</p>
+                <strong>÷{new Intl.NumberFormat(locale).format(2.5)}</strong>
+                <h3>{t("Снижение fraud rate")}</h3>
+                <p>{t("Twinby · Антифрод из 9 сервисов: ML-детекция, device fingerprinting, автомодерация и liveness.")}</p>
               </article>
               <article>
                 <strong>−60%</strong>
-                <h3>Time-to-market аналитики</h3>
-                <p>Twinby · Docs-as-code, AI-флоу, ADR и архитектурный надзор.</p>
+                <h3>{t("Time-to-market аналитики")}</h3>
+                <p>{t("Twinby · Docs-as-code, AI-флоу, ADR и архитектурный надзор.")}</p>
               </article>
               <article>
                 <strong>+40%</strong>
-                <h3>Производительность команд</h3>
-                <p>Финтех-холдинг · Расширил отдел с 2 до 5 команд и сократил интервал релизов.</p>
+                <h3>{t("Производительность команд")}</h3>
+                <p>{t("Финтех-холдинг · Расширил отдел с 2 до 5 команд и сократил интервал релизов.")}</p>
               </article>
               <article>
                 <strong>12<span>→</span>34%</strong>
-                <h3>Маржинальность проектов</h3>
-                <p>Itis Team · Автоматизация и повторное использование кода.</p>
+                <h3>{t("Маржинальность проектов")}</h3>
+                <p>{t("Itis Team · Автоматизация и повторное использование кода.")}</p>
               </article>
             </div>
-            <div className="little-law" role="img" aria-label="Закон Литтла: Lead time равно WIP, делённому на Throughput">
+            <div className="little-law" role="img" aria-label={t("Закон Литтла: Lead time равно WIP, делённому на Throughput")}>
               <div className="equation-slot">
                 <div className="equation-typeset" aria-hidden="true">
                   <span>Lead time</span><span>=</span>
                   <span className="equation-fraction"><span>WIP</span><span>Throughput</span></span>
                 </div>
               </div>
-              <p>Время выполнения = задачи в работе / пропускная способность</p>
+              <p>{t("Время выполнения = задачи в работе / пропускная способность")}</p>
             </div>
           </div>
         </section>
         <section className="experience" id="experience">
           <div className="section-top">
-            <h2>Опыт работы</h2>
-            <p>
-              2026 → 2019. Сначала последнее место работы.
-              Раскройте компанию, чтобы увидеть задачи и результаты.
-            </p>
+            <h2><a href="#experience">{t("Опыт работы")}</a></h2>
+            <p>{t("2026 → 2019. Сначала последнее место работы. Раскройте компанию, чтобы увидеть задачи и результаты.")}</p>
           </div>
           <div className="experience-body">
           <div className="history">
@@ -181,21 +168,21 @@ export default function App() {
               <div className="career-entry" key={company}>
               <details open={i === 0} data-company={company}>
                 <summary>
-                  <span className="company-line"><span className="company">{company}</span><span className="business">{businesses[company]}</span></span>
-                  <span className="job">{role}</span>
+                  <span className="company-line"><span className="company">{t(company)}</span><span className="business">{t(businesses[company])}</span></span>
+                  <span className="job">{t(role)}</span>
                   <span className="date">{date}</span>
-                  <span className="disclosure"><span className="when-closed">Подробнее</span><span className="when-open">Свернуть</span><span className="plus" aria-hidden="true">+</span></span>
+                  <span className="disclosure"><span className="when-closed">{t("Подробнее")}</span><span className="when-open">{t("Свернуть")}</span><span className="plus" aria-hidden="true">+</span></span>
                 </summary>
                 <div className="job-content">
-                  <p>{scope}</p>
+                  <p>{t(scope)}</p>
                   <ul>
                     {points.map((p) => (
-                      <li key={p}>{p}</li>
+                      <li key={p}>{t(p)}</li>
                     ))}
                   </ul>
                 </div>
               </details>
-              <div className="matryoshka-slot" role="img" aria-label={`Матрёшка: ${company}`}><p className="matryoshka-fallback">{company}</p></div>
+              <div className="matryoshka-slot" role="img" aria-label={`${t("Матрёшка")}: ${t(company)}`}><p className="matryoshka-fallback">{t(company)}</p></div>
               </div>
             ))}
           </div>
@@ -205,104 +192,40 @@ export default function App() {
           <div className="about-photo">
             <img
               src="./artem-books.jpg"
-              alt="Артем в книжном магазине у полки об искусственном интеллекте"
+              alt={t("Артем в книжном магазине у полки об искусственном интеллекте")}
               width="640"
               height="640"
               loading="lazy"
             />
-            <span>Любопытство — часть работы.</span>
+            <span>{t("Любопытство — часть работы.")}</span>
           </div>
           <div className="about-copy">
-            <h2>
-              Менеджер.
-              <br />С инженерной оптикой.
-            </h2>
-            <p className="large-copy">
-              Мне важно понимать,
-              <br />
-              как устроена система.
-              <br />И как работают люди внутри неё.
-            </p>
-            <p>
-              Начинал с Android-разработки. Сегодня управляю сроками, ресурсами,
-              рисками и межкомандными зависимостями. Могу обсуждать с инженерами
-              API и архитектуру, а с бизнесом — экономический эффект.
-            </p>
-            <p>
-              Развиваю open-source проекты и основал AI Engineers Guild —
-              инженерное сообщество с 900+ участниками.
-            </p>
+            <h2><a href="#about">{t("Менеджер.")}<br />{t("С инженерной оптикой.")}</a></h2>
+            <p className="large-copy">{t("Мне важно понимать,")}<br />{t("как устроена система.")}<br />{t("И как работают люди внутри неё.")}</p>
+            <p>{t("Начинал с Android-разработки. Сегодня управляю сроками, ресурсами, рисками и межкомандными зависимостями. Могу обсуждать с инженерами API и архитектуру, а с бизнесом — экономический эффект.")}</p>
+            <p>{t("Развиваю open-source проекты и основал AI Engineers Guild — инженерное сообщество с 900+ участниками.")}</p>
             <a
               className="text-link"
               href="https://github.com/letya999"
               target="_blank"
               rel="noreferrer"
-            >
-              Мои проекты на GitHub <Arrow />
+            >{t("Мои проекты на GitHub")}<Arrow />
             </a>
           </div>
         </section>
-        <section className="practice">
-          <h2>
-            От общего языка
-            <br />к общему результату.
-          </h2>
-          <div className="practice-columns">
-            <div>
-              <h3>Управление</h3>
-              <p>
-                Roadmap · SDLC · Ресурсы
-                <br />
-                Риски и зависимости · Требования
-                <br />
-                Scrum · Kanban · Приоритизация
-              </p>
-            </div>
-            <div>
-              <h3>Инженерия</h3>
-              <p>
-                API · Интеграции · SQL
-                <br />
-                Docs-as-code · ADR
-                <br />
-                AI-инструменты · Автоматизация
-              </p>
-            </div>
-            <div>
-              <h3>Образование</h3>
-              <p>
-                СПбПУ · 2017–2024
-                <br />
-                Инноватика и управление качеством
-              </p>
-              <p>
-                SAFe RTE · PSM I · ICAgile
-                <br />
-                Kanban System Design & Improvement
-              </p>
-            </div>
-          </div>
-        </section>
+        <Practice />
+        <Conveyor />
         <footer id="contact">
           <div className="contact-top">
-            <h2>
-              Давайте
-              <br />
-              соберёмся.
-            </h2>
+            <h2><a href="#contact">{t("Давайте")}<br />{t("соберёмся.")}</a></h2>
             <div>
-              <p>
-                Ищете Tech / Delivery PM,
-                <br />
-                который понимает и код, и людей?
-              </p>
+              <p>{t("Ищете Tech / Delivery PM,")}<br />{t("который понимает и код, и людей?")}</p>
               <a
                 className="primary"
                 href="https://t.me/artemletya"
                 target="_blank"
                 rel="noreferrer"
-              >
-                Написать в Telegram <Arrow />
+              >{t("Написать в Telegram")}<Arrow />
               </a>
               <a className="email" href="mailto:artemletyushev@gmail.com">
                 artemletyushev@gmail.com
@@ -310,7 +233,7 @@ export default function App() {
             </div>
           </div>
           <div className="footer-bottom">
-            <span>Артем Летюшев · 2026</span>
+            <span>{t("Артем Летюшев · 2026")}</span>
             <a
               href="https://www.linkedin.com/in/artemletya"
               target="_blank"
@@ -318,10 +241,9 @@ export default function App() {
             >
               LinkedIn <Arrow />
             </a>
-            <a href="./Artem-Letyushev-CV.pdf" download>
-              Скачать резюме <Arrow />
+            <a href="./Artem-Letyushev-CV.pdf" download>{t("Скачать резюме")}<Arrow />
             </a>
-            <a href="#top">Наверх ↑</a>
+            <a href="#top">{t("Наверх ↑")}</a>
           </div>
         </footer>
       </main>

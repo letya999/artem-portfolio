@@ -23,20 +23,23 @@ test('each job has one aligned matryoshka, newest first and largest first; retur
   await check(page.locator('#experience .business')).toHaveCount(6);
   await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, document.querySelector('#experience').offsetTop); });
   const models = () => page.evaluate(async () => {
-    const {Vector3} = await import('/node_modules/three/build/three.module.js');
-    const mesh = window.portraitScenes.flatMap(scene => scene.children).find(mesh => mesh.geometry?.attributes.equationTarget);
-    const target = mesh.geometry.attributes.experienceTarget, camera = window.portraitCamera;
+    const {Vector3,Matrix4} = await import('/node_modules/three/build/three.module.js');
+    const objects = window.portraitScenes.flatMap(scene => scene.children);
+    const mesh = objects.find(mesh => mesh.userData.dollOpen);
+    const law = objects.find(mesh => mesh.geometry?.attributes.equationTarget);
+    const camera = window.portraitCamera, matrix = new Matrix4();
     const canvas = document.querySelector('.portrait-stage canvas').getBoundingClientRect();
     mesh.updateMatrixWorld(); camera.updateMatrixWorld();
     const bounds = Array.from({length: 6}, () => ({min: Infinity, max: -Infinity}));
-    for (let i = 0; i < target.count; i++) {
-      const group = Math.min(5, Math.floor(i * 6 / target.count));
-      const p = new Vector3(target.getX(i), target.getY(i), target.getZ(i)).applyMatrix4(mesh.matrixWorld).project(camera);
+    for (let i = 0; i < mesh.count; i++) {
+      const group = mesh.geometry.attributes.dollPart.getX(i);
+      mesh.getMatrixAt(i,matrix);
+      const p = new Vector3().setFromMatrixPosition(matrix).applyMatrix4(mesh.matrixWorld).project(camera);
       const y = canvas.top + (1 - p.y) / 2 * canvas.height;
       bounds[group].min = Math.min(bounds[group].min, y); bounds[group].max = Math.max(bounds[group].max, y);
     }
     const slots = [...document.querySelectorAll('.career-entry .matryoshka-slot')].map(slot => slot.getBoundingClientRect());
-    return {flow: mesh.userData.experienceProgress.value, aligned: slots.length === 6 && slots.every((slot, i) => Math.abs((slot.top + slot.bottom) / 2 - (bounds[i].min + bounds[i].max) / 2) < 15), heights: bounds.map(b => b.max - b.min)};
+    return {flow: law.userData.experienceProgress.value, aligned: slots.length === 6 && slots.every((slot, i) => Math.abs((slot.top + slot.bottom) / 2 - (bounds[i].min + bounds[i].max) / 2) < 15), heights: bounds.map(b => b.max - b.min)};
   });
   await check.poll(async () => (await models()).flow).toBe(1);
   await check.poll(async () => (await models()).aligned, {message: 'Every doll must remain opposite its own job row'}).toBe(true);

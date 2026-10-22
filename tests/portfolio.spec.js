@@ -10,7 +10,7 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
       identity:
         document.querySelector("h1")?.textContent.includes("ЛЕТЮШЕВ") ?? false,
       portrait: !!document.querySelector(".portrait-stage canvas"),
-      controls: [...document.querySelectorAll("button")].map((b) =>
+      controls: [...document.querySelectorAll(".portrait-controls button")].map((b) =>
         b.textContent.trim(),
       ),
       experience: !!document.querySelector("#experience details"),
@@ -20,7 +20,7 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
   ).toEqual({
     identity: true,
     portrait: true,
-    controls: ["Разобрать +", "Обзор 360°", "Пауза", "Заново"],
+    controls: [],
     experience: true,
     contact: true,
     photo: true,
@@ -31,28 +31,10 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
   const stage = page.locator(".portrait-stage");
   await expect(stage).toHaveClass(/loaded/);
   await expect(stage.locator("canvas")).toBeVisible();
-  await page.waitForTimeout(4000);
-  await page.getByRole("button", { name: "Пауза", exact: true }).click();
-  const still = await stage.screenshot();
-  await page.waitForTimeout(250);
-  expect((await stage.screenshot()).equals(still)).toBe(true);
-  await page.getByRole("button", { name: "Пуск", exact: true }).click();
-  await page.getByRole("button", { name: /Разобрать/ }).click();
-  await expect(page.getByRole("button", { name: /Собрать/ })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
-  await page.waitForTimeout(600);
-  expect((await stage.screenshot()).equals(still)).toBe(false);
-  await page.getByRole("button", { name: "Заново", exact: true }).click();
-  await expect(page.getByRole("button", { name: /Разобрать/ })).toHaveAttribute(
-    "aria-pressed",
-    "false",
-  );
   await page.getByRole("link", { name: "Опыт", exact: true }).click();
   await page.locator('#experience summary').getByText("МТС", { exact: true }).click();
-  await expect(page.getByText(/LeSS на SAFe/)).toBeVisible();
-  await expect(page.locator('a[href="https://t.me/artemletya"]')).toBeVisible();
+  await expect(page.locator('#experience').getByText(/LeSS на SAFe/)).toBeVisible();
+  await expect(page.locator('footer a[href="https://t.me/artemletya"]')).toBeVisible();
   expect(
     (await page.request.get("/Artem-Letyushev-CV.pdf")).headers()[
       "content-type"
@@ -78,7 +60,6 @@ test("portrait responds to a cursor outside its canvas and preserves the photo o
   const stage = page.locator(".portrait-stage");
   await expect(stage).toHaveClass(/loaded/);
   await page.clock.pauseAt(new Date("2026-01-01T00:00:10Z"));
-  await page.getByRole("button", { name: "Заново", exact: true }).click();
   // Both positions are over the left text column, outside the portrait canvas.
   await page.mouse.move(20, 140);
   await page.clock.runFor(450);
@@ -92,28 +73,9 @@ test("portrait responds to a cursor outside its canvas and preserves the photo o
   await page.goto("/");
   await expect(stage).not.toHaveClass(/loaded/);
   await expect(stage.locator("img")).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Пауза", exact: true }),
-  ).toBeDisabled();
+  await expect(page.locator(".portrait-controls button")).toHaveCount(0);
 });
 
-
-test("360 overview can be paused and reset", async ({page}) => {
-  await page.goto('/');
-  await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/);
-  await page.getByRole('button',{name:'Обзор 360°',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Остановить 360°',exact:true})).toHaveAttribute('aria-pressed','true');
-  const canvas=page.locator('.portrait-stage canvas');
-  const start=await canvas.screenshot();
-  await page.waitForTimeout(650);
-  expect((await canvas.screenshot()).equals(start)).toBe(false);
-  await page.getByRole('button',{name:'Пауза',exact:true}).click();
-  const frozen=await canvas.screenshot();
-  await page.waitForTimeout(250);
-  expect((await canvas.screenshot()).equals(frozen)).toBe(true);
-  await page.getByRole('button',{name:'Заново',exact:true}).click();
-  await expect(page.getByRole('button',{name:'Обзор 360°',exact:true})).toHaveAttribute('aria-pressed','false');
-});
 
 test('larger portrait keeps its raised rest pose and follows the cursor around its stage',async({page})=>{
   await page.addInitScript(()=>{
@@ -188,16 +150,10 @@ test('larger portrait keeps its raised rest pose and follows the cursor around i
     });
     expect(baseTilt,'The neck base must stay horizontal while the skull tracks the cursor').toBeLessThan(1e-6);
   }
-  await page.getByRole('button',{name:'Разобрать +',exact:true}).click();
-  const fillVisible=()=>page.evaluate(()=>window.portraitScenes.flatMap(s=>s.children).find(o=>o.userData.cubeCount).userData.neckFill.visible);
-  await expect.poll(fillVisible,{message:'Disassembly must not expose the joint filler'}).toBe(false);
-  await page.getByRole('button',{name:'Заново',exact:true}).click();
-  await page.mouse.move(cx,cy);
-  await expectRaised();
-  await expect.poll(fillVisible,{message:'Cubes must fill the neck joint after reassembly'}).toBe(true);
+
 });
 
-test('eyes blink and brows respond locally while pause and reduced motion hold them still',async({page})=>{
+test('eyes blink and brows respond locally while reduced motion holds them still',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   await page.addInitScript(()=>{
@@ -239,10 +195,6 @@ test('eyes blink and brows respond locally while pause and reduced motion hold t
   const up=(await expression())[1];
   await page.mouse.move(cx,rect.y+rect.height);await page.clock.runFor(500);
   expect(up,'Brow response must follow the gaze').toBeGreaterThan((await expression())[1]+.1);
-  await page.getByRole('button',{name:'Пауза',exact:true}).click();
-  const frozen=await expression();await page.clock.runFor(500);
-  expect(await expression()).toEqual(frozen);
-  await page.getByRole('button',{name:'Пуск',exact:true}).click();
   await page.emulateMedia({reducedMotion:'reduce'});await page.clock.runFor(500);
   expect(await expression()).toEqual([0,0]);
   const eyePixels=await page.evaluate(async()=>{
@@ -327,13 +279,6 @@ test('cube ripples travel across the surface, restore the cubes and recur every 
     expect.soft(event.next-event.started).toBeGreaterThanOrEqual(3);expect.soft(event.next-event.started).toBeLessThanOrEqual(10);
     expect.soft(event.source).toBeGreaterThanOrEqual(0);expect.soft(event.source).toBeLessThan(event.sources);
   }
-  await page.getByRole('button',{name:'Пауза',exact:true}).click();
-  const frozen=await state();await page.clock.runFor(1000);expect(await state()).toEqual(frozen);
-  await page.getByRole('button',{name:'Пуск',exact:true}).click();
-  await page.getByRole('button',{name:'Заново',exact:true}).click();await page.clock.runFor(100);
-  const reset=await state();
-  expect(reset.started,'Reset must cancel the previous ripple').toBeLessThan(0);
-  expect(reset.next).toBeGreaterThanOrEqual(3);expect(reset.next).toBeLessThanOrEqual(10);
   await page.emulateMedia({reducedMotion:'reduce'});await page.clock.runFor(100);
   expect((await state()).enabled).toBe(0);
   expect(errors).toEqual([]);

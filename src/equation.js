@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { layoutMatryoshkas } from './matryoshka.js';
 
 export function achievementProgress(sectionTop, viewportHeight) {
   return THREE.MathUtils.clamp((viewportHeight * .88 - sectionTop) / (viewportHeight * .65), 0, 1);
@@ -25,22 +24,21 @@ export function makeEquation(model) {
   }
   if (!points.length) throw new Error('Equation glyphs unavailable');
   const geometry = model.children[0].geometry.clone();
-  const count = points.length * 3;
+  const count = points.length * 9;
   const target = new Float32Array(count * 4);
-  const experienceTarget = new Float32Array(count * 4), experienceShade = new Float32Array(count);
-  geometry.setAttribute('experienceTarget', new THREE.InstancedBufferAttribute(experienceTarget, 4));
-  geometry.setAttribute('experienceShade', new THREE.InstancedBufferAttribute(experienceShade, 1));
   geometry.setAttribute('equationTarget', new THREE.InstancedBufferAttribute(target, 4));
   geometry.setAttribute('equationRelease', new THREE.InstancedBufferAttribute(Float32Array.from({length: count}, (_, i) => i % 97 / 96 * .22), 1));
   const progress = {value: 0};
   const experienceProgress = {value: 0};
+  const absorption = {value: new THREE.Vector3()};
+  const absorptionSpread = {value: .8};
   const material = new THREE.MeshStandardMaterial({color: 0xbcc3ca, metalness: 1, roughness: .28, envMapIntensity: 1.4});
   material.onBeforeCompile = shader => {
     shader.uniforms.equationProgress = progress;
     shader.uniforms.experienceProgress = experienceProgress;
-    shader.vertexShader = 'attribute vec4 experienceTarget; attribute float experienceShade; varying float vExperienceShade; uniform float experienceProgress; attribute vec4 equationTarget; attribute float equationRelease; uniform float equationProgress; float equationPhase() { return smoothstep(equationRelease, .78 + equationRelease, equationProgress); }\n' + shader.vertexShader;
-    shader.fragmentShader = 'varying float vExperienceShade;\n' + shader.fragmentShader;
-    shader.fragmentShader = shader.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n diffuseColor.rgb *= vExperienceShade;');
+    shader.uniforms.absorption = absorption;
+    shader.uniforms.absorptionSpread = absorptionSpread;
+    shader.vertexShader = 'uniform float absorptionSpread; uniform vec3 absorption; uniform float experienceProgress; attribute vec4 equationTarget; attribute float equationRelease; uniform float equationProgress; float equationPhase() { return smoothstep(equationRelease, .78 + equationRelease, equationProgress); }\n' + shader.vertexShader;
     shader.vertexShader = shader.vertexShader.replace('#include <defaultnormal_vertex>', `#include <defaultnormal_vertex>
       transformedNormal = mix(transformedNormal, normalMatrix * objectNormal, smoothstep(.32, 1.0, equationPhase()));
     `);
@@ -51,8 +49,9 @@ export function makeEquation(model) {
       vec4 source = instanceMatrix * vec4(transformed, 1.0);
       vec3 destination = equationTarget.xyz + transformed * equationTarget.w;
       float flow = smoothstep(equationRelease * .25, 1.0, experienceProgress);
-      destination = mix(destination, experienceTarget.xyz + transformed * experienceTarget.w, flow);
-      vExperienceShade = mix(1.0, experienceShade, flow);
+      destination = mix(destination, absorption, flow);
+      float seed = fract(sin(dot(equationTarget.xyz,vec3(12.9898,78.233,37.719)))*43758.5453);
+      destination += vec3(sin(seed*42.0)*.9,.65+seed*.45,cos(seed*27.0)*.35)*sin(flow*3.14159265359)*absorptionSpread;
       vec3 displaced = mix(source.xyz, destination, assemble);
       displaced.x += .9 * sin(instanceMatrix[3].x * 23.0 + instanceMatrix[3].y * 17.0 + instanceMatrix[3].z * 31.0) * fall;
       displaced.y -= 2.3 * fall;
@@ -102,16 +101,13 @@ export function makeEquation(model) {
     const size = width * 9 / 900;
     for (let i = 0; i < mesh.count; i++) {
       const point = points[i % points.length];
-      target.set([point[0] * width, point[1] * width * 400 / 900 - .075, (Math.floor(i / points.length) - 1) * size, size * .92], i * 4);
+      target.set([(point[0] - .04) * width, point[1] * width * 400 / 900 - .075, (Math.floor(i / points.length) - 4) * size, size * .92], i * 4);
     }
     geometry.attributes.equationTarget.needsUpdate = true;
   };
   mesh.userData.progress = progress;
   mesh.userData.experienceProgress = experienceProgress;
-  mesh.userData.layoutExperience = rows => {
-    layoutMatryoshkas(experienceTarget, experienceShade, count, rows);
-    geometry.attributes.experienceTarget.needsUpdate = true;
-    geometry.attributes.experienceShade.needsUpdate = true;
-  };
+  mesh.userData.absorption = absorption;
+  mesh.userData.absorptionSpread = absorptionSpread;
   return mesh;
 }

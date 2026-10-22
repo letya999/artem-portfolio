@@ -57,7 +57,7 @@ test('achievements follow the hero; scroll assembles Little law and reverse scro
     const meshes = window.portraitScenes.flatMap(scene => scene.children);
     const portrait = meshes.find(mesh => mesh.userData.cubeCount);
     const equation = meshes.find(mesh => mesh.geometry?.attributes.equationTarget);
-    return Boolean(equation?.visible && !portrait.visible && equation.count < 1200 && equation.userData.progress.value === 1);
+    return Boolean(equation?.visible && !portrait.visible && equation.count < 5000 && equation.userData.progress.value === 1);
   }), {message: 'The sampled cubes must assemble as the equation'}).toBe(true);
   await expect(page.locator('.equation-typeset')).toBeHidden();
   await expect(stage.locator('canvas')).toBeVisible();

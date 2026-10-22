@@ -14,5 +14,5 @@ test('WebGL context loss during the equation restores the readable formula', asy
   });
   await expect(stage).not.toHaveClass(/loaded/);
   await expect(page.locator('.equation-typeset')).toBeVisible();
-  await expect(page.getByRole('button', {name: 'Пауза', exact: true})).toBeDisabled();
+  await expect(page.locator('.portrait-controls button')).toHaveCount(0);
 });

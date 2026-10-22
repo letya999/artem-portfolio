@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-test('only about a thousand coarse steel cubes leave the head and form a larger equation under a single-line heading', async ({page}) => {
+test('coarse steel cubes form a deep equation while the entire bust dissolves under a single-line heading', async ({page}) => {
   await page.setViewportSize({width: 1440, height: 900});
   await page.addInitScript(() => {
     window.portraitScenes = [];
@@ -23,6 +23,7 @@ test('only about a thousand coarse steel cubes leave the head and form a larger 
     return {
       count: equation.count,
       portraitVisible: portrait.visible,
+      dissolve: portrait.userData.dissolve.value,
       progress: equation.userData.progress.value,
       releaseSpread: equation.geometry.attributes.equationRelease ? Math.max(...equation.geometry.attributes.equationRelease.array) - Math.min(...equation.geometry.attributes.equationRelease.array) : 0,
       metalness: equation.material.metalness,
@@ -38,8 +39,9 @@ test('only about a thousand coarse steel cubes leave the head and form a larger 
   await expect.poll(async () => (await state()).progress).toBeGreaterThan(0);
   const middle = await state();
   expect.soft(middle.count).toBeGreaterThanOrEqual(800);
-  expect.soft(middle.count).toBeLessThanOrEqual(1200);
-  expect.soft(middle.portraitVisible, 'The rest of the head must stay in the hero during partial shedding').toBe(true);
+  expect.soft(middle.count).toBeLessThanOrEqual(5000);
+  expect.soft(middle.portraitVisible, 'The whole bust remains animated while disintegrating').toBe(true);
+  expect.soft(middle.dissolve).toBeGreaterThan(0);
   expect.soft(middle.headingLines).toBeLessThan(1.2);
   expect.soft(middle.equationWidth).toBeGreaterThan(720);
   expect.soft(middle.metalness).toBeGreaterThanOrEqual(.95);

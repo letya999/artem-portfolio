@@ -1,20 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import {useI18n} from './i18n.jsx';
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { makeVoxelPortrait, poseVoxelPortrait, updateCubeWave } from "./voxel.js";
 import { layerPose, cursorTarget, stepSpring } from "./motion.js";
 import { achievementProgress, makeEquation } from "./equation.js";
+import { makeMatryoshkas } from "./matryoshka.js";
 export default function Portrait() {
+ const {t}=useI18n();
   const ref = useRef(null),
     control = useRef({ paused: false, spread: false, spinning: false, replay: 0 });
-  const [paused, setPaused] = useState(false),
-    [spread, setSpread] = useState(false),
-    [ready, setReady] = useState(false),
-    [spinning, setSpinning] = useState(false);
+
   useEffect(() => {
     const host = ref.current,
       scene = new THREE.Scene(),
       camera = new THREE.OrthographicCamera(-2.05, 2.05, 2.05, -2.05, 0.1, 100);
     camera.position.set(0, -.075, 6.15);
+    const perspective = new THREE.PerspectiveCamera(32, 1, .1, 100);
+    perspective.position.set(0, -.075, 4.1 / (2 * Math.tan(16 * Math.PI / 180)));
     let renderer;
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -73,15 +75,22 @@ export default function Portrait() {
       renderer.render(scene, camera);
     });
     resize.observe(host);
-    let equation, scrollProgress = 0, experienceFlow = 0, scrollDirty = true;
+    let equation, dolls, scrollProgress = 0, experienceFlow = 0, scrollDirty = true, activeDoll = 0, careerStage = 0, selectOnScroll = true, dollExpanded = true;
     const equationSlot = document.querySelector('.equation-slot');
     const results = document.querySelector('#results');
     const experience = document.querySelector('#experience');
     const experienceSlots = [...document.querySelectorAll('.matryoshka-slot')];
-    const onScroll = () => { scrollDirty = true; };
+    const careerRows = [...document.querySelectorAll('#experience details')];
+    const onScroll = () => { scrollDirty = true; selectOnScroll = true; };
+    const onToggle = event => {
+      const index = careerRows.indexOf(event.target);
+      if (index < 0) return;
+      activeDoll = careerStage = index; dollExpanded = event.target.open;
+      scrollDirty = true; selectOnScroll = false;
+    };
     window.addEventListener('scroll', onScroll, {passive: true});
     window.addEventListener('resize', onScroll, {passive: true});
-    experience?.addEventListener('toggle', onScroll, true);
+    experience?.addEventListener('toggle', onToggle, true);
     const resetEquation = () => {
       renderer.domElement.removeAttribute('style');
       const source = host.getBoundingClientRect();
@@ -92,7 +101,8 @@ export default function Portrait() {
       equationSlot?.classList.remove('equation-rendered');
       experienceSlots.forEach(slot => slot.classList.remove('sculpture-rendered'));
       if (equation) { equation.visible = false; equation.userData.restore(); equation.userData.experienceProgress.value = 0; }
-      if (sculpture) { sculpture.visible = true; sculpture.position.set(0, 0, 0); }
+      if (dolls) dolls.visible = false;
+      if (sculpture) { sculpture.visible = true; sculpture.position.set(0, 0, 0); sculpture.userData.dissolve.value = 0; }
       scrollProgress = 0;
       experienceFlow = 0;
     };
@@ -106,7 +116,7 @@ export default function Portrait() {
       visible = true;
     const pointer = { x: 0, y: 0, active: false };
     const yaw = {value: -.60, velocity: 0}, pitch = {value: 0, velocity: 0};
-    const equationYaw = {value: -.22, velocity: 0};
+    const equationYaw = {value: -.38, velocity: 0};
     const assembly = {value: 0, velocity: 0};
     const overview = {value: 0, velocity: 0};
     const brow = {value: 0, velocity: 0};
@@ -134,7 +144,7 @@ export default function Portrait() {
       e.preventDefault();
       host.classList.remove("loaded");
       resetEquation();
-      setReady(false);
+
       renderer.setAnimationLoop(null);
     };
     renderer.domElement.addEventListener("webglcontextlost", lost);
@@ -153,21 +163,39 @@ export default function Portrait() {
         try {
           equation = makeEquation(sculpture);
           scene.add(equation);
+          dolls = makeMatryoshkas(sculpture.children[0].geometry);
+          scene.add(dolls);
         } catch { /* The readable HTML equation remains available. */ }
         host.classList.add("loaded");
-        setReady(true);
+
       }).catch(() => { /* The original portrait remains visible on load failure. */ });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    reduced.addEventListener('change', onScroll);
     renderer.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       if (!sculpture || document.hidden) return;
       const c = control.current;
+      if (reduced.matches && !scrollDirty) return;
       if (equation && equationSlot && results && (scrollDirty || reduced.matches)) {
         scrollDirty = false;
         const previous = scrollProgress;
         experienceFlow = experienceSlots.length && experience ? THREE.MathUtils.clamp((innerHeight * .9 - experience.getBoundingClientRect().top) / (innerHeight * .8), 0, 1) : 0;
         if (reduced.matches && experienceFlow > 0) experienceFlow = 1;
+        if (experienceFlow > 0 && selectOnScroll) {
+          const centers = experienceSlots.map(slot => {const r = slot.getBoundingClientRect();return r.top + r.height / 2;});
+          careerStage = 0;
+          for (let i = 0; i < centers.length - 1; i++) {
+            if (innerHeight * .45 >= centers[i]) careerStage = i + THREE.MathUtils.clamp((innerHeight * .45 - centers[i]) / (centers[i + 1] - centers[i]), 0, 1);
+          }
+          if (experienceFlow < 1) careerStage = 0;
+          // Native scroll offsets round to CSS pixels at the row boundary.
+          if (Math.abs(careerStage - Math.round(careerStage)) < .005) careerStage = Math.round(careerStage);
+          if (reduced.matches) careerStage = Math.round(careerStage);
+          const next = Math.min(5, Math.floor(careerStage + .0001));
+          if (next !== activeDoll) dollExpanded = true;
+          activeDoll = next; selectOnScroll = false;
+        }
         scrollProgress = c.paused ? 0 : reduced.matches ? experienceFlow > 0 ? 1 : 0 : achievementProgress(results.getBoundingClientRect().top, innerHeight);
         if (scrollProgress > 0) {
           if (previous === 0) equation.userData.capture();
@@ -176,40 +204,63 @@ export default function Portrait() {
           const destination = {};
           for (const key of ['left', 'top', 'width', 'height']) destination[key] = THREE.MathUtils.lerp(law[key], viewport[key], experienceFlow);
           destination.bottom = destination.top + destination.height;
-          const renderWidth = THREE.MathUtils.lerp(Math.max(source.width, law.width * 1.08), innerWidth, experienceFlow);
+          const renderWidth = THREE.MathUtils.lerp(Math.max(source.width, law.width * 1.38), innerWidth, experienceFlow);
           const renderHeight = THREE.MathUtils.lerp(source.height, innerHeight, experienceFlow);
           renderer.setSize(renderWidth, renderHeight, false);
           camera.left = -2.05 * renderWidth / renderHeight;
           camera.right = -camera.left;
           camera.updateProjectionMatrix();
           const blend = scrollProgress * scrollProgress * (3 - 2 * scrollProgress);
+          perspective.aspect = renderWidth / renderHeight;
+          perspective.updateProjectionMatrix();
           const left = source.left + source.width / 2 - renderWidth / 2 + (destination.left + destination.width / 2 - source.left - source.width / 2) * blend;
           const top = source.top + source.height / 2 - renderHeight / 2 + (destination.top + destination.height / 2 - source.top - source.height / 2) * blend;
           Object.assign(renderer.domElement.style, {position: 'fixed', left: `${left}px`, top: `${top}px`, width: `${renderWidth}px`, height: `${renderHeight}px`, pointerEvents: 'none', zIndex: '3'});
           const units = 4.1 / renderHeight;
-          equation.userData.layout(law.width * units);
-          equation.userData.layoutExperience(experienceSlots.map(slot => {
+          equation.userData.layout(law.width * units * 1.10);
+          const rows = experienceSlots.map((slot, index) => {
             const r = slot.getBoundingClientRect();
-            return {x: (r.left + r.width / 2 - left - renderWidth / 2) * units, y: (top + renderHeight / 2 - r.top - r.height / 2) * units, width: r.width * units, height: r.height * units};
-          }));
+            const extent = Math.min(r.width * .90 / 3.2, r.height * .90 / 2.8) * 1.35;
+            const centerY = index === 0 && experienceFlow < 1 ? Math.min(r.top + r.height / 2, Math.min(innerHeight, top + renderHeight) - 24 - extent) : r.top + r.height / 2;
+            return {x: (r.left + r.width / 2 - left - renderWidth / 2) * units, y: (top + renderHeight / 2 - centerY) * units, width: r.width * units, height: r.height * units};
+          });
+          dolls.userData.layout(rows);
+          dolls.userData.active = activeDoll;
+          dolls.userData.stage.value = careerStage;
+          dolls.userData.flow.value = experienceFlow;
+          dolls.visible = experienceFlow > 0;
+          equation.userData.absorption.value.set(rows[0].x, rows[0].y - .075 - dolls.userData.rows[0].scale * .65, 0);
           equation.userData.experienceProgress.value = experienceFlow;
           equation.userData.progress.value = scrollProgress;
-          equation.visible = destination.bottom > 0 && destination.top < innerHeight;
-          sculpture.visible = source.bottom > 0;
+          equation.visible = experienceFlow < 1 && destination.bottom > 0 && destination.top < innerHeight;
+          sculpture.userData.dissolve.value = scrollProgress;
+          sculpture.visible = source.bottom > 0 && scrollProgress < 1;
           sculpture.position.set((source.left + source.width / 2 - left - renderWidth / 2) * units, (top + renderHeight / 2 - source.top - source.height / 2) * units, 0);
           equationSlot.classList.add('equation-rendered');
           experienceSlots.forEach(slot => slot.classList.toggle('sculpture-rendered', experienceFlow > 0));
           equation.rotation.y = equationYaw.value * scrollProgress * (1 - experienceFlow);
+          equation.rotation.x = -.12 * scrollProgress * (1 - experienceFlow);
         } else resetEquation();
         host.dataset.equationProgress = String(scrollProgress);
-        renderer.render(scene, camera);
+        renderer.render(scene, scrollProgress > 0 ? perspective : camera);
       }
       if (scrollProgress > 0) {
+        let changed = false;
+        if (dolls.visible && !c.paused) {
+          const values = dolls.userData.dollOpen.value;
+          for (let i = 0; i < 6; i++) {
+            const target = i === activeDoll && dollExpanded ? 1 : 0;
+            const next = reduced.matches ? target : THREE.MathUtils.damp(values[i], target, 9, dt);
+            if (Math.abs(values[i] - next) > .00001) changed = true;
+            values[i] = Math.abs(next-target)<.001 ? target : next;
+          }
+        }
         if (equation.visible && !c.paused && !reduced.matches) {
           const previous = equation.rotation.y;
-          equation.rotation.y = stepSpring(equationYaw, -.22 + (pointer.active ? pointer.x * .16 : 0), dt, 6) * scrollProgress * (1 - experienceFlow);
-          if (Math.abs(previous - equation.rotation.y) > .00001) renderer.render(scene, camera);
+          equation.rotation.y = stepSpring(equationYaw, -.38 + (pointer.active ? pointer.x * .16 : 0), dt, 6) * scrollProgress * (1 - experienceFlow);
+          if (Math.abs(previous - equation.rotation.y) > .00001) changed = true;
         }
+        if (changed) renderer.render(scene, perspective);
         return;
       }
       if (!visible) return;
@@ -270,7 +321,8 @@ export default function Portrait() {
       resetEquation();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
-      experience?.removeEventListener('toggle', onScroll, true);
+      reduced.removeEventListener('change', onScroll);
+      experience?.removeEventListener('toggle', onToggle, true);
       renderer.setAnimationLoop(null);
       resize.disconnect();
       visibleObserver.disconnect();
@@ -298,60 +350,15 @@ export default function Portrait() {
         ref={ref}
         className="portrait-stage"
         role="img"
-        aria-label="Кинетический объёмный портрет Артема"
+        aria-label={t("Кинетический объёмный портрет Артема")}
       >
         <img
           src="./artem-reference.png"
           className="portrait-fallback"
-          alt="Артем Летюшев"
+          alt={t("Артем Летюшев")}
         />
       </div>
-      <div className="portrait-controls">
-        <span>Порядок из сложности</span>
-        <div>
-          <button
-            disabled={!ready}
-            aria-pressed={spread}
-            onClick={() => {
-              control.current.spread = !spread;
-              setSpread(!spread);
-            }}
-          >
-            {spread ? "Собрать −" : "Разобрать +"}
-          </button>
-          <button disabled={!ready} aria-pressed={spinning} onClick={() => {
-            control.current.spinning = !spinning;
-            control.current.paused = false;
-            setPaused(false);
-            setSpinning(!spinning);
-          }}>{spinning ? "Остановить 360°" : "Обзор 360°"}</button>
-          <button
-            disabled={!ready}
-            aria-pressed={paused}
-            onClick={() => {
-              control.current.paused = !paused;
-              window.dispatchEvent(new Event('scroll'));
-              setPaused(!paused);
-            }}
-          >
-            {paused ? "Пуск" : "Пауза"}
-          </button>
-          <button
-            disabled={!ready}
-            onClick={() => {
-              control.current.replay++;
-              control.current.spinning = false;
-              setSpinning(false);
-              control.current.paused = false;
-              control.current.spread = false;
-              setPaused(false);
-              setSpread(false);
-            }}
-          >
-            Заново
-          </button>
-        </div>
-      </div>
+      <div className="portrait-controls"><span>{t("Порядок из сложности")}</span></div>
     </div>
   );
 }

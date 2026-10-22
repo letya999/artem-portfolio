@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
 function applyCubeWave(shader,wave,cubeSize){
-  Object.assign(shader.uniforms,{portraitWaveTime:wave.time,portraitWaveStart:wave.start,portraitWaveEnabled:wave.enabled,portraitWaveOrigin:wave.origin,portraitWaveAxis:wave.axis,portraitWaveCubeSize:{value:cubeSize}});
+  Object.assign(shader.uniforms,{portraitDissolve:wave.dissolve,portraitWaveTime:wave.time,portraitWaveStart:wave.start,portraitWaveEnabled:wave.enabled,portraitWaveOrigin:wave.origin,portraitWaveAxis:wave.axis,portraitWaveCubeSize:{value:cubeSize}});
   shader.vertexShader=`attribute vec4 instanceWavePosition;
-    uniform float portraitWaveTime,portraitWaveStart,portraitWaveEnabled,portraitWaveCubeSize;
+    uniform float portraitDissolve,portraitWaveTime,portraitWaveStart,portraitWaveEnabled,portraitWaveCubeSize;
     uniform vec3 portraitWaveOrigin,portraitWaveAxis;
     float cubeWavePhase(){
       if(portraitWaveEnabled<.5||instanceWavePosition.w<.5)return -1.0;
@@ -23,7 +23,11 @@ function applyCubeWave(shader,wave,cubeSize){
       float lift=sin(3.14159265359*vertexWavePhase);
       vec3 outward=normalize(instanceWavePosition.xyz-vec3(0.0,1.8,-.1));
       transformed+=(outward*.014+portraitWaveAxis*.004)*lift*lift/portraitWaveCubeSize;
-    }`);
+    }
+    float seed=fract(sin(dot(instanceWavePosition.xyz,vec3(12.9898,78.233,37.719)))*43758.5453);
+    float scatter=smoothstep(seed*.18,.70+seed*.18,portraitDissolve);
+    transformed=cubeWaveRotation(scatter)*transformed*(1.0-smoothstep(.48,1.0,scatter));
+    transformed+=vec3(sin(seed*42.0)*.65,-2.8*scatter,cos(seed*27.0)*.45)*scatter/portraitWaveCubeSize;`);
   shader.vertexShader=shader.vertexShader.replace('#include <defaultnormal_vertex>',`
     float normalWavePhase=cubeWavePhase();
     if(normalWavePhase>0.0&&normalWavePhase<1.0)objectNormal=cubeWaveRotation(normalWavePhase)*objectNormal;
@@ -74,7 +78,8 @@ export function makeVoxelPortrait(data) {
   }
   const material = new THREE.MeshStandardMaterial({color: 0xffffff, metalness: 1, roughness: .32, envMapIntensity: 1.1});
   const motionTime={value:0},motionAmount={value:0},gaze={value:new THREE.Vector2()},expression={value:new THREE.Vector2()};
-  const cubeWave={time:motionTime,start:{value:-10},enabled:{value:0},origin:{value:new THREE.Vector3()},axis:{value:new THREE.Vector3(1,0,0)},sources:[],state:{started:-10,next:3+Math.random()*7,source:0}};
+  const dissolve={value:0};
+  const cubeWave={dissolve,time:motionTime,start:{value:-10},enabled:{value:0},origin:{value:new THREE.Vector3()},axis:{value:new THREE.Vector3(1,0,0)},sources:[],state:{started:-10,next:3+Math.random()*7,source:0}};
   const depthMaterial=new THREE.MeshDepthMaterial({depthPacking:THREE.RGBADepthPacking});
   depthMaterial.onBeforeCompile=shader=>applyCubeWave(shader,cubeWave,data.cubeSize);
   material.onBeforeCompile=shader=>{
@@ -110,7 +115,6 @@ export function makeVoxelPortrait(data) {
   const cells=data.cubes.map(c=>c.position.map((v,i)=>Math.round(v/data.pitch-(i===1?.5:0))));
   const occupied=new Set(cells.map(cell=>cell.join(','))),surface=new Set();
   data.cubes.forEach((cube,i)=>{
-    if(cube.position[1]<.78)return;
     const [x,y,z]=cells[i];
     if([[x-1,y,z],[x+1,y,z],[x,y-1,z],[x,y+1,z],[x,y,z-1],[x,y,z+1]].some(cell=>!occupied.has(cell.join(','))))surface.add(cube);
   });
@@ -169,7 +173,7 @@ export function makeVoxelPortrait(data) {
   Object.assign(neckFill.userData,{rest:new Float32Array(rest),weights:new Float32Array(weights),point:new THREE.Vector3(),euler:new THREE.Euler(),quaternion:new THREE.Quaternion(),matrix:new THREE.Matrix4(),scale:new THREE.Vector3().setScalar(data.cubeSize)});
   group.children[0].add(neckFill);
   group.rotation.order='YXZ';
-  Object.assign(group.userData,{motionTime,motionAmount,gaze,expression,neckFill,cubeWave,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
+  Object.assign(group.userData,{dissolve,motionTime,motionAmount,gaze,expression,neckFill,cubeWave,restPitch:-.10,headRotation:new THREE.Vector3(-.10,0,0),neckPivot:new THREE.Vector3(0,1.04-centerY,-.32),width:data.bounds.max[0]-data.bounds.min[0]});
   group.userData.cubeCount = data.count;
   poseVoxelPortrait(group,group.userData.headRotation);
   return group;
