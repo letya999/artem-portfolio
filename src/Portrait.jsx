@@ -22,6 +22,7 @@ export default function Portrait() {
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     } catch {
+      host.classList.add('fallback-visible');
       return;
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -144,6 +145,7 @@ export default function Portrait() {
     const lost = (e) => {
       e.preventDefault();
       host.classList.remove("loaded");
+      host.classList.add('fallback-visible');
       resetEquation();
 
       renderer.setAnimationLoop(null);
@@ -169,7 +171,7 @@ export default function Portrait() {
         } catch { /* The readable HTML equation remains available. */ }
         host.classList.add("loaded");
 
-      }).catch(() => { /* The original portrait remains visible on load failure. */ });
+      }).catch(() => { host.classList.add('fallback-visible'); });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let previousReduced = reduced.matches;
     reduced.addEventListener('change', onScroll);

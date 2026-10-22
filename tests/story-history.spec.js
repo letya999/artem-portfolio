@@ -18,7 +18,7 @@ test('archived model previews load their own model assets',async({page})=>{
 
 test('photo-derived surface is its own interactive stage before the iPhone scan',async({page})=>{
  await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
- await page.locator('.story-dialog figure').nth(2).locator('.story-media-trigger').click();
+ await page.locator('.story-dialog figure').nth(3).locator('.story-media-trigger').click();
  await expect(page.locator('.story-viewer .scan-preview')).toHaveAttribute('data-source','./story/models/photo-reconstruction.json');
  await expect(page.locator('.story-viewer .scan-preview')).toHaveAttribute('data-state','ready');
 });
@@ -27,12 +27,12 @@ test('the restored chronology remains localized',async({page})=>{
  await page.goto('/ru.html');await page.locator('select').selectOption('en');
  await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
  await expect(page.locator('.story-dialog figure').first().locator('h3')).toHaveText('First voxel portrait');
- await expect(page.locator('.story-dialog figure').nth(3).locator('h3')).toHaveText('Original iPhone scan');
+ await expect(page.locator('.story-dialog figure').nth(4).locator('h3')).toHaveText('Original iPhone scan');
 });
 
 test('archived models fit in the viewer and show the detailed face',async({page})=>{
  await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
- for(const [index,maxBottom,minContrast] of [[0,.02,0],[5,.02,25]]){
+ for(const [index,maxBottom,minContrast] of [[0,.02,0],[6,.02,25]]){
   await page.locator('.story-dialog figure').nth(index).locator('.story-media-trigger').click();
   const preview=page.locator('.story-viewer .scan-preview');await expect(preview).toHaveAttribute('data-state','ready');
   const png=await preview.screenshot();
@@ -48,12 +48,12 @@ test('making-of follows distinct archived models through the textured scan and l
  await page.locator('.story-trigger').click();
  const story=page.locator('.story-dialog');
  await expect(story.locator('#story-title')).toHaveText('От первых кубиков к движению.');
- await expect(story.locator('figure')).toHaveCount(7);
- await expect(story.locator('.story-number')).toHaveText(['01','02','03','04','05','06','07']);
- for(const [index,file] of [[0,'thumb-0.png'],[1,'thumb-1.png'],[2,'thumb-2.png'],[3,'thumb-3.png'],[4,'thumb-4.png'],[5,'thumb-5.png'],[6,'thumb-6.png']])
+ await expect(story.locator('figure')).toHaveCount(8);
+ await expect(story.locator('.story-number')).toHaveText(['01','02','03','04','05','06','07','08']);
+ for(const [index,file] of [[0,'thumb-0.png'],[1,'thumb-1.png'],[2,'landmarks.png'],[3,'thumb-2.png'],[4,'thumb-3.png'],[5,'thumb-4.png'],[6,'thumb-5.png'],[7,'thumb-6.png']])
   await expect(story.locator('figure').nth(index).locator('img')).toHaveAttribute('src',new RegExp(file));
  const sources=[];
- for(const index of [0,1,3,4,5,6]){
+ for(const index of [0,1,4,5,6,7]){
   await story.locator('figure').nth(index).locator('.story-media-trigger').click();
   const preview=page.locator('.story-viewer .scan-preview');
   await expect(preview).toHaveAttribute('data-state','ready');
