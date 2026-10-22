@@ -631,7 +631,7 @@
   },
   "Публикации и проекты": {
     "ru": "Публикации и проекты",
-    "en": "Publications and projects",
+    "en": "Writing and projects",
     "kk": "Жарияланымдар мен жобалар"
   },
   "Roadmap": {
@@ -673,5 +673,385 @@
     "ru": "Scrum Master / Agile Coach",
     "en": "Scrum Master / Agile Coach",
     "kk": "Scrum шебері / Agile коучы"
+  },
+  "Резюме MD": {
+    "ru": "Резюме MD",
+    "en": "CV Markdown",
+    "kk": "Түйіндеме Markdown"
+  },
+  "Сайт": {
+    "ru": "Сайт",
+    "en": "Website",
+    "kk": "Сайт"
+  },
+  "Загрузка…": {
+    "ru": "Загрузка…",
+    "en": "Loading…",
+    "kk": "Жүктелуде…"
+  },
+  "Формат сайта": {
+    "ru": "Формат сайта",
+    "en": "Site format",
+    "kk": "Сайт пішімі"
+  },
+  "Гант": {
+    "ru": "Гант",
+    "en": "Gantt",
+    "kk": "Гант"
+  },
+  "ИСР": {
+    "ru": "ИСР",
+    "en": "WBS",
+    "kk": "Жұмыстар құрылымы"
+  },
+  "Декомпозиция": {
+    "ru": "Декомпозиция",
+    "en": "Decomposition",
+    "kk": "Декомпозиция"
+  },
+  "Сетевое планирование": {
+    "ru": "Сетевое планирование",
+    "en": "Network planning",
+    "kk": "Желілік жоспарлау"
+  },
+  "Квартальные планы": {
+    "ru": "Квартальные планы",
+    "en": "Quarterly planning",
+    "kk": "Тоқсандық жоспарлар"
+  },
+  "Юнит-экономика": {
+    "ru": "Юнит-экономика",
+    "en": "Unit economics",
+    "kk": "Юнит-экономика"
+  },
+  "Найм": {
+    "ru": "Найм",
+    "en": "Hiring",
+    "kk": "Жұмысқа қабылдау"
+  },
+  "IT-активы": {
+    "ru": "IT-активы",
+    "en": "IT assets",
+    "kk": "IT активтері"
+  },
+  "Бюджеты": {
+    "ru": "Бюджеты",
+    "en": "Budgets",
+    "kk": "Бюджеттер"
+  },
+  "Автоматизация": {
+    "ru": "Автоматизация",
+    "en": "Automation",
+    "kk": "Автоматтандыру"
+  },
+  "Зависимости": {
+    "ru": "Зависимости",
+    "en": "Dependencies",
+    "kk": "Тәуелділіктер"
+  },
+  "Финтех": {
+    "ru": "Финтех",
+    "en": "Fintech",
+    "kk": "Финтех"
+  },
+  "Дейтинг": {
+    "ru": "Дейтинг",
+    "en": "Dating",
+    "kk": "Танысу сервистері"
+  },
+  "Телеком": {
+    "ru": "Телеком",
+    "en": "Telecom",
+    "kk": "Телеком"
+  },
+  "Антифрод": {
+    "ru": "Антифрод",
+    "en": "Antifraud",
+    "kk": "Алаяқтыққа қарсы жүйелер"
+  },
+  "Конверсия": {
+    "ru": "Конверсия",
+    "en": "Conversion",
+    "kk": "Конверсия"
+  },
+  "Гипотезы": {
+    "ru": "Гипотезы",
+    "en": "Hypotheses",
+    "kk": "Гипотезалар"
+  },
+  "Как управлял": {
+    "ru": "Как управлял",
+    "en": "How I managed",
+    "kk": "Қалай басқардым"
+  },
+  "С кем работал": {
+    "ru": "С кем работал",
+    "en": "Who I worked with",
+    "kk": "Кімдермен жұмыс істедім"
+  },
+  "Мой инструментарий": {
+    "ru": "Мой инструментарий",
+    "en": "My toolkit",
+    "kk": "Құралдарым"
+  },
+  "Образование и сертификаты": {
+    "ru": "Образование и сертификаты",
+    "en": "Education and certifications",
+    "kk": "Білім және сертификаттар"
+  },
+  "Что проектировал": {
+    "ru": "Что проектировал",
+    "en": "What I designed",
+    "kk": "Нені жобаладым"
+  },
+  "На чём пишу": {
+    "ru": "На чём пишу",
+    "en": "What I code with",
+    "kk": "Қандай тілдерде жазамын"
+  },
+  "Что автоматизировал": {
+    "ru": "Что автоматизировал",
+    "en": "What I automated",
+    "kk": "Нені автоматтандырдым"
+  },
+  "Как работаю с качеством": {
+    "ru": "Как работаю с качеством",
+    "en": "How I approach quality",
+    "kk": "Сапамен қалай жұмыс істеймін"
+  },
+  "Компании и роли": {
+    "ru": "Компании и роли",
+    "en": "Companies and roles",
+    "kk": "Компаниялар мен рөлдер"
+  },
+  "Какие задачи закрывал": {
+    "ru": "Какие задачи закрывал",
+    "en": "Responsibilities",
+    "kk": "Қандай міндеттерді шештім"
+  },
+  "Экономика и результат": {
+    "ru": "Экономика и результат",
+    "en": "Economics and outcomes",
+    "kk": "Экономика және нәтижелер"
+  },
+  "Операционная оптика": {
+    "ru": "Операционная оптика",
+    "en": "An operations perspective",
+    "kk": "Операциялық көзқарас"
+  },
+  "Домены и продукты": {
+    "ru": "Домены и продукты",
+    "en": "Domains and products",
+    "kk": "Салалар мен өнімдер"
+  },
+  "Гипотезы и измерение": {
+    "ru": "Гипотезы и измерение",
+    "en": "Hypotheses and measurement",
+    "kk": "Гипотезалар мен өлшеу"
+  },
+  "Полученный и ожидаемый эффект": {
+    "ru": "Полученный и ожидаемый эффект",
+    "en": "Actual and forecast impact",
+    "kk": "Нақты және болжамды әсер"
+  },
+  "Это я": {
+    "ru": "Это я",
+    "en": "That's me",
+    "kk": "Бұл мен"
+  },
+  "Посмотреть, как это сделано": {
+    "ru": "Посмотреть, как это сделано",
+    "en": "See how it was made",
+    "kk": "Қалай жасалғанын көру"
+  },
+  "За кулисами портрета": {
+    "ru": "За кулисами портрета",
+    "en": "Behind the portrait",
+    "kk": "Портреттің жасалу тарихы"
+  },
+  "От фотографии к движению.": {
+    "ru": "От фотографии к движению.",
+    "en": "From photograph to motion.",
+    "kk": "Фотодан қозғалысқа дейін."
+  },
+  "Фото и подготовка": {
+    "ru": "Фото и подготовка",
+    "en": "Photo and preparation",
+    "kk": "Фото және дайындық"
+  },
+  "Ориентиры → маска": {
+    "ru": "Ориентиры → маска",
+    "en": "Landmarks → mesh",
+    "kk": "Бағдарлар → тор"
+  },
+  "Настоящий скан": {
+    "ru": "Настоящий скан",
+    "en": "The real scan",
+    "kk": "Нақты скан"
+  },
+  "База из кубиков": {
+    "ru": "База из кубиков",
+    "en": "The voxel foundation",
+    "kk": "Текшелерден құралған негіз"
+  },
+  "Совмещение и сборка": {
+    "ru": "Совмещение и сборка",
+    "en": "Alignment and assembly",
+    "kk": "Сәйкестендіру және құрастыру"
+  },
+  "Материал и движение": {
+    "ru": "Материал и движение",
+    "en": "Material and motion",
+    "kk": "Материал және қозғалыс"
+  },
+  "Покрутите оригинал": {
+    "ru": "Покрутите оригинал",
+    "en": "Rotate the original",
+    "kk": "Түпнұсқаны айналдырыңыз"
+  },
+  "Измеренная поверхность.": {
+    "ru": "Измеренная поверхность.",
+    "en": "The measured surface.",
+    "kk": "Өлшенген бет."
+  },
+  "Интерактивная версия очищенного скана — до превращения в кубики.": {
+    "ru": "Интерактивная версия очищенного скана — до превращения в кубики.",
+    "en": "An interactive cleaned scan, before conversion into cubes.",
+    "kk": "Текшелерге айналдырылғанға дейінгі тазартылған сканның интерактивті нұсқасы."
+  },
+  "Интерактивный скан лица": {
+    "ru": "Интерактивный скан лица",
+    "en": "Interactive face scan",
+    "kk": "Беттің интерактивті сканы"
+  },
+  "Потяните модель, чтобы повернуть скан.": {
+    "ru": "Потяните модель, чтобы повернуть скан.",
+    "en": "Drag to rotate the scan.",
+    "kk": "Сканды айналдыру үшін модельді сүйреңіз."
+  },
+  "Не удалось загрузить 3D. Скриншоты скана доступны выше.": {
+    "ru": "Не удалось загрузить 3D. Скриншоты скана доступны выше.",
+    "en": "Could not load 3D. Scan images are available above.",
+    "kk": "3D жүктелмеді. Скан суреттері жоғарыда берілген."
+  },
+  "Ориентиры: MediaPipe. Исходная воксельная модель: MIT. Фото и скан: Артем Летюшев.": {
+    "ru": "Ориентиры: MediaPipe. Исходная воксельная модель: MIT. Фото и скан: Артем Летюшев.",
+    "en": "Landmarks: MediaPipe. Original voxel model: MIT license. Photo and scan: Artem Letyushev.",
+    "kk": "Бағдарлар: MediaPipe. Бастапқы воксельдік модель: MIT лицензиясы. Фото және скан: Артем Летюшев."
+  },
+  "Twinby: четыре команды — Data Science, backend, рекламный кабинет и системный анализ. Финтех-холдинг: пять команд, около 50 специалистов. МТС: пять кросс-функциональных и две сервисные команды.": {
+    "ru": "Twinby: четыре команды — Data Science, backend, рекламный кабинет и системный анализ. Финтех-холдинг: пять команд, около 50 специалистов. МТС: пять кросс-функциональных и две сервисные команды.",
+    "en": "Twinby: four teams — Data Science, backend, advertising platform and systems analysis. Fintech holding: five teams, around 50 specialists. MTS: five cross-functional and two service teams.",
+    "kk": "Twinby: төрт команда — Data Science, backend, жарнама кабинеті және жүйелік талдау. Финтех-холдинг: бес команда, шамамен 50 маман. МТС: бес кросс-функционалды және екі сервистік команда."
+  },
+  "Декомпозиция, roadmap, ресурсы, риски и межкомандные зависимости. Квартальное планирование и регулярные релизы. В МТС перевёл подразделение с LeSS на SAFe; в ЮMoney выполнение согласованных планов достигло 100%.": {
+    "ru": "Декомпозиция, roadmap, ресурсы, риски и межкомандные зависимости. Квартальное планирование и регулярные релизы. В МТС перевёл подразделение с LeSS на SAFe; в ЮMoney выполнение согласованных планов достигло 100%.",
+    "en": "Decomposition, roadmaps, resources, risks and cross-team dependencies. Quarterly planning and regular releases. At MTS I moved the division from LeSS to SAFe; at YooMoney, delivery of agreed plans reached 100%.",
+    "kk": "Декомпозиция, roadmap, ресурстар, тәуекелдер және командалар арасындағы тәуелділіктер. Тоқсандық жоспарлау және тұрақты релиздер. МТС-та бөлімшені LeSS-тен SAFe-ке көшірдім; ЮMoney-де келісілген жоспарлардың орындалуы 100%-ға жетті."
+  },
+  "CEO, бизнес-заказчики, Product Owners, аналитики, дизайнеры, Data Science, мобильные и backend-разработчики, QA и DevOps. В ЮMoney перестроил взаимодействие примерно 90 участников.": {
+    "ru": "CEO, бизнес-заказчики, Product Owners, аналитики, дизайнеры, Data Science, мобильные и backend-разработчики, QA и DevOps. В ЮMoney перестроил взаимодействие примерно 90 участников.",
+    "en": "CEOs, business stakeholders, Product Owners, analysts, designers, Data Science, mobile and backend developers, QA and DevOps. At YooMoney I reorganized collaboration among roughly 90 people.",
+    "kk": "CEO, бизнес-тапсырыс берушілер, Product Owner-лер, талдаушылар, дизайнерлер, Data Science, мобильді және backend әзірлеушілер, QA және DevOps. ЮMoney-де шамамен 90 қатысушының өзара жұмысын қайта ұйымдастырдым."
+  },
+  "Гант, ИСР и календарно-сетевое планирование — для структуры и зависимостей; Scrum и Kanban — для командной работы и потока; SAFe и LeSS — для координации нескольких команд.": {
+    "ru": "Гант, ИСР и календарно-сетевое планирование — для структуры и зависимостей; Scrum и Kanban — для командной работы и потока; SAFe и LeSS — для координации нескольких команд.",
+    "en": "Gantt charts, WBS and network scheduling for structure and dependencies; Scrum and Kanban for teamwork and flow; SAFe and LeSS for coordinating multiple teams.",
+    "kk": "Құрылым мен тәуелділіктер үшін Гант диаграммасы, жұмыстардың иерархиялық құрылымы және күнтізбелік-желілік жоспарлау; командалық жұмыс пен ағын үшін Scrum және Kanban; бірнеше команданы үйлестіру үшін SAFe және LeSS."
+  },
+  "СПбПУ, 2017–2024: приборостроение; управление качеством; инноватика — инновационный менеджмент программных продуктов. SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.": {
+    "ru": "СПбПУ, 2017–2024: приборостроение; управление качеством; инноватика — инновационный менеджмент программных продуктов. SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.",
+    "en": "Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instrumentation; quality management; innovation studies — innovation management of software products. SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.",
+    "kk": "СПбПУ, 2017–2024: аспап жасау; сапаны басқару; инноватика — бағдарламалық өнімдердің инновациялық менеджменті. SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement."
+  },
+  "В Twinby работал над антифродом из девяти сервисов, API и интеграциями, мультитенантной архитектурой CIS/global и CDP для 10+ каналов. Обсуждал требования и ограничения вместе с аналитиками и инженерами.": {
+    "ru": "В Twinby работал над антифродом из девяти сервисов, API и интеграциями, мультитенантной архитектурой CIS/global и CDP для 10+ каналов. Обсуждал требования и ограничения вместе с аналитиками и инженерами.",
+    "en": "At Twinby I worked on a nine-service antifraud system, APIs and integrations, a CIS/global multitenant architecture and a CDP for 10+ channels. I discussed requirements and constraints with analysts and engineers.",
+    "kk": "Twinby-де тоғыз сервистен тұратын антифрод, API мен интеграциялар, CIS/global мультитенантты архитектурасы және 10-нан астам арнаға арналған CDP бойынша жұмыс істедім. Талаптар мен шектеулерді талдаушылар және инженерлермен талқыладым."
+  },
+  "Начинал с Android. В собственных проектах использую Python, TypeScript, React / Next.js, FastAPI и LangGraph. В ai-stp есть Rust CLI и Tauri. Развиваю RAG-поддержку, AI-аудитора и инструменты автоматизации.": {
+    "ru": "Начинал с Android. В собственных проектах использую Python, TypeScript, React / Next.js, FastAPI и LangGraph. В ai-stp есть Rust CLI и Tauri. Развиваю RAG-поддержку, AI-аудитора и инструменты автоматизации.",
+    "en": "I started in Android development. My own projects use Python, TypeScript, React / Next.js, FastAPI and LangGraph. ai-stp includes a Rust CLI and Tauri. I develop RAG support, an AI auditor and automation tools.",
+    "kk": "Android әзірлеуден бастадым. Жеке жобаларымда Python, TypeScript, React / Next.js, FastAPI және LangGraph қолданамын. ai-stp құрамында Rust CLI және Tauri бар. RAG-қолдау, AI-аудитор және автоматтандыру құралдарын дамытамын."
+  },
+  "Лично писал инструменты для командных и инженерных метрик, учёта OPEX/CAPEX и управленческой отчётности. Развивал skills и MCP-сервисы. В job_ftch — сбор и обработка вакансий.": {
+    "ru": "Лично писал инструменты для командных и инженерных метрик, учёта OPEX/CAPEX и управленческой отчётности. Развивал skills и MCP-сервисы. В job_ftch — сбор и обработка вакансий.",
+    "en": "I personally built tools for team and engineering metrics, OPEX/CAPEX tracking and management reporting. I developed skills and MCP services. job_ftch collects and processes job postings.",
+    "kk": "Командалық және инженерлік метрикалар, OPEX/CAPEX есебі және басқарушылық есептілік құралдарын өзім жаздым. Skills және MCP сервистерін дамыттым. job_ftch жобасында бос жұмыс орындары жиналып, өңделеді."
+  },
+  "API-контракты, SQL, архитектурные ограничения, наблюдаемость и оценка RAG. Внедрил docs-as-code, ADR и AI-флоу; time-to-market аналитики сократился на 60%.": {
+    "ru": "API-контракты, SQL, архитектурные ограничения, наблюдаемость и оценка RAG. Внедрил docs-as-code, ADR и AI-флоу; time-to-market аналитики сократился на 60%.",
+    "en": "API contracts, SQL, architectural constraints, observability and RAG evaluation. I introduced docs-as-code, ADR and AI workflows; analytics time-to-market fell by 60%.",
+    "kk": "API келісімшарттары, SQL, архитектуралық шектеулер, бақыланымдылық және RAG бағалауы. Docs-as-code, ADR және AI жұмыс ағындарын енгіздім; талдаудың time-to-market көрсеткіші 60%-ға қысқарды."
+  },
+  "Renewal Studio — переход от разработки к управлению студийными проектами. Itis Team — рост команды с 5 до 18 человек. Curestry — операционная роль COO в HealthTech. В продуктовых компаниях — управление поставкой и межкомандной координацией.": {
+    "ru": "Renewal Studio — переход от разработки к управлению студийными проектами. Itis Team — рост команды с 5 до 18 человек. Curestry — операционная роль COO в HealthTech. В продуктовых компаниях — управление поставкой и межкомандной координацией.",
+    "en": "Renewal Studio: a transition from development to managing studio projects. Itis Team: team growth from 5 to 18 people. Curestry: a COO role in HealthTech. In product companies: delivery management and cross-team coordination.",
+    "kk": "Renewal Studio — әзірлеуден студия жобаларын басқаруға ауысу. Itis Team — команданың 5 адамнан 18 адамға өсуі. Curestry — HealthTech саласындағы COO рөлі. Өнімдік компанияларда — нәтижені жеткізу және командалар арасындағы үйлестіру."
+  },
+  "Планирование ресурсов, рост команд, организация релизов, зависимости, автоматизация отчётности и учёт OPEX/CAPEX. Соединял работу специалистов с потребностями бизнеса.": {
+    "ru": "Планирование ресурсов, рост команд, организация релизов, зависимости, автоматизация отчётности и учёт OPEX/CAPEX. Соединял работу специалистов с потребностями бизнеса.",
+    "en": "Resource planning, team growth, release organization, dependencies, reporting automation and OPEX/CAPEX tracking. I connected specialist work to business needs.",
+    "kk": "Ресурстарды жоспарлау, командаларды өсіру, релиздерді ұйымдастыру, тәуелділіктер, есептілікті автоматтандыру және OPEX/CAPEX есебі. Мамандардың жұмысын бизнес қажеттіліктерімен байланыстырдым."
+  },
+  "Renewal Studio вышла на окупаемость за два месяца. В Itis Team маржинальность проектов выросла с 12% до 34% благодаря автоматизации и повторному использованию кода. В финтех-холдинге интервал релизов сократился на 20%.": {
+    "ru": "Renewal Studio вышла на окупаемость за два месяца. В Itis Team маржинальность проектов выросла с 12% до 34% благодаря автоматизации и повторному использованию кода. В финтех-холдинге интервал релизов сократился на 20%.",
+    "en": "Renewal Studio broke even in two months. At Itis Team, project margins rose from 12% to 34% through automation and code reuse. At the fintech holding, release intervals fell by 20%.",
+    "kk": "Renewal Studio екі айда өзін-өзі ақтауға жетті. Itis Team-де автоматтандыру және кодты қайта пайдалану арқылы жобалардың маржиналдылығы 12%-дан 34%-ға өсті. Финтех-холдингте релиздер аралығы 20%-ға қысқарды."
+  },
+  "P&L, юнит-экономика, бюджеты, найм, performance review и управление IT-активами — язык операционных решений: стоимость, ответственность, доступная мощность и устойчивость работы. Подтверждённые кейсы выше отделяю от этого инструментария.": {
+    "ru": "P&L, юнит-экономика, бюджеты, найм, performance review и управление IT-активами — язык операционных решений: стоимость, ответственность, доступная мощность и устойчивость работы. Подтверждённые кейсы выше отделяю от этого инструментария.",
+    "en": "P&L, unit economics, budgets, hiring, performance reviews and IT asset management are the language of operational decisions: cost, ownership, capacity and continuity. I distinguish the evidenced cases above from this toolkit.",
+    "kk": "P&L, юнит-экономика, бюджеттер, жұмысқа қабылдау, performance review және IT активтерін басқару — операциялық шешімдердің тілі: құн, жауапкершілік, қолжетімді қуат және жұмыстың тұрақтылығы. Жоғарыдағы дәлелденген кейстерді осы құралдар жиынтығынан бөлек көрсетемін."
+  },
+  "Дейтинг: Twinby, антифрод, рекламный кабинет и CDP. Финтех: электронные платежи, международное мобильное приложение и каталог метаданных. Телеком: МТС-Касса и франшиза. HealthTech: Curestry.": {
+    "ru": "Дейтинг: Twinby, антифрод, рекламный кабинет и CDP. Финтех: электронные платежи, международное мобильное приложение и каталог метаданных. Телеком: МТС-Касса и франшиза. HealthTech: Curestry.",
+    "en": "Dating: Twinby, antifraud, advertising platform and CDP. Fintech: electronic payments, an international mobile app and a metadata catalog. Telecom: MTS Kassa and franchising. HealthTech: Curestry.",
+    "kk": "Танысу сервистері: Twinby, антифрод, жарнама кабинеті және CDP. Финтех: электрондық төлемдер, халықаралық мобильді қосымша және метадеректер каталогы. Телеком: МТС-Касса және франшиза. HealthTech: Curestry."
+  },
+  "Связывал бизнес-задачу с требованиями, приоритетами и критериями результата. Запускал мобильное приложение на трёх рынках; retention вырос на 15%, конверсия — на 10%. В антифроде выполнял роль Product Owner.": {
+    "ru": "Связывал бизнес-задачу с требованиями, приоритетами и критериями результата. Запускал мобильное приложение на трёх рынках; retention вырос на 15%, конверсия — на 10%. В антифроде выполнял роль Product Owner.",
+    "en": "I connected business goals to requirements, priorities and success criteria. I launched a mobile app in three markets; retention rose by 15% and conversion by 10%. I acted as Product Owner for antifraud.",
+    "kk": "Бизнес міндеттерін талаптармен, басымдықтармен және нәтиже өлшемдерімен байланыстырдым. Мобильді қосымшаны үш нарыққа шығардым; retention 15%-ға, конверсия 10%-ға өсті. Антифродта Product Owner рөлін атқардым."
+  },
+  "Работал с задачами снижения fraud rate, улучшения рекламного таргетинга, платёжных сценариев, upsell и промомеханик. CustDev и CJM — инструменты проверки потребности и пути пользователя; эффект оцениваю через продуктовые метрики.": {
+    "ru": "Работал с задачами снижения fraud rate, улучшения рекламного таргетинга, платёжных сценариев, upsell и промомеханик. CustDev и CJM — инструменты проверки потребности и пути пользователя; эффект оцениваю через продуктовые метрики.",
+    "en": "I worked on reducing fraud rate, improving ad targeting, payment journeys, upsell and promotional mechanics. CustDev and CJM are tools for validating needs and user journeys; I assess impact through product metrics.",
+    "kk": "Fraud rate көрсеткішін төмендету, жарнаманы нысаналауды жақсарту, төлем сценарийлері, upsell және промомеханикалар бойынша жұмыс істедім. CustDev пен CJM — қажеттілік пен пайдаланушы жолын тексеру құралдары; әсерді өнімдік метрикалармен бағалаймын."
+  },
+  "Антифрод снизил fraud rate в 2,5 раза; $800 тыс. в год — оценочный эффект. CDP для 10+ каналов доведена до этапа запуска; около $1 млн прибыли в год — прогноз, а не уже полученный результат.": {
+    "ru": "Антифрод снизил fraud rate в 2,5 раза; $800 тыс. в год — оценочный эффект. CDP для 10+ каналов доведена до этапа запуска; около $1 млн прибыли в год — прогноз, а не уже полученный результат.",
+    "en": "Antifraud reduced fraud rate by a factor of 2.5; $800,000 per year is an estimated impact. The CDP for 10+ channels reached the launch stage; around $1 million in annual profit is a forecast, not a realized result.",
+    "kk": "Антифрод fraud rate көрсеткішін 2,5 есе төмендетті; жылына $800 мың — бағаланған әсер. 10-нан астам арнаға арналған CDP іске қосу кезеңіне жеткізілді; жылына шамамен $1 млн пайда — алынған нәтиже емес, болжам."
+  },
+  "Исходное фото задаёт узнаваемость: пропорции, силуэт и выражение лица. Для извлечения ориентиров использовался отдельно подготовленный фронтальный портрет.": {
+    "ru": "Исходное фото задаёт узнаваемость: пропорции, силуэт и выражение лица. Для извлечения ориентиров использовался отдельно подготовленный фронтальный портрет.",
+    "en": "The original photo establishes recognizable proportions, silhouette and expression. A separately prepared frontal portrait was used to extract landmarks.",
+    "kk": "Бастапқы фото танылатын пропорцияларды, сұлбаны және бет әлпетін береді. Бағдарларды алу үшін бөлек дайындалған фронталды портрет қолданылды."
+  },
+  "MediaPipe выделяет ориентиры лица. По точкам строится треугольная маска: глаза, нос, рот и контур. Это геометрическая подсказка из изображения, а не полноценный скан головы.": {
+    "ru": "MediaPipe выделяет ориентиры лица. По точкам строится треугольная маска: глаза, нос, рот и контур. Это геометрическая подсказка из изображения, а не полноценный скан головы.",
+    "en": "MediaPipe identifies facial landmarks. These points form a triangular mesh of the eyes, nose, mouth and outline. It is a geometric guide from an image, not a complete head scan.",
+    "kk": "MediaPipe бет бағдарларын анықтайды. Нүктелерден көз, мұрын, ауыз және контурдың үшбұрышты торы құралады. Бұл — толық бас сканы емес, суреттен алынған геометриялық бағдар."
+  },
+  "Ваш 3D-скан очищен от фона и лишних фрагментов. После обработки осталось 32 016 измеренных вершин. Задняя поверхность открыта: скан не содержит полного затылка.": {
+    "ru": "Ваш 3D-скан очищен от фона и лишних фрагментов. После обработки осталось 32 016 измеренных вершин. Задняя поверхность открыта: скан не содержит полного затылка.",
+    "en": "Your 3D scan was cleaned to remove the background and stray fragments. Processing retained 32,016 measured vertices. The rear surface is open: the scan does not contain the whole back of the head.",
+    "kk": "Сіздің 3D сканыңыз фоннан және артық фрагменттерден тазартылды. Өңдеуден кейін 32 016 өлшенген төбе қалды. Артқы беті ашық: сканда желкенің толық пішіні жоқ."
+  },
+  "Исходная воксельная модель задаёт кубическую структуру. Фотографические ориентиры помогают проверить пропорции, а измеренный скан — перенести рельеф лица на кубики.": {
+    "ru": "Исходная воксельная модель задаёт кубическую структуру. Фотографические ориентиры помогают проверить пропорции, а измеренный скан — перенести рельеф лица на кубики.",
+    "en": "The original voxel model provides the cube structure. Photo landmarks help check proportions, while the measured scan transfers facial relief onto the cubes.",
+    "kk": "Бастапқы воксельдік модель текшелер құрылымын береді. Фотодағы бағдарлар пропорцияларды тексеруге, ал өлшенген скан бет бедерін текшелерге көшіруге көмектеседі."
+  },
+  "Поверхность скана и кубическая оболочка совмещены в общей системе координат. Лицо опирается на измерения; затылок, шея и недостающие участки достроены. Это художественная реконструкция.": {
+    "ru": "Поверхность скана и кубическая оболочка совмещены в общей системе координат. Лицо опирается на измерения; затылок, шея и недостающие участки достроены. Это художественная реконструкция.",
+    "en": "The scan surface and cube shell are aligned in one coordinate system. The face is based on measurements; the back of the head, neck and missing regions are reconstructed. This is an artistic reconstruction.",
+    "kk": "Скан беті мен текшелер қабығы ортақ координаттар жүйесінде сәйкестендірілген. Бет өлшемдерге негізделген; желке, мойын және жетіспейтін бөліктер толықтырылған. Бұл — көркем реконструкция."
+  },
+  "React и Three.js. InstancedMesh рисует тысячи кубиков; металлический материал и свет подчёркивают грани. Пружинная динамика реагирует на курсор, а прокрутка управляет распадом и сборкой следующих моделей.": {
+    "ru": "React и Three.js. InstancedMesh рисует тысячи кубиков; металлический материал и свет подчёркивают грани. Пружинная динамика реагирует на курсор, а прокрутка управляет распадом и сборкой следующих моделей.",
+    "en": "React and Three.js. InstancedMesh draws thousands of cubes; metallic materials and lighting define their edges. Spring dynamics respond to the cursor, while scrolling controls disassembly and reassembly into the next models.",
+    "kk": "React және Three.js. InstancedMesh мыңдаған текшені салады; металдық материал мен жарық қырларды айқындайды. Серіппелі динамика курсорға жауап береді, ал айналдыру келесі модельдерге ыдырау мен қайта жиналуды басқарады."
   }
 }

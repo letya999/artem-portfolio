@@ -1,4 +1,5 @@
 import {useI18n} from './i18n.jsx';
+import PortraitStory from './PortraitStory.jsx';
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { makeVoxelPortrait, poseVoxelPortrait, updateCubeWave } from "./voxel.js";
@@ -170,11 +171,16 @@ export default function Portrait() {
 
       }).catch(() => { /* The original portrait remains visible on load failure. */ });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    let previousReduced = reduced.matches;
     reduced.addEventListener('change', onScroll);
     renderer.setAnimationLoop((now) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       if (!sculpture || document.hidden) return;
+      if (previousReduced !== reduced.matches) {
+        previousReduced = reduced.matches;
+        onScroll();
+      }
       const c = control.current;
       if (reduced.matches && !scrollDirty) return;
       if (equation && equationSlot && results && (scrollDirty || reduced.matches)) {
@@ -359,6 +365,7 @@ export default function Portrait() {
         />
       </div>
       <div className="portrait-controls"><span>{t("Порядок из сложности")}</span></div>
+      <PortraitStory/>
     </div>
   );
 }

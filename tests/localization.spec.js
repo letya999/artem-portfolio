@@ -15,7 +15,7 @@ test('complete locale selection, persistence, browser detection, navigation and 
  await expect.soft(page.locator('#experience h2')).toHaveText('Жұмыс тәжірибесі',{timeout:100});
  await page.evaluate(()=>{const s=document.querySelector('select');if(s){s.value='en';s.dispatchEvent(new Event('change',{bubbles:true}));}});
  await page.locator('.practice-more').first().click();
- await expect.soft(page.locator('dialog')).toContainText('What I managed',{timeout:100});await page.keyboard.press('Escape');
+ await expect.soft(page.locator('#practice dialog')).toContainText('What I managed',{timeout:100});await page.keyboard.press('Escape');
  await page.locator('header a[href="#experience"]').click();await page.waitForTimeout(1200);
  expect.soft(await page.locator('#experience').evaluate(e=>e.getBoundingClientRect().top)).toBeGreaterThan(60);
  await page.setViewportSize({width:390,height:844});

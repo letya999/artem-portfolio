@@ -1,0 +1,10 @@
+Portrait making-of assets
+
+Photo and measured face scan: Artem Letyushev, supplied by the site owner.
+scan.json: cleaned face component from the owner-supplied scan; 32,016 measured vertices. It is an open facial surface, not a complete head.
+scan-views.png: four rendered views of that same cleaned face component.
+landmarks.png: visualization of extracted MediaPipe landmarks over a prepared portrait and the corresponding triangular face mesh.
+MediaPipe canonical topology: https://github.com/google-ai-edge/mediapipe/blob/master/mediapipe/modules/face_geometry/data/canonical_face_model.obj (Apache-2.0).
+base.png: screenshot of the original voxel portrait preview. License: ../voxel-LICENSE.txt (MIT).
+combined.png and final.png: screenshots of the portfolio reconstruction. Face depth comes from the owner scan; missing rear/neck areas are estimated.
+No Basel Face Model geometry or research-only fitted surfaces are distributed here.

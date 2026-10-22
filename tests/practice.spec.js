@@ -7,10 +7,11 @@ test('four voxel disciplines disclose grounded detail independently of the conve
   const contracts=await section.evaluate(s=>({
     dialogs:!!s.querySelector('dialog'),
     detailButtons:s.querySelectorAll('.practice-more').length,
-    words:s.querySelectorAll('[data-voxel-word]').length,
     renderer:!!s.querySelector('canvas[data-voxel-count]'),
   }));
-  expect.soft(contracts).toEqual({dialogs:true,detailButtons:4,words:12,renderer:true});
+  // Expanded orbit vocabularies replace the former three fixed tags per area.
+  // Their required terms and minimum size are checked in practice-orbit.spec.js.
+  expect.soft(contracts).toEqual({dialogs:true,detailButtons:4,renderer:true});
   await expect.soft(section.locator(':scope > h2')).toHaveText('От общего языка к общему результату.');
   await expect.soft(section.locator('h2 br')).toHaveCount(0);
   await expect.soft(section.locator('.practice-area')).toHaveCount(4);
