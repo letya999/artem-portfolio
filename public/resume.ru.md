@@ -79,7 +79,7 @@ IT-аутсорсинг · мобильная и веб-разработка
 
 ## Менеджмент
 
-Гант · ИСР · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Roadmap · Сетевое планирование · Квартальные планы · Риски
+Гант · ИСР · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Roadmap · Сетевое планирование · Квартальные планы · Риски · OKR · KPI · Delivery · Backlog
 
 Собираю команды вокруг общего результата.
 
@@ -105,7 +105,7 @@ CEO, бизнес-заказчики, Product Owners, аналитики, диз
 
 ## Инженерия
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git
 
 Понимаю систему глубже списка задач.
 
@@ -131,7 +131,7 @@ API-контракты, SQL, архитектурные ограничения, 
 
 ## Операционка
 
-P&L · Юнит-экономика · OPEX / CAPEX · Найм · Performance review · IT-активы · Flow · Релизы · Бюджеты · Автоматизация · Зависимости · Команды
+P&L · Юнит-экономика · OPEX / CAPEX · Найм · Performance review · IT-активы · Flow · Релизы · Бюджеты · Автоматизация · Зависимости · Команды · SLA · FinOps · Capacity · Forecast
 
 Превращаю загрузку в предсказуемую поставку.
 
@@ -157,7 +157,7 @@ P&L, юнит-экономика, бюджеты, найм, performance review �
 
 ## Продуктовка
 
-Финтех · HealthTech · Дейтинг · Телеком · CustDev · CJM · CDP · Антифрод · Retention · Конверсия · Гипотезы · Метрики
+Финтех · HealthTech · Дейтинг · Телеком · CustDev · CJM · CDP · Антифрод · Retention · Конверсия · Гипотезы · Метрики · A/B · Growth · NPS · UX
 
 Соединяю запуск с измеримым эффектом.
 

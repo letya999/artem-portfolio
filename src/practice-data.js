@@ -1,8 +1,8 @@
 export const areas = [
- ['Менеджмент','Гант','ИСР','Scrum','Kanban','Agile','SAFe','LeSS','Декомпозиция','Roadmap','Сетевое планирование','Квартальные планы','Риски'],
- ['Инженерия','React','Rust','Python','TypeScript','Next.js','FastAPI','LangGraph','RAG','API','SQL','ADR','MCP'],
- ['Операционка','P&L','Юнит-экономика','OPEX / CAPEX','Найм','Performance review','IT-активы','Flow','Релизы','Бюджеты','Автоматизация','Зависимости','Команды'],
- ['Продуктовка','Финтех','HealthTech','Дейтинг','Телеком','CustDev','CJM','CDP','Антифрод','Retention','Конверсия','Гипотезы','Метрики'],
+ ['Менеджмент','Гант','ИСР','Scrum','Kanban','Agile','SAFe','LeSS','Декомпозиция','Roadmap','Сетевое планирование','Квартальные планы','Риски','OKR','KPI','Delivery','Backlog'],
+ ['Инженерия','React','Rust','Python','TypeScript','Next.js','FastAPI','LangGraph','RAG','API','SQL','ADR','MCP','DevOps','CI/CD','Docker','Git'],
+ ['Операционка','P&L','Юнит-экономика','OPEX / CAPEX','Найм','Performance review','IT-активы','Flow','Релизы','Бюджеты','Автоматизация','Зависимости','Команды','SLA','FinOps','Capacity','Forecast'],
+ ['Продуктовка','Финтех','HealthTech','Дейтинг','Телеком','CustDev','CJM','CDP','Антифрод','Retention','Конверсия','Гипотезы','Метрики','A/B','Growth','NPS','UX'],
 ];
 export const education = 'СПбПУ, 2017–2024: приборостроение; управление качеством; инноватика — инновационный менеджмент программных продуктов.';
 export const certifications = 'SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.';

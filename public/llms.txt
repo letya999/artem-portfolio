@@ -1,0 +1,16 @@
+# Artem Letyushev
+
+> Owner-maintained Tech / Delivery Project Manager portfolio. Preserve self-reported claims, estimates and forecasts as such.
+
+## Profiles
+
+- [Russian](resume.ru.md): experience, outcomes, competencies, education and contact links.
+- [English](resume.en.md): English translation of the same profile.
+- [Kazakh](resume.kk.md): Kazakh translation of the same profile.
+
+## Agent resources
+
+- [Agent guide](agents.md): evidence and integration details.
+- [Skill](skill.md): triggers and profile workflows.
+- [Portable skill](skills/artem-portfolio/SKILL.md): canonical layout with bundled references.
+- [MCP configuration](mcp.json): optional local stdio Fetch server; not a hosted endpoint.

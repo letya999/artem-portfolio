@@ -6,7 +6,8 @@ export default function Conveyor(){
  const {t}=useI18n();
   const root=useRef(null);
   useEffect(()=>createConveyor(root.current),[]);
-  return <section id="conveyor" className="conveyor-section" aria-label={t("Публикации и проекты")}>
+  return <section id="conveyor" className="conveyor-section" aria-labelledby="resources-title">
+    <h2 id="resources-title"><a href="#conveyor">{t('Мои ресурсы')}</a></h2>
     <div className="conveyor-stage" ref={root}>{profiles.map(([name,url,slug])=><a className="conveyor-link" key={name} href={url} target="_blank" rel="noreferrer" aria-label={name}><img src={`./brand-marks/${slug}.svg`} alt="" width="80" height="80" /></a>)}</div>
   </section>;
 }

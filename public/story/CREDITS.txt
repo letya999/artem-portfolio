@@ -1,5 +1,14 @@
 Portrait making-of assets
 
+Current interactive chronology:
+models/original-voxel.glb: voxel-portrait/model/portrait-detail.glb from the owner-provided voxel_portrait_threejs.zip; original project license: ../voxel-LICENSE.txt (MIT).
+models/metal-first.json: public/voxel-portrait.json at local commit deca966.
+models/photo-reconstruction.json: locally generated MediaPipe landmark interpolation from two owner photos (qa/clay-face.json); invisible scalp and ears are estimates, not measured scan data.
+models/iphone-scan.glb: unchanged original 21.10.2026.glb from the owner-provided 21.10.2026.zip, including its photographic skin and hair texture. The captured surface contains background and clothing and is open at the rear.
+models/scan-transfer.json: public/voxel-portrait.json at local commit 0102e21.
+models/dense-reconstruction.json: public/voxel-portrait.json at local commit 50e4a55.
+models/thumb-*.png: screenshots of the corresponding interactive models. The final model uses public/voxel-portrait.json.
+
 Photo and measured face scan: Artem Letyushev, supplied by the site owner.
 scan.json: cleaned face component from the owner-supplied scan; 32,016 measured vertices. It is an open facial surface, not a complete head.
 scan-views.png: four rendered views of that same cleaned face component.

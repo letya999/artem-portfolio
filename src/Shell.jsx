@@ -9,7 +9,7 @@ export default function Shell(){
   {agent?<div className="agent-shell">
    <header><a href="?view=human">← {t('Сайт')}</a><a href={`./resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')} ↓</a>
    <select aria-label={t('Язык')} value={locale} onChange={e=>changeLocale(e.target.value)}><option value="ru">RU</option><option value="en">EN</option><option value="kk">ҚАЗ</option></select></header>
-   <main><pre>{resumeMarkdown(t)}</pre></main>
+   <main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{resumeMarkdown(t)}</pre></main>
   </div>:<Human/>}
   <aside className="view-dock" aria-label={t('Формат сайта')}>
    <a href="?view=human" aria-current={!agent?'page':undefined}><span aria-hidden="true">{agent?'○':'●'}</span> Human</a>

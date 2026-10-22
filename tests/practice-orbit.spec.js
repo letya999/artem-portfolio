@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 test('four orbiting vocabularies and structured evidence include projects and relevant education',async({page})=>{
  await page.goto('/#practice');await page.locator('#practice').scrollIntoViewIfNeeded();
- expect.soft(await page.locator('[data-voxel-word]').count()).toBeGreaterThanOrEqual(40);
+ for(const cloud of await page.locator('.voxel-tags').all())expect.soft(await cloud.locator('[data-voxel-word]').count()).toBeGreaterThanOrEqual(16);
  for(const word of ['Гант','ИСР','Rust','React','P&L','CJM'])expect.soft(await page.locator('#practice').textContent()).toContain(word);
  for(let i=0;i<4;i++){
   await page.locator('.practice-more').nth(i).click();const dialog=page.locator('#practice .practice-dialog');

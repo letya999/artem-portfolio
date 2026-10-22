@@ -79,7 +79,7 @@ Transitioned from Android development to project management.
 
 ## Management
 
-Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Network planning · Quarterly planning · Risks
+Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Network planning · Quarterly planning · Risks · OKR · KPI · Delivery · Backlog
 
 Bringing teams together around a shared outcome.
 
@@ -105,7 +105,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Engineering
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git
 
 Understanding the system beyond the task list.
 
@@ -131,7 +131,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Operations
 
-P&L · Unit economics · OPEX / CAPEX · Hiring · Performance review · IT assets · Flow · Releases · Budgets · Automation · Dependencies · Teams
+P&L · Unit economics · OPEX / CAPEX · Hiring · Performance review · IT assets · Flow · Releases · Budgets · Automation · Dependencies · Teams · SLA · FinOps · Capacity · Forecast
 
 Turning a busy workload into predictable delivery.
 
@@ -157,7 +157,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Product
 
-Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics
+Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics · A/B · Growth · NPS · UX
 
 Connecting launches to measurable impact.
 
