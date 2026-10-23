@@ -79,7 +79,7 @@ Transitioned from Android development to project management.
 
 ## Processes
 
-Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Risks · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Hiring · Flow · Releases · Budgets · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review
+Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Risks · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Hiring · Flow · Releases · Budgets · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review · Sprint Planning · Sprint Review · Retrospective · Daily Scrum · PI Planning · System Demo · Release Train · Dependency Mapping · Risk Register · RAID · Critical Path · WIP Limits · Throughput · Velocity · Takt Time · Service Level Expectation · Monte Carlo · Incident Management · Change Management · RACI · Decision Log · Stakeholder Map · Resource Planning · Budget Forecast · Team Topologies · Team Health · Continuous Improvement · Value Stream Mapping
 
 Bringing teams together around a shared outcome.
 
@@ -121,7 +121,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Engineering
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents · JavaScript · Node.js · Astro · Three.js · WebGL · HTML · CSS · Vite · Playwright · REST · GraphQL · OpenAPI · WebSocket · JSON · DAX · Power Query · T-SQL · Data Warehouse · Data Pipelines · ETL · ELT · Data Modeling · Star Schema · OLAP · GitHub Actions · Linux · Kotlin · Gradle · Android SDK
 
 Understanding the system beyond the task list.
 
@@ -151,7 +151,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Product
 
-Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica
+Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica · User Research · User Interviews · Usability Tests · Funnel Analysis · AARRR · LTV / CAC · ARPU · DAU / MAU · Retention Cohorts · Onboarding · Pricing · Subscription · Payments · Fraud Detection · Recommendations · CRM · Push Campaigns · Journey Mapping · Product Strategy · Value Proposition · Opportunity Mapping · RICE · ICE · Kano · HEART · Feature Adoption · Experiment Design · Product-Market Fit · Market Research · Customer Segments · Product Roadmap
 
 Connecting launches to measurable impact.
 

@@ -1,0 +1,58 @@
+import fs from 'node:fs';
+import * as THREE from 'three';
+// The MIT-licensed source and notice are kept beside this generator in assets/.
+const bytes=fs.readFileSync(new URL('./assets/webxr-right-hand.glb',import.meta.url));
+const length=bytes.readUInt32LE(12),gltf=JSON.parse(bytes.subarray(20,20+length)),bin=bytes.subarray(28+length);
+function read(index){
+ const a=gltf.accessors[index],b=gltf.bufferViews[a.bufferView],count={SCALAR:1,VEC3:3,VEC4:4}[a.type],size={5126:4,5123:2,5121:1}[a.componentType];
+ const method={5126:'readFloatLE',5123:'readUInt16LE',5121:'readUInt8'}[a.componentType],offset=(b.byteOffset||0)+(a.byteOffset||0);
+ return Array.from({length:a.count},(_,i)=>Array.from({length:count},(_,j)=>bin[method](offset+i*(b.byteStride||count*size)+j*size)));
+}
+const primitive=gltf.meshes[0].primitives[0],raw=read(primitive.attributes.POSITION),normals=read(primitive.attributes.NORMAL),joints=read(primitive.attributes.JOINTS_0),weights=read(primitive.attributes.WEIGHTS_0);
+const wrist=gltf.nodes[0].translation;
+const map=p=>new THREE.Vector3(-(p[1]-wrist[1])*1000-65,-(p[0]-wrist[0])*1250,(p[2]-wrist[2])*1000);
+const positions=raw.map(map);
+for(const p of positions)if(p.x< -65)p.x=-65+(p.x+65)*2.7;
+const ns=normals.map(p=>new THREE.Vector3(-p[1],-p[0]/1.25,p[2]).normalize());
+positions.forEach((p,i)=>p.addScaledVector(ns[i],1.6));
+const indices=read(primitive.indices).flat();for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];
+const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions.flatMap(p=>p.toArray()),3));geometry.setIndex(indices);geometry.computeVertexNormals();
+const mesh=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));mesh.updateMatrixWorld(true);
+const bounds=new THREE.Box3().setFromObject(mesh),pitch=8.4,ray=new THREE.Raycaster(),tiles=[];
+const bary=new THREE.Vector3(),round=n=>Math.round(n*10000)/10000;
+const triangle=new THREE.Triangle(),accepted=new Map();
+for(const phase of [0,.5])for(const axis of [1,2,0]){
+ const u=(axis+1)%3,w=(axis+2)%3,direction=new THREE.Vector3().setComponent(axis,-1);
+ for(let i=Math.ceil(bounds.min.getComponent(u)/pitch);i<=Math.floor(bounds.max.getComponent(u)/pitch);i++)for(let j=Math.ceil(bounds.min.getComponent(w)/pitch);j<=Math.floor(bounds.max.getComponent(w)/pitch);j++){
+  const origin=new THREE.Vector3().setComponent(axis,200).setComponent(u,(i+phase)*pitch).setComponent(w,(j+phase)*pitch);ray.set(origin,direction);
+  for(const hit of ray.intersectObject(mesh)){
+   const face=hit.faceIndex,ids=indices.slice(face*3,face*3+3);triangle.set(...ids.map(id=>positions[id]));triangle.getBarycoord(hit.point,bary);
+   const normal=new THREE.Vector3(),blended=new Map();
+   for(let k=0;k<3;k++){
+    const vertex=ids[k],weight=bary.getComponent(k);normal.addScaledVector(ns[vertex],weight);
+    for(let n=0;n<4;n++)blended.set(joints[vertex][n],(blended.get(joints[vertex][n])||0)+weights[vertex][n]*weight);
+   }
+   normal.normalize();
+   if(Math.abs(normal.getComponent(axis))<.50)continue;
+   const point=hit.point.clone().addScaledVector(normal,-pitch*.22),cell=point.toArray().map(n=>Math.round(n/(pitch*.75))),key=cell.join(',');
+   let overlaps=false;
+   for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)for(let c=-1;c<=1;c++){
+    const neighbors=accepted.get([cell[0]+a,cell[1]+b,cell[2]+c].join(','))||[];
+    if(neighbors.some(p=>p.distanceToSquared(point)<(pitch*.72)**2))overlaps=true;
+   }
+   if(overlaps)continue;
+   if(!accepted.has(key))accepted.set(key,[]);accepted.get(key).push(point);
+   const x=axis===0?normal.clone():new THREE.Vector3(1,0,0).addScaledVector(normal,-normal.x).normalize();
+   const y=axis===1?normal.clone():axis===2?new THREE.Vector3().crossVectors(normal,x).normalize():new THREE.Vector3(0,1,0).addScaledVector(normal,-normal.y).normalize();
+   const z=new THREE.Vector3().crossVectors(x,y).normalize();y.crossVectors(z,x).normalize();
+   const q=new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x,y,z));
+   const skin=[...blended].sort((a,b)=>b[1]-a[1]).slice(0,4),total=skin.reduce((sum,entry)=>sum+entry[1],0);
+   tiles.push({p:point.toArray().map(round),n:normal.toArray().map(round),q:q.toArray().map(round),j:skin.map(k=>k[0]),w:skin.map(k=>round(k[1]/total))});
+  }
+ }
+}
+// A recessed skin prevents daylight through joints without covering the blocks.
+positions.forEach((p,i)=>p.addScaledVector(ns[i],-pitch*.4));
+const data={pitch,positions:positions.flatMap(p=>p.toArray().map(round)),indices,joints:gltf.nodes.slice(0,25).map(n=>({name:n.name,p:map(n.translation).toArray().map(round)})),skinJoints:joints,skinWeights:weights.map(w=>w.map(round)),tiles};
+fs.writeFileSync(new URL('../src/practice-hand-data.js',import.meta.url),'/*! Hand asset: Copyright (c) 2019 Amazon, MIT. License: /licenses/webxr-hand.LICENSE.txt */\n// Generated by scripts/build-practice-hand.mjs.\nexport default '+JSON.stringify(data)+';\n');
+console.log({cubes:tiles.length,vertices:positions.length,bounds:[bounds.min.toArray(),bounds.max.toArray()]});

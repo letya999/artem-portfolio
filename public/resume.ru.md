@@ -79,7 +79,7 @@ IT-аутсорсинг · мобильная и веб-разработка
 
 ## Процессы
 
-Гант · ИСР · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Roadmap · Риски · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Найм · Flow · Релизы · Бюджеты · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review
+Гант · ИСР · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Roadmap · Риски · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Найм · Flow · Релизы · Бюджеты · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review · Sprint Planning · Sprint Review · Retrospective · Daily Scrum · PI Planning · System Demo · Release Train · Dependency Mapping · Risk Register · RAID · Critical Path · WIP Limits · Throughput · Velocity · Takt Time · Service Level Expectation · Monte Carlo · Incident Management · Change Management · RACI · Decision Log · Stakeholder Map · Resource Planning · Budget Forecast · Team Topologies · Team Health · Continuous Improvement · Value Stream Mapping
 
 Собираю команды вокруг общего результата.
 
@@ -119,9 +119,9 @@ P&L, юнит-экономика, бюджеты, найм, performance review �
 
 СПбПУ, 2017–2024: приборостроение; управление качеством; инноватика — инновационный менеджмент программных продуктов. SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.
 
-## Инженерка
+## Инженерия
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents · JavaScript · Node.js · Astro · Three.js · WebGL · HTML · CSS · Vite · Playwright · REST · GraphQL · OpenAPI · WebSocket · JSON · DAX · Power Query · T-SQL · Data Warehouse · Data Pipelines · ETL · ELT · Data Modeling · Star Schema · OLAP · GitHub Actions · Linux · Kotlin · Gradle · Android SDK
 
 Понимаю систему глубже списка задач.
 
@@ -151,7 +151,7 @@ API-контракты, SQL, архитектурные ограничения, 
 
 ## Продукт
 
-Финтех · HealthTech · Дейтинг · Телеком · CustDev · CJM · CDP · Антифрод · Retention · Конверсия · Гипотезы · Метрики · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica
+Финтех · HealthTech · Дейтинг · Телеком · CustDev · CJM · CDP · Антифрод · Retention · Конверсия · Гипотезы · Метрики · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica · User Research · User Interviews · Usability Tests · Funnel Analysis · AARRR · LTV / CAC · ARPU · DAU / MAU · Retention Cohorts · Onboarding · Pricing · Subscription · Payments · Fraud Detection · Recommendations · CRM · Push Campaigns · Journey Mapping · Product Strategy · Value Proposition · Opportunity Mapping · RICE · ICE · Kano · HEART · Feature Adoption · Experiment Design · Product-Market Fit · Market Research · Customer Segments · Product Roadmap
 
 Соединяю запуск с измеримым эффектом.
 

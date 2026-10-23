@@ -10,13 +10,12 @@ test('three voxel disciplines disclose grounded detail independently of the conv
     detailButtons:s.querySelectorAll('.practice-more').length,
     renderer:!!s.querySelector('canvas[data-voxel-count]'),
   }));
-  // Expanded flowing vocabularies replace the former three fixed tags per area.
-  // Their required terms and minimum size are checked in practice-orbit.spec.js.
+  // The streams carry cubes; detailed vocabulary remains in each card dialog.
   expect.soft(contracts).toEqual({dialogs:true,detailButtons:3,renderer:true});
-  await expect.soft(section.locator(':scope > h2')).toHaveText('От общего языка к общему результату.');
+  await expect.soft(section.locator(':scope > h2')).toHaveText('Работа на пересечении');
   await expect.soft(section.locator('h2 br')).toHaveCount(0);
   await expect.soft(section.locator('.practice-area')).toHaveCount(3);
-  for(const name of ['Процессы','Инженерка','Продукт']){
+  for(const name of ['Процессы','Инженерия','Продукт']){
     await section.locator('.practice-area').filter({has:page.getByRole('heading',{name,exact:true})}).getByRole('button',{name:'Узнать подробнее'}).click();
     const dialog=page.getByRole('dialog');
     await expect.soft(dialog).toBeVisible({timeout:500});

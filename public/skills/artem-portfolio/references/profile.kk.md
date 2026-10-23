@@ -79,7 +79,7 @@ Android әзірлеуден жобаларды басқаруға ауысты�
 
 ## Процестер
 
-Гант · Жұмыстар құрылымы · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Жол картасы · Тәуекелдер · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Жұмысқа қабылдау · Ағын · Релиздер · Бюджеттер · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review
+Гант · Жұмыстар құрылымы · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Жол картасы · Тәуекелдер · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Жұмысқа қабылдау · Ағын · Релиздер · Бюджеттер · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review · Sprint Planning · Sprint Review · Retrospective · Daily Scrum · PI Planning · System Demo · Release Train · Dependency Mapping · Risk Register · RAID · Critical Path · WIP Limits · Throughput · Velocity · Takt Time · Service Level Expectation · Monte Carlo · Incident Management · Change Management · RACI · Decision Log · Stakeholder Map · Resource Planning · Budget Forecast · Team Topologies · Team Health · Continuous Improvement · Value Stream Mapping
 
 Командаларды ортақ нәтиже төңірегінде біріктіремін.
 
@@ -121,7 +121,7 @@ P&L, юнит-экономика, бюджеттер, жұмысқа қабыл�
 
 ## Инженерия
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents · JavaScript · Node.js · Astro · Three.js · WebGL · HTML · CSS · Vite · Playwright · REST · GraphQL · OpenAPI · WebSocket · JSON · DAX · Power Query · T-SQL · Data Warehouse · Data Pipelines · ETL · ELT · Data Modeling · Star Schema · OLAP · GitHub Actions · Linux · Kotlin · Gradle · Android SDK
 
 Жүйені міндеттер тізімінен тереңірек түсінемін.
 
@@ -151,7 +151,7 @@ API келісімшарттары, SQL, архитектуралық шекте
 
 ## Өнім
 
-Финтех · HealthTech · Танысу сервистері · Телеком · CustDev · CJM · CDP · Алаяқтыққа қарсы жүйелер · Retention · Конверсия · Гипотезалар · Метрикалар · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica
+Финтех · HealthTech · Танысу сервистері · Телеком · CustDev · CJM · CDP · Алаяқтыққа қарсы жүйелер · Retention · Конверсия · Гипотезалар · Метрикалар · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica · User Research · User Interviews · Usability Tests · Funnel Analysis · AARRR · LTV / CAC · ARPU · DAU / MAU · Retention Cohorts · Onboarding · Pricing · Subscription · Payments · Fraud Detection · Recommendations · CRM · Push Campaigns · Journey Mapping · Product Strategy · Value Proposition · Opportunity Mapping · RICE · ICE · Kano · HEART · Feature Adoption · Experiment Design · Product-Market Fit · Market Research · Customer Segments · Product Roadmap
 
 Іске қосуды өлшенетін әсермен байланыстырамын.
 

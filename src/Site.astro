@@ -107,7 +107,7 @@ const markdown=resumeMarkdown(t);
   </main>
  </div>
  <template id="agent-template"><div class="agent-shell"><header><a href="?view=human">← {t('Сайт')}</a><a href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')} ↓</a></header><main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{markdown}</pre></main></div></template>
- <aside class="view-dock" aria-label={t('Формат сайта')}><a href="?view=human" aria-current="page"><span class="switch-state" aria-hidden="true">Ⅰ</span><span>Human</span></a><a href="?view=agent"><span class="switch-state" aria-hidden="true">○</span><span>Agent</span></a></aside>
+ <aside class="view-dock" aria-label={t('Формат сайта')}><a href="?view=human" aria-current="page"><span class="switch-state" aria-hidden="true">I</span><span>Human</span><span class="switch-off" aria-hidden="true">O</span></a><a href="?view=agent"><span class="switch-state" aria-hidden="true">I</span><span>Agent</span><span class="switch-off" aria-hidden="true">O</span></a></aside>
  <script is:inline>
   if(document.documentElement.dataset.view==='agent'){
    const fragment=document.querySelector('#agent-template').content.cloneNode(true);
@@ -115,8 +115,34 @@ const markdown=resumeMarkdown(t);
    document.querySelector('.human-shell').replaceWith(fragment);
    const [human,agent]=document.querySelectorAll('.view-dock a');
    human.removeAttribute('aria-current');agent.setAttribute('aria-current','page');
-   human.querySelector('.switch-state').textContent='○';agent.querySelector('.switch-state').textContent='Ⅰ';
   }
+  const dock=document.querySelector('.view-dock');
+  dock.addEventListener('click',async event=>{
+   const target=event.target.closest('a');
+   if(!target||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+   if(dock.dataset.switching||target.hasAttribute('aria-current')){event.preventDefault();return;}
+   event.preventDefault();
+   if(matchMedia('(prefers-reduced-motion: reduce)').matches){location.assign(target.href);return;}
+   const current=dock.querySelector('a[aria-current]');
+   dock.dataset.switching='releasing';
+   const release=current.animate([
+    {transform:'rotateX(-12deg) translateY(4px)'},
+    {transform:'rotateX(15deg) translateY(-4px)',offset:.78},
+    {transform:'rotateX(12deg) translateY(-3px)'}
+   ],{duration:360,easing:'cubic-bezier(.72,0,.26,1)',fill:'forwards'});
+   await release.finished;current.removeAttribute('aria-current');release.cancel();
+   await new Promise(resolve=>setTimeout(resolve,120));
+   dock.dataset.switching='engaging';
+   const engage=target.animate([
+    {transform:'rotateX(12deg) translateY(-3px)'},
+    {transform:'rotateX(-16deg) translateY(5px)',offset:.76},
+    {transform:'rotateX(-12deg) translateY(4px)'}
+   ],{duration:390,easing:'cubic-bezier(.72,0,.24,1)',fill:'forwards'});
+   target.setAttribute('aria-current','page');
+   await engage.finished;engage.cancel();
+   await new Promise(resolve=>setTimeout(resolve,140));
+   location.assign(target.href);
+  });
   document.querySelectorAll('select[data-language]').forEach(select=>select.addEventListener('change',()=>{
    const locale=select.value;if(!['ru','en','kk'].includes(locale))return;
    try{localStorage.setItem('portfolio-language',locale)}catch{}
