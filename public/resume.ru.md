@@ -79,7 +79,7 @@ IT-аутсорсинг · мобильная и веб-разработка
 
 ## Процессы
 
-Гант · ИСР · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Roadmap · Риски · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Найм · Flow · Релизы · Бюджеты · SLA · FinOps · Forecast
+Гант · ИСР · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Roadmap · Риски · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Найм · Flow · Релизы · Бюджеты · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review
 
 Собираю команды вокруг общего результата.
 
@@ -121,7 +121,7 @@ P&L, юнит-экономика, бюджеты, найм, performance review �
 
 ## Инженерка
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents
 
 Понимаю систему глубже списка задач.
 
@@ -132,6 +132,10 @@ React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG 
 ### На чём пишу
 
 Начинал с Android. В собственных проектах использую Python, TypeScript, React / Next.js, FastAPI и LangGraph. В ai-stp есть Rust CLI и Tauri. Развиваю RAG-поддержку, AI-аудитора и инструменты автоматизации.
+
+### Данные и платформы
+
+Работал с инженерией данных: MS SQL, Data Lake, Power BI и Airflow; с аналитической платформой — ClickHouse, DataLens, ETL/ELT и витринами данных. В веб- и мобильных командах — Angular, React, Rust, Flutter и Dart.
 
 ### Что автоматизировал
 
@@ -147,7 +151,7 @@ API-контракты, SQL, архитектурные ограничения, 
 
 ## Продукт
 
-Финтех · HealthTech · Дейтинг · Телеком · CustDev · CJM · CDP · Антифрод · Retention · Конверсия · Гипотезы · Метрики · A/B · Growth · NPS · UX
+Финтех · HealthTech · Дейтинг · Телеком · CustDev · CJM · CDP · Антифрод · Retention · Конверсия · Гипотезы · Метрики · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica
 
 Соединяю запуск с измеримым эффектом.
 

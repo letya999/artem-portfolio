@@ -79,7 +79,7 @@ Android әзірлеуден жобаларды басқаруға ауысты�
 
 ## Процестер
 
-Гант · Жұмыстар құрылымы · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Жол картасы · Тәуекелдер · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Жұмысқа қабылдау · Ағын · Релиздер · Бюджеттер · SLA · FinOps · Forecast
+Гант · Жұмыстар құрылымы · Scrum · Kanban · Agile · SAFe · LeSS · Декомпозиция · Жол картасы · Тәуекелдер · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Жұмысқа қабылдау · Ағын · Релиздер · Бюджеттер · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review
 
 Командаларды ортақ нәтиже төңірегінде біріктіремін.
 
@@ -121,7 +121,7 @@ P&L, юнит-экономика, бюджеттер, жұмысқа қабыл�
 
 ## Инженерия
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents
 
 Жүйені міндеттер тізімінен тереңірек түсінемін.
 
@@ -132,6 +132,10 @@ Twinby-де тоғыз сервистен тұратын антифрод, API �
 ### Қандай тілдерде жазамын
 
 Android әзірлеуден бастадым. Жеке жобаларымда Python, TypeScript, React / Next.js, FastAPI және LangGraph қолданамын. ai-stp құрамында Rust CLI және Tauri бар. RAG-қолдау, AI-аудитор және автоматтандыру құралдарын дамытамын.
+
+### Деректер мен платформалар
+
+Деректер инженериясында MS SQL, Data Lake, Power BI және Airflow құралдарымен; аналитикалық платформаларда ClickHouse, DataLens, ETL/ELT және деректер витриналарымен; веб және мобильді командаларда Angular, React, Rust, Flutter және Dart технологияларымен жұмыс істедім.
 
 ### Нені автоматтандырдым
 
@@ -147,7 +151,7 @@ API келісімшарттары, SQL, архитектуралық шекте
 
 ## Өнім
 
-Финтех · HealthTech · Танысу сервистері · Телеком · CustDev · CJM · CDP · Алаяқтыққа қарсы жүйелер · Retention · Конверсия · Гипотезалар · Метрикалар · A/B · Growth · NPS · UX
+Финтех · HealthTech · Танысу сервистері · Телеком · CustDev · CJM · CDP · Алаяқтыққа қарсы жүйелер · Retention · Конверсия · Гипотезалар · Метрикалар · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica
 
 Іске қосуды өлшенетін әсермен байланыстырамын.
 

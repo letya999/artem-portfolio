@@ -10,7 +10,7 @@ test('three voxel disciplines disclose grounded detail independently of the conv
     detailButtons:s.querySelectorAll('.practice-more').length,
     renderer:!!s.querySelector('canvas[data-voxel-count]'),
   }));
-  // Expanded orbit vocabularies replace the former three fixed tags per area.
+  // Expanded flowing vocabularies replace the former three fixed tags per area.
   // Their required terms and minimum size are checked in practice-orbit.spec.js.
   expect.soft(contracts).toEqual({dialogs:true,detailButtons:3,renderer:true});
   await expect.soft(section.locator(':scope > h2')).toHaveText('От общего языка к общему результату.');

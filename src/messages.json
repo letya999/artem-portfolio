@@ -1,4 +1,11 @@
 {
+  "Соединяю продуктовые цели, инженерные решения и процессы доставки, чтобы команды выпускали работающие продукты.":{"ru":"Соединяю продуктовые цели, инженерные решения и процессы доставки, чтобы команды выпускали работающие продукты.","en":"I connect product goals, engineering decisions, and delivery processes so teams can ship products that work.","kk":"Командалар жұмыс істейтін өнім шығара алуы үшін өнім мақсаттарын, инженерлік шешімдерді және жеткізу процестерін біріктіремін."},
+  "Знаю, как довести до результата":{"ru":"Знаю, как довести до результата","en":"I know how to get results","kk":"Нәтижеге жеткізуді білемін"},
+  "Понимаю, как это реализовать":{"ru":"Понимаю, как это реализовать","en":"I know how to build it","kk":"Қалай іске асыруды білемін"},
+  "Понимаю, что создаём и зачем":{"ru":"Понимаю, что создаём и зачем","en":"I know what we build and why","kk":"Нені және не үшін жасайтынымызды білемін"},
+  "3D-руки собирают потоки в продукт":{"ru":"3D-руки собирают потоки в продукт","en":"3D hands compress three streams into a product","kk":"3D қолдар үш ағынды өнімге біріктіреді"},
+  "Результат":{"ru":"Результат","en":"Outcome","kk":"Нәтиже"},
+  "Согласованные решения. Предсказуемая доставка. Полезный продукт.":{"ru":"Согласованные решения. Предсказуемая доставка. Полезный продукт.","en":"Aligned decisions. Predictable delivery. A useful product.","kk":"Келісілген шешімдер. Болжамды жеткізу. Пайдалы өнім."},
   "От первых кубиков к движению.":{"ru":"От первых кубиков к движению.","en":"From the first cubes to motion.","kk":"Алғашқы кубтардан қозғалысқа дейін."},
   "Первая модель из кубиков":{"ru":"Первая модель из кубиков","en":"First voxel portrait","kk":"Алғашқы куб портреті"},
   "Металлическая модель":{"ru":"Металлическая модель","en":"Metal voxel portrait","kk":"Металл куб портреті"},
@@ -1077,6 +1084,8 @@
     "en": "The scan surface and cube shell are aligned in one coordinate system. The face is based on measurements; the back of the head, neck and missing regions are reconstructed. This is an artistic reconstruction.",
     "kk": "Скан беті мен текшелер қабығы ортақ координаттар жүйесінде сәйкестендірілген. Бет өлшемдерге негізделген; желке, мойын және жетіспейтін бөліктер толықтырылған. Бұл — көркем реконструкция."
   },
+  "Данные и платформы": {"ru":"Данные и платформы","en":"Data and platforms","kk":"Деректер мен платформалар"},
+  "Работал с инженерией данных: MS SQL, Data Lake, Power BI и Airflow; с аналитической платформой — ClickHouse, DataLens, ETL/ELT и витринами данных. В веб- и мобильных командах — Angular, React, Rust, Flutter и Dart.": {"ru":"Работал с инженерией данных: MS SQL, Data Lake, Power BI и Airflow; с аналитической платформой — ClickHouse, DataLens, ETL/ELT и витринами данных. В веб- и мобильных командах — Angular, React, Rust, Flutter и Dart.","en":"I have worked with data engineering tools including MS SQL, Data Lake, Power BI and Airflow; with ClickHouse, DataLens, ETL/ELT and data marts in analytics platforms; and with Angular, React, Rust, Flutter and Dart in web and mobile teams.","kk":"Деректер инженериясында MS SQL, Data Lake, Power BI және Airflow құралдарымен; аналитикалық платформаларда ClickHouse, DataLens, ETL/ELT және деректер витриналарымен; веб және мобильді командаларда Angular, React, Rust, Flutter және Dart технологияларымен жұмыс істедім."},
   "Процессы": {"ru":"Процессы","en":"Processes","kk":"Процестер"},
   "Инженерка": {"ru":"Инженерка","en":"Engineering","kk":"Инженерия"},
   "Продукт": {"ru":"Продукт","en":"Product","kk":"Өнім"},

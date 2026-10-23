@@ -1,7 +1,7 @@
 export const areas = [
- ['Процессы','Гант','ИСР','Scrum','Kanban','Agile','SAFe','LeSS','Декомпозиция','Roadmap','Риски','OKR','KPI','Delivery','Backlog','P&L','OPEX / CAPEX','Найм','Flow','Релизы','Бюджеты','SLA','FinOps','Forecast'],
- ['Инженерка','React','Rust','Python','TypeScript','Next.js','FastAPI','LangGraph','RAG','API','SQL','ADR','MCP','DevOps','CI/CD','Docker','Git'],
- ['Продукт','Финтех','HealthTech','Дейтинг','Телеком','CustDev','CJM','CDP','Антифрод','Retention','Конверсия','Гипотезы','Метрики','A/B','Growth','NPS','UX'],
+ ['Процессы','Гант','ИСР','Scrum','Kanban','Agile','SAFe','LeSS','Декомпозиция','Roadmap','Риски','OKR','KPI','Delivery','Backlog','P&L','OPEX / CAPEX','Найм','Flow','Релизы','Бюджеты','SLA','FinOps','Forecast','PMBoK','P3.express','RTE','Lead Time','Cycle Time','Capacity','Stakeholders','Facilitation','Coaching','Portfolio','Prioritization','AI-native SDLC','Performance Review'],
+ ['Инженерка','React','Rust','Python','TypeScript','Next.js','FastAPI','LangGraph','RAG','API','SQL','ADR','MCP','DevOps','CI/CD','Docker','Git','Data Engineering','MS SQL','Data Lake','Power BI','Airflow','Angular','Flutter','Dart','Android','PostgreSQL','ClickHouse','ETL / ELT','DataLens','Dagster','Go','Tauri','Observability','Microservices','AI Agents'],
+ ['Продукт','Финтех','HealthTech','Дейтинг','Телеком','CustDev','CJM','CDP','Антифрод','Retention','Конверсия','Гипотезы','Метрики','A/B','Growth','NPS','UX','Product Discovery','JTBD','MVP','Unit Economics','Monetization','Funnels','Cohorts','Activation','Churn','LTV','CAC','Segmentation','North Star','Go-to-Market','Experimentation','Product Analytics','AppMetrica'],
 ];
 export const education = 'СПбПУ, 2017–2024: приборостроение; управление качеством; инноватика — инновационный менеджмент программных продуктов.';
 export const certifications = 'SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.';
@@ -16,6 +16,7 @@ const sourceContent = [
  ['Понимаю систему глубже списка задач.',[
   ['Что проектировал','В Twinby работал над антифродом из девяти сервисов, API и интеграциями, мультитенантной архитектурой CIS/global и CDP для 10+ каналов. Обсуждал требования и ограничения вместе с аналитиками и инженерами.'],
   ['На чём пишу','Начинал с Android. В собственных проектах использую Python, TypeScript, React / Next.js, FastAPI и LangGraph. В ai-stp есть Rust CLI и Tauri. Развиваю RAG-поддержку, AI-аудитора и инструменты автоматизации.'],
+  ['Данные и платформы','Работал с инженерией данных: MS SQL, Data Lake, Power BI и Airflow; с аналитической платформой — ClickHouse, DataLens, ETL/ELT и витринами данных. В веб- и мобильных командах — Angular, React, Rust, Flutter и Dart.'],
   ['Что автоматизировал','Лично писал инструменты для командных и инженерных метрик, учёта OPEX/CAPEX и управленческой отчётности. Развивал skills и MCP-сервисы. В job_ftch — сбор и обработка вакансий.'],
   ['Как работаю с качеством','API-контракты, SQL, архитектурные ограничения, наблюдаемость и оценка RAG. Внедрил docs-as-code, ADR и AI-флоу; time-to-market аналитики сократился на 60%.'],
   ['Образование и сертификаты',education+' '+certifications],

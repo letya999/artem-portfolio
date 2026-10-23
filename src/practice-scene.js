@@ -1,88 +1,115 @@
 import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+
 export function createPracticeScene(root){
+  if(!root)return ()=>{};
   let renderer;
   try{renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});}catch{return ()=>{};}
-  const canvas=renderer.domElement;canvas.className='practice-canvas';canvas.setAttribute('aria-hidden','true');root.prepend(canvas);
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
-  const scene=new THREE.Scene(),camera=new THREE.OrthographicCamera(),cameraDistance=Math.hypot(650,1800),screenY=1800/cameraDistance,depthY=650/cameraDistance;camera.position.set(0,-650,1800);camera.lookAt(0,0,0);
-  scene.add(new THREE.HemisphereLight(0xffffff,0x6a7062,2.5));
-  const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-300,600,1000);scene.add(light);
-  const geometry=new THREE.BoxGeometry(.87,.87,.87),matrix=new THREE.Matrix4();
-  const material=new THREE.MeshStandardMaterial({color:0x354238,metalness:.55,roughness:.36});
-  let disposed=false, visible=false, frame=0, phase=0, last=0, lastWidth=0, lastHeight=0;
-  const reduced=matchMedia("(prefers-reduced-motion: reduce)");
-  const words=[],galaxies=[],speeds=[.82,1.17,.96];let hover=null;
-  const particleGeometry=new THREE.BoxGeometry(1,1,1),particleMaterial=new THREE.MeshStandardMaterial({color:0x435446,metalness:.3,roughness:.58});
-  const particleCount=900;
-  function galaxy(el,index){
-    const mesh=new THREE.InstancedMesh(particleGeometry,particleMaterial,particleCount);
-    mesh.name='practice:galaxy';mesh.userData.spinRate=speeds[index];mesh.userData.radialWobble=.018+index*.004;mesh.frustumCulled=false;scene.add(mesh);galaxies.push({el,mesh,index});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
+  const canvas=renderer.domElement;
+  canvas.className='practice-canvas';
+  canvas.setAttribute('aria-hidden','true');
+  root.prepend(canvas);
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera();
+  camera.position.set(0,0,900);
+  camera.lookAt(0,0,0);
+  const pmrem=new THREE.PMREMGenerator(renderer),room=new RoomEnvironment(),env=pmrem.fromScene(room);
+  scene.environment=env.texture;
+  room.dispose();pmrem.dispose();
+  scene.add(new THREE.HemisphereLight(0xffffff,0x71757a,2.3));
+  const key=new THREE.DirectionalLight(0xffffff,3.5);key.position.set(-220,320,500);scene.add(key);
+  const rim=new THREE.DirectionalLight(0xffffff,2.2);rim.position.set(260,-180,250);scene.add(rim);
+  const box=new THREE.BoxGeometry(7.5,7.5,7.5);
+  const silver=new THREE.MeshStandardMaterial({color:0xa9afb4,metalness:.72,roughness:.25});
+  const dark=new THREE.MeshStandardMaterial({color:0x686f75,metalness:.8,roughness:.23});
+  const matrix=new THREE.Matrix4(),color=new THREE.Color();
+  const handVoxels=[];
+  const add=(x,y,z)=>handVoxels.push([x,y,z]);
+  for(let y=4;y<=50;y+=9)for(let x=-42;x<=42;x+=9)for(const z of [-8,0,8]){
+    if(Math.abs(x)>34&&y>38)continue;
+    add(x,y,z);
   }
-  function wordMesh(text){
-    const mask=document.createElement('canvas');mask.width=420;mask.height=80;
-    const ctx=mask.getContext('2d');ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='800 55px "Manrope Variable"';ctx.fillText(text,210,40,400);
-    const pixels=ctx.getImageData(0,0,420,80).data,points=[];
-    for(let y=0;y<80;y+=4)for(let x=0;x<420;x+=4)if(pixels[(y*420+x)*4+3]>128)points.push([x/4,y/4]);
-    const box=new THREE.Box2();points.forEach(([x,y])=>box.expandByPoint(new THREE.Vector2(x,y)));
-    const center=box.getCenter(new THREE.Vector2()),size=box.getSize(new THREE.Vector2());
-    const mesh=new THREE.InstancedMesh(geometry,material.clone(),points.length*4);mesh.name=`practice:word:${text}`;
-    points.forEach(([x,y],i)=>{for(let z=0;z<4;z++)mesh.setMatrixAt(i*4+z,matrix.makeTranslation(x-center.x,center.y-y,(z-1.5)*1.15));});
-    mesh.rotation.set(.16,-.22,-.015);mesh.userData.size=size;scene.add(mesh);return mesh;
+  for(let y=54;y<=147;y+=9)for(let x=-32;x<=32;x+=9)for(const z of [-8,0,8])add(x+(y-54)*.13,y,z);
+  for(let f=0;f<4;f++){
+    const start=-36+f*22,length=[39,54,59,46][f];
+    for(let y=-length;y<=-4;y+=8)for(const z of [-8,0,8])add(start+Math.max(0,-y-25)*.12,y,z);
   }
-  function layout(){
-    const rect=root.getBoundingClientRect(),width=rect.width,height=rect.height;
-    if(width!==lastWidth||height!==lastHeight){renderer.setSize(width,height);lastWidth=width;lastHeight=height;}camera.left=-width/2;camera.right=width/2;camera.top=height*screenY/2;camera.bottom=-height*screenY/2;camera.near=.1;camera.far=3000;camera.updateProjectionMatrix();
-    galaxies.forEach(({el,mesh,index})=>{
-      const r=el.getBoundingClientRect(),cx=r.left-rect.left+r.width/2-width/2,cy=height/2-(r.top-rect.top+r.height/2);
-      for(let i=0;i<particleCount;i++){
-        const arm=i%2,t=(Math.floor(i/2)+.5)/Math.ceil(particleCount/2),seed=Math.sin(i*127.1)*43758.5453,jitter=(seed-Math.floor(seed)-.5)*.22;
-        const angle=arm*Math.PI+t*Math.PI*3+phase*speeds[index]+index*.63+jitter,radius=Math.sqrt(t),core=i>particleCount-90;
-        const flutter=mesh.userData.radialWobble*Math.sin(phase*(7+index*.6)+i*1.37),orbitRadius=Math.max(0,(core?radius*.25:radius)+flutter);
-        const x=cx+Math.cos(angle)*r.width*.47*orbitRadius,y=cy+Math.sin(angle)*r.height*.21*orbitRadius-(1-orbitRadius)**2*r.height*.34;
-        const z=Math.sin(angle)*65*orbitRadius-(1-orbitRadius)**2*110,size=core?4.2:2.6+(1-t)*1.3;
-        matrix.makeScale(size,size,size).setPosition(x,y,z-18);mesh.setMatrixAt(i,matrix);
-      }
-      mesh.instanceMatrix.needsUpdate=true;
+  for(let n=0;n<8;n++)for(const z of [-8,0,8])add(45+n*5,27-n*8,z);
+  function hand(flip){
+    const mesh=new THREE.InstancedMesh(box,silver,handVoxels.length);
+    handVoxels.forEach(([x,y,z],i)=>{
+      matrix.makeTranslation(x,y,z+(i%7===0?2:0));mesh.setMatrixAt(i,matrix);
+      mesh.setColorAt(i,color.set(i%13===0?0xffffff:i%9===0?0x7e858a:0xc8cbd0));
     });
-    words.forEach(({el,mesh,galaxyIndex})=>{const parent=el.parentElement,r=parent.getBoundingClientRect(),index=[...parent.children].indexOf(el),count=parent.children.length;
-      const ring=index%3,slot=Math.floor(index/3),slots=Math.ceil((count-ring)/3),angle=slot/slots*Math.PI*2+ring*1.18+phase*speeds[galaxyIndex]+galaxyIndex*.63;
-      const radius=[.99,.63,.29][ring],tier=((index*7)%5-2)*13,orbitX=Math.cos(angle)*r.width*(r.width<500?.31:.45)*radius,orbitY=Math.sin(angle)*r.height*.31*radius-(1-radius)**2*r.height*.14+tier;
-      const depth=(Math.sin(angle)+1)/2,x=r.left-rect.left+r.width/2-width/2+orbitX,y=height/2-(r.top-rect.top+r.height/2)+orbitY;
-      const focus=hover?Math.max(0,1-Math.hypot(hover.x-x,hover.y-y)/85):0;
-      const s=Math.min(r.width*(r.width<500?.27:.3)/Math.max(mesh.userData.size.x,1),1.85)*(.88+.12*depth)*(1+focus*.48);
-      mesh.scale.setScalar(s);mesh.position.set(r.left-rect.left+r.width/2-width/2+orbitX,height/2-(r.top-rect.top+r.height/2)+orbitY,Math.sin(angle)*70*radius-(1-radius)**2*105);
-      mesh.rotation.set(-.12,Math.sin(angle)*.22,0);mesh.material.transparent=true;mesh.material.opacity=.66+.34*depth;mesh.visible=true;
-    });
-    for(const galaxy of galaxies){
-      const labels=words.filter(word=>word.galaxyIndex===galaxy.index).map(word=>word.mesh);
-      for(let pass=0;pass<20;pass++)for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++){
-        const a=labels[i],b=labels[j],ay=a.position.y*screenY+a.position.z*depthY,by=b.position.y*screenY+b.position.z*depthY,dx=Math.abs(a.position.x-b.position.x),dy=Math.abs(ay-by);
-        const xLimit=(a.userData.size.x*a.scale.x+b.userData.size.x*b.scale.x)/2+4;
-        const yLimit=(a.userData.size.y*a.scale.y+b.userData.size.y*b.scale.y)/2+4;
-        if(dx<xLimit&&dy<yLimit){
-          if(xLimit-dx<yLimit-dy){const shift=(xLimit-dx)/2+.5,direction=a.position.x>=b.position.x?1:-1;a.position.x+=shift*direction;b.position.x-=shift*direction;}
-          else{const shift=((yLimit-dy)/2+.5)/screenY,direction=ay>=by?1:-1;a.position.y+=shift*direction;b.position.y-=shift*direction;}
-        }
-      }
+    mesh.instanceMatrix.needsUpdate=true;
+    const group=new THREE.Group();group.scale.y=flip;group.rotation.x=flip===1?-.28:.28;group.rotation.y=flip===1?-.45:.4;group.rotation.z=flip===1?-.12:.12;
+    group.add(mesh);scene.add(group);return group;
+  }
+  const upper=hand(1),lower=hand(-1);
+  const streamCount=135,stream=new THREE.InstancedMesh(box,dark,streamCount);
+  const travelCount=42,travel=new THREE.InstancedMesh(box,dark,travelCount);
+  const productPoints=[];
+  for(let x=-3;x<=3;x++)for(let y=-3;y<=3;y++)for(let z=-3;z<=3;z++)if(Math.max(Math.abs(x),Math.abs(y),Math.abs(z))===3)productPoints.push([x,y,z]);
+  const product=new THREE.InstancedMesh(box,silver,productPoints.length);
+  productPoints.forEach(([x,y,z],i)=>{matrix.makeTranslation(x*8,y*8,z*8);product.setMatrixAt(i,matrix);product.setColorAt(i,color.set((x+y+z)%5===0?0xf8f9f7:0xb4b7bb));});
+  product.instanceMatrix.needsUpdate=true;
+  scene.add(stream,travel,product);product.rotation.set(-.38,.52,.04);
+  canvas.dataset.handVoxels=String(handVoxels.length*2);
+  canvas.dataset.streamVoxels=String(streamCount);
+  canvas.dataset.voxelCount=String(handVoxels.length*2+streamCount+travelCount+productPoints.length);
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  let frame=0,visible=false,disposed=false,start=performance.now(),width=0,height=0;
+  let press,output,lanes;
+  const clamp=(n)=>Math.max(0,Math.min(1,n));
+  const smooth=(n)=>{n=clamp(n);return n*n*(3-2*n);};
+  const point=(element,stage)=>{const rect=element.getBoundingClientRect();return {x:rect.left-stage.left+rect.width/2-stage.width/2,y:stage.height/2-(rect.top-stage.top+rect.height/2)};};
+  function draw(now){
+    if(disposed)return;
+    if(!press||root.clientWidth!==width||root.clientHeight!==height){
+      const bounds=root.getBoundingClientRect();
+      width=bounds.width;height=bounds.height;renderer.setSize(width,height);
+      camera.left=-width/2;camera.right=width/2;camera.top=height/2;camera.bottom=-height/2;camera.near=.1;camera.far=2000;camera.updateProjectionMatrix();
+      press=point(root.querySelector('[data-press-anchor]'),bounds);output=point(root.querySelector('[data-outcome-anchor]'),bounds);
+      lanes=[...root.querySelectorAll('.practice-stream')].map(el=>{el.style.setProperty('--flow-length',el.clientWidth+'px');return point(el,bounds);});
     }
+    const phase=reduced.matches?.48:((now-start)/6200)%1;
+    const closing=smooth((phase-.19)/.24)*(1-smooth((phase-.51)/.18));
+    const scale=Math.min(1.35,Math.max(.7,width/1250));
+    upper.scale.set(scale,scale,scale);lower.scale.set(scale,-scale,scale);
+    upper.position.set(press.x,press.y+(95-43*closing)*scale,0);
+    lower.position.set(press.x,press.y-(95-43*closing)*scale,0);
+    upper.rotation.z=-.12+closing*.055;lower.rotation.z=.12-closing*.055;
+    for(let i=0;i<streamCount;i++){
+      const lane=i%3,seed=Math.floor(i/3),progress=(phase*1.55+seed/45)%1;
+      const from=lanes[lane]||press,jitter=Math.sin(seed*9.17+lane)*16;
+      const x=from.x+(press.x-from.x)*progress;
+      const y=from.y+(press.y-from.y)*smooth(progress)+jitter*(1-progress);
+      const size=(1.4+Math.sin(i*7.31)**2*.6)*(1-progress*.4);
+      matrix.makeScale(size,size,size).setPosition(x,y,Math.cos(seed*2.2)*26);
+      stream.setMatrixAt(i,matrix);
+      if(i%11===0)stream.setColorAt(i,color.set(0xffffff));
+    }
+    stream.instanceMatrix.needsUpdate=true;
+    const emission=smooth((phase-.45)/.17)*(1-smooth((phase-.84)/.14));
+    for(let i=0;i<travelCount;i++){
+      const delay=i/travelCount*.28,progress=clamp((phase-.48-delay)/.35);
+      const scatter=Math.sin(i*4.61)*23*(1-progress);
+      const x=press.x+(output.x-press.x)*smooth(progress),y=press.y+(output.y-press.y)*smooth(progress)+scatter;
+      const size=emission*(.55+Math.sin(i*3.7)**2*.7);
+      matrix.makeScale(size,size,size).setPosition(x,y,Math.cos(i*1.9)*20);
+      travel.setMatrixAt(i,matrix);
+    }
+    travel.instanceMatrix.needsUpdate=true;
+    product.position.set(output.x-38*scale,output.y-78*scale,0);
+    product.scale.setScalar(scale*(2.15+.12*emission));
+    canvas.dataset.cycleTime=phase.toFixed(3);
     renderer.render(scene,camera);
   }
-  function tick(now){frame=0;if(disposed||!visible||document.hidden)return;phase+=Math.min((now-last)||0,40)*.00018;last=now;canvas.dataset.orbitTime=phase.toFixed(4);layout();if(!reduced.matches)frame=requestAnimationFrame(tick);}
-  function resume(){cancelAnimationFrame(frame);last=performance.now();if(visible&&!document.hidden)frame=requestAnimationFrame(tick);}
-  function pointerMove(event){const r=root.getBoundingClientRect();hover={x:event.clientX-r.left-r.width/2,y:r.height/2-(event.clientY-r.top)};if(reduced.matches)layout();}
-  function pointerLeave(){hover=null;if(reduced.matches)layout();}
+  function tick(now){frame=0;if(!visible||document.hidden||disposed)return;draw(now);if(!reduced.matches)frame=requestAnimationFrame(tick);}
+  function resume(){cancelAnimationFrame(frame);if(visible&&!document.hidden)frame=requestAnimationFrame(tick);}
   const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;resume();});observer.observe(root);
-  document.addEventListener('visibilitychange',resume);reduced.addEventListener('change',resume);
-  root.addEventListener('pointermove',pointerMove,{passive:true});root.addEventListener('pointerleave',pointerLeave);
-  const resize=new ResizeObserver(layout);resize.observe(root);
-  document.fonts.ready.then(()=>{
-    if(disposed)return;
-    const groups=[...root.querySelectorAll('.voxel-tags')];
-    root.querySelectorAll('[data-voxel-word]').forEach(el=>words.push({el,mesh:wordMesh(el.dataset.voxelWord),galaxyIndex:groups.indexOf(el.parentElement)}));
-    groups.forEach(galaxy);
-    canvas.dataset.voxelCount=words.reduce((sum,{mesh})=>sum+mesh.count,0);
-    canvas.dataset.galaxyCount=galaxies.length;canvas.dataset.particleCount=galaxies.length*particleCount;
-    root.classList.add('practice-ready');layout();
-  });
-  return ()=>{disposed=true;cancelAnimationFrame(frame);observer.disconnect();document.removeEventListener("visibilitychange",resume);reduced.removeEventListener("change",resume);root.removeEventListener('pointermove',pointerMove);root.removeEventListener('pointerleave',pointerLeave);resize.disconnect();words.forEach(({mesh})=>{mesh.dispose();mesh.material.dispose();});galaxies.forEach(({mesh})=>mesh.dispose());particleGeometry.dispose();particleMaterial.dispose();geometry.dispose();material.dispose();renderer.dispose();canvas.remove();root.classList.remove('practice-ready');};
+  const resize=new ResizeObserver(()=>{width=0;resume();});resize.observe(root);
+  reduced.addEventListener('change',resume);document.addEventListener('visibilitychange',resume);
+  return ()=>{disposed=true;cancelAnimationFrame(frame);observer.disconnect();resize.disconnect();reduced.removeEventListener('change',resume);document.removeEventListener('visibilitychange',resume);[upper,lower].forEach(group=>{group.children[0].dispose();scene.remove(group);});stream.dispose();travel.dispose();product.dispose();box.dispose();silver.dispose();dark.dispose();env.dispose();renderer.dispose();canvas.remove();};
 }

@@ -79,7 +79,7 @@ Transitioned from Android development to project management.
 
 ## Processes
 
-Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Risks · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Hiring · Flow · Releases · Budgets · SLA · FinOps · Forecast
+Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Risks · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Hiring · Flow · Releases · Budgets · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review
 
 Bringing teams together around a shared outcome.
 
@@ -121,7 +121,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Engineering
 
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git
+React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents
 
 Understanding the system beyond the task list.
 
@@ -132,6 +132,10 @@ At Twinby I worked on a nine-service antifraud system, APIs and integrations, a 
 ### What I code with
 
 I started in Android development. My own projects use Python, TypeScript, React / Next.js, FastAPI and LangGraph. ai-stp includes a Rust CLI and Tauri. I develop RAG support, an AI auditor and automation tools.
+
+### Data and platforms
+
+I have worked with data engineering tools including MS SQL, Data Lake, Power BI and Airflow; with ClickHouse, DataLens, ETL/ELT and data marts in analytics platforms; and with Angular, React, Rust, Flutter and Dart in web and mobile teams.
 
 ### What I automated
 
@@ -147,7 +151,7 @@ Peter the Great St Petersburg Polytechnic University (SPbPU), 2017–2024: instr
 
 ## Product
 
-Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics · A/B · Growth · NPS · UX
+Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica
 
 Connecting launches to measurable impact.
 
