@@ -9,12 +9,12 @@
 
 ## Cloudflare Pages
 
-Connect the private GitHub repository to a new Cloudflare Pages project and select `main`. Set framework preset Astro, build command `npm run build`, output directory `dist`, and build variable `SITE_URL=https://artemletyushev.website`. Keep analytics variables empty until counters are ready. A Git push to `main` should create a production deployment; verify the generated `*.pages.dev` URL before changing custom domains.
+The live Git-connected project is `artem-portfolio-git`, sourced from private `letya999/artem-portfolio` branch `main`. It uses the Astro preset, build command `npm run build`, output directory `dist`, `SITE_URL=https://artemletyushev.website`, and `NODE_VERSION=22`. Its preview hostname is `artem-portfolio-git.pages.dev`. Keep analytics variables empty until counters are ready. A Git push to `main` creates a production deployment.
 
-The current Direct Upload project cannot be converted to Git integration in place. For cutover, record its existing custom domains and DNS records, remove `artemletyushev.website` and `www.artemletyushev.website` from that project, attach both to the new project, and check the automatically managed DNS targets and SSL status. Keep the Cloudflare nameservers at REG.RU. DNS caches outside Cloudflare can retain old answers until TTL expiry.
+The previous Direct Upload project `artem-portfolio` remains available at `artem-portfolio-7y3.pages.dev` for rollback. Both `artemletyushev.website` and `www.artemletyushev.website` are attached to the Git project, and Cloudflare DNS has proxied CNAME records to `artem-portfolio-git.pages.dev`. The OpenAI TXT verification record remains in the zone. Keep the Cloudflare nameservers at REG.RU. Resolvers outside Cloudflare can retain the former answer until their TTL expires; a stale resolver does not indicate that the Pages deployment failed.
 
 Check the apex and `www` over HTTPS, each language URL, the PDF, agent resources, unknown-path HTTP 404, 3D assets, mobile navigation, and browser console. For 3D payloads, check Cloudflare edge cache headers and transfer size, then measure actual browser rendering separately. Do not claim Kazakhstan performance from a single synthetic request; validate from a real Kazakhstan network when available.
 
 ## Recovery
 
-If the new deployment fails before domain cutover, keep the old project attached and fix the Git build. If cutover fails, reattach the domains to the old project using the recorded settings. Do not delete the old project until the new production site, domain, and SSL have been checked.
+If a future Git deployment fails, Cloudflare Pages keeps the last successful production deployment. Diagnose the build log and restore a working commit. If the domain routing fails, reattach both domains to the previous Direct Upload project and verify its DNS and SSL. Do not delete the previous project until the owner decides rollback is no longer needed.
