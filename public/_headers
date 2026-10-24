@@ -7,5 +7,5 @@
 /story/models/iphone-scan.glb
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
 
-/social-card.png
+/social-card-v2.png
   Cache-Control: public, max-age=86400

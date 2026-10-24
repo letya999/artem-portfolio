@@ -16,7 +16,7 @@ test('static SEO build is portable and changes its absolute URLs with SITE_URL',
   for(const lang of ['ru','en','kk']){
    const html=readFileSync(`${output}/${lang}.html`,'utf8');
    assert.ok(html.includes(`<html lang="${lang}">`));assert.ok(html.includes('Twinby'));
-   if(origin){assert.ok(html.includes(`rel="canonical" href="${origin}/${lang}"`));assert.ok(html.includes(`property="og:image" content="${origin}/social-card.png"`));assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));assert.ok(existsSync(`${output}/social-card.png`));}
+   if(origin){assert.ok(html.includes(`rel="canonical" href="${origin}/${lang}"`));assert.ok(html.includes(`property="og:image" content="${origin}/social-card-v2.png"`));assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));assert.ok(existsSync(`${output}/social-card-v2.png`));}
    else assert.ok(!html.includes('rel="canonical"'));
    assert.equal((html.match(/id="profile-schema"/g)||[]).length,1);
    for(const match of html.matchAll(/(?:src|href)="\/_astro\/([^"]+)"/g))assert.ok(existsSync(`${output}/_astro/${match[1]}`));
