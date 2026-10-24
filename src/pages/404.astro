@@ -1,0 +1,63 @@
+---
+import '@fontsource-variable/manrope';
+import '@fontsource-variable/oswald';
+import Analytics from '../Analytics.astro';
+---
+<!doctype html>
+<html lang="ru">
+<head>
+ <Analytics />
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <meta name="robots" content="noindex" />
+ <meta name="theme-color" content="#191c1d" />
+ <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+ <title>404 — Artem Letyushev</title>
+ <script is:inline src="https://player.vimeo.com/api/player.js"></script>
+</head>
+<body>
+ <main>
+  <a class="brand" href="/">Artem Letyushev</a>
+  <div class="content">
+   <div class="copy"><h1>404</h1><p>Страница не найдена.<br />Зато кое-что нашлось.</p><a class="home" href="/">← На главную</a></div>
+   <div class="video"><iframe id="rickroll" title="Rick Astley — Never Gonna Give You Up" src="https://player.vimeo.com/video/1126541722?autoplay=1&muted=0&autopause=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><button id="sound" type="button">Включить звук</button></div>
+  </div>
+ </main>
+</body>
+</html>
+<script is:inline>
+ const soundButton = document.getElementById('sound');
+ if (window.Vimeo?.Player) {
+  const player = new Vimeo.Player(document.getElementById('rickroll'));
+  const startWithSound = async () => {
+   try {
+    await player.play();
+    await player.setMuted(false);
+    await player.setVolume(1);
+    soundButton.hidden = !(await player.getMuted());
+   } catch {
+    soundButton.hidden = false;
+   }
+  };
+  player.ready().then(startWithSound).catch(() => {});
+  soundButton.addEventListener('click', startWithSound);
+ }
+</script>
+<style>
+ :global(*){box-sizing:border-box}
+ :global(body){margin:0;background:#191c1d;color:#efefeb;font-family:'Manrope Variable',sans-serif}
+ main{min-height:100svh;padding:32px clamp(20px,5vw,76px);display:flex;flex-direction:column;gap:clamp(48px,9vh,110px)}
+ .brand{color:inherit;text-decoration:none;font-weight:800;font-size:18px}
+ .brand:hover,.brand:focus-visible{color:#c1f168}
+ .content{display:grid;grid-template-columns:minmax(230px,1fr) minmax(0,1.5fr);align-items:center;gap:clamp(28px,5vw,80px);max-width:1500px;width:100%;margin:auto}
+ h1{font-family:'Oswald Variable',sans-serif;font-size:clamp(110px,22vw,340px);line-height:.9;margin:0;color:#c1f168}
+ .copy p{font-size:clamp(20px,2.1vw,32px);line-height:1.35;margin:30px 0}
+ .home{display:inline-flex;align-items:center;min-height:48px;padding:12px 18px;background:#c1f168;color:#191c1d;text-decoration:none;font-weight:800}
+ .home:hover,.home:focus-visible{background:#e0ffae;outline:2px solid #fff;outline-offset:3px}
+ .video iframe{display:block;width:100%;aspect-ratio:16/9;min-height:220px;border:1px solid #7a8584;background:#111}
+ .video p{font-size:13px;line-height:1.5;color:#c1c9c5}
+ .video button{margin-top:12px;padding:10px 14px;border:1px solid #c1f168;background:transparent;color:#c1f168;font:inherit;cursor:pointer}
+ .video button:hover,.video button:focus-visible{background:#c1f168;color:#191c1d}
+ .video button[hidden]{display:none}
+ @media(max-width:700px){main{gap:30px}.content{grid-template-columns:1fr;gap:32px}h1{font-size:clamp(110px,40vw,200px)}.copy p{margin:15px 0}.video iframe{min-height:200px}}
+</style>

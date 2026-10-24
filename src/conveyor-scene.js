@@ -47,7 +47,7 @@ export function createConveyor(root){
   }
   function resize(){
     const r=root.getBoundingClientRect();if(!r.width||!r.height)return;
-    width=Math.max(11,r.width/56);renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;
+    width=Math.max(r.width<700?8:11,r.width/56);renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;
     const distance=width/(2*Math.tan(THREE.MathUtils.degToRad(17.5))*camera.aspect);
     camera.position.set(0,distance*.18,distance);camera.lookAt(0,0,0);camera.updateProjectionMatrix();
     beltWidth=width*.8;
@@ -82,11 +82,13 @@ export function createConveyor(root){
     if(!dirty)return;
     const start=machine.position.x+.9,end=beltWidth/2-.6,span=end-start,gap=span/6;
     models.forEach((model,i)=>{
+      const mobile=root.clientWidth<700;
       const pose=reduced.matches?{x:(i+.5)*gap,y:0,rotation:0}:conveyorPose(time*.85,i,span);
+      if(mobile)pose.y*=3;
       const target=active===i&&!reduced.matches?.28:0;model.userData.lift=THREE.MathUtils.damp(model.userData.lift,target,12,dt);
-      const scale=Math.min(.8,(gap-.2)/3.5);
+      const scale=mobile?.5:Math.min(.8,(gap-.2)/3.5);
       model.scale.setScalar(scale);model.rotation.z=-pose.rotation;
-      model.position.set(start+pose.x,-.42-model.boundingBox.min.y*scale+pose.y+model.userData.lift,.12);model.visible=pose.y>-4;
+      model.position.set(start+pose.x,-.42-model.boundingBox.min.y*scale+pose.y+model.userData.lift,.12);model.visible=pose.y>(mobile?-1:-4);
       model.updateMatrixWorld(true);
       const box=model.boundingBox.clone().applyMatrix4(model.matrixWorld),min=new THREE.Vector2(Infinity,Infinity),max=new THREE.Vector2(-Infinity,-Infinity);
       for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){

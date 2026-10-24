@@ -1,70 +1,58 @@
-# Tech PM - Artem Letyushev
+<p align="center"><img src="public/brand/logo-mono.png" width="96" alt="Artem Letyushev monogram"></p>
+<h1 align="center">Artem Letyushev · Portfolio</h1>
+<p align="center"><strong>An interactive portfolio for a Tech / Delivery Project Manager.</strong><br>Editorial storytelling, a sculpted 3D portrait, and evidence-led project work.</p>
+<p align="center"><strong>English</strong> · <a href="README.ru.md">Русский</a></p>
+<p align="center"><a href="https://artemletyushev.website">Live site</a> · <a href="docs/index.md">Documentation</a> · <a href="LICENSE">GPL-3.0 license</a></p>
 
-Astro static Tech Project Manager portfolio with three React islands for the portrait, practice and conveyor scenes. Content is based on the owner's supplied and approved professional profile. Estimates, prototypes and launch-stage projects retain their status.
+![A measured face reconstructed as dense voxels for the portfolio's 3D story.](public/story/combined.png)
 
-Edit experience, major cases and biography in `src/portfolio-data.js`; edit the product, engineering and process descriptions in `src/practice-data.js`. Update all three translations in `src/messages.json` and the profile update date when facts change. `npm run build` regenerates the downloadable Markdown and bundled skill references from those sources. The supplied PDF is a separate Russian original document, linked only on the Russian page; English and Kazakh pages offer their matching Markdown resumes.
+## What is here
 
-## Development
+The site presents a professional profile in Russian, English, and Kazakh. Its static Astro pages remain readable without JavaScript; React and Three.js power three interactive islands: portrait, practice, and conveyor. A downloadable CV, contact links, localized metadata, agent-readable resources, and a real 404 page round out the experience. Claims and estimates follow the owner's approved profile.
 
-Node 22.23.4+ is required by Astro 7.
+## Built with
+
+Astro 7 · React 19 · Three.js · JavaScript · CSS · Playwright · Cloudflare Pages. The visual direction was explored in Sketch and refined through a rapid, iterative design-and-build workflow. The author's agent-assisted workflow draws on [Impeccable](https://github.com/pbakaus/impeccable), [Test Designer](https://github.com/letya999/test-designer), [Test Critic](https://github.com/letya999/test-critic), [Probity](https://github.com/letya999/probity), and [AI Repo Safety](https://github.com/letya999/ai-repo-safety-skill). These are development aids, not runtime dependencies or guarantees.
+
+## Run locally
+
+Requires Node.js 22.23.4 or newer.
 
 ```sh
 npm ci
+cp .env.example .env
 npm run dev
-npm run build
-npm run preview
 ```
 
-The production site is generated into `dist`. No backend, cookies, analytics or API credentials are required. Contact actions link directly to email, Telegram and LinkedIn. The PDF in `public` is intentionally downloadable and contains the contact information supplied by the owner.
+On Windows PowerShell, use `Copy-Item .env.example .env`. The local `.env` is ignored by Git. Set `SITE_URL` to the final HTTPS origin for production builds; analytics IDs are optional. The site needs no backend or API secret.
 
-## Design
+```sh
+npm run build
+npm run preview
+npm test
+```
 
-Monochrome editorial typography with an electric lime interaction accent. References: https://typesafe.ai/ and https://olhalazarieva.com/. Manrope and Oswald are locally bundled under the SIL Open Font License. No third-party photographs or invented portraits are used.
+`dist/` is the static deployment artifact. Browser checks use `npm run test:e2e` with a local Chrome installation. See the [runbook](docs/operations/runbook.md) for deployment, domain cutover, and verification.
 
-The owner-supplied logo kit provides the header symbol, favicons, touch icons and mask icon. The header uses the monochrome symbol by default and its colour counterpart on hover or keyboard focus. On narrow phones the symbol stands alone to leave room for navigation.
+## Project map
 
-## Accessibility
+| Path | Purpose |
+| --- | --- |
+| `src/` | Astro shell, content, React islands, animation, and styles. |
+| `public/` | CV, imagery, 3D data, agent resources, and third-party notices. |
+| `scripts/generate-static.js` | Generate localized static resources from canonical content. |
+| `tests/` | Browser and generated-output checks. |
+| [`docs/`](docs/index.md) | Current product, architecture, and operations notes. |
+| [`AGENTS.md`](AGENTS.md) | Project instructions for coding agents. |
 
-Semantic landmarks, keyboard-operable disclosure controls, visible focus, native anchors, and reduced-motion support. No scroll hijacking.
+Read the [product notes](docs/product.md), [architecture notes](docs/architecture.md), and [security notes](docs/security.md) before changing content or publishing assets.
 
-## SEO and AI search
+## Deployment and analytics
 
-The build serves readable profile HTML before JavaScript, using the same localized experience and competency data as the interactive site. `/ru.html`, `/en.html` and `/kk.html` are stable language URLs; explicit language URLs override browser preferences. The homepage keeps browser-language detection. Switching languages preserves the query and section anchor.
+Cloudflare Pages builds `main` with `npm run build` and publishes `dist`. Set `SITE_URL=https://artemletyushev.website` in its build environment. The apex and `www` hostnames are attached as custom domains in Cloudflare. The domain and DNS are managed separately from GitHub; the [runbook](docs/operations/runbook.md) records the cutover procedure.
 
-Each page includes localized title/description, canonical and reciprocal language links, Open Graph metadata, a Twitter summary card, and Schema.org `ProfilePage` with `Person`. The supplied portrait is used for previews. Public content is allowed by `robots.txt`; the agent Markdown resources remain accessible. No hidden keywords, fabricated reviews or guaranteed AI rankings are used. See [Google's JavaScript guidance](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) and [AI search guidance](https://developers.google.com/search/docs/appearance/ai-features).
+Set `PUBLIC_GA_MEASUREMENT_ID` and/or `PUBLIC_YANDEX_METRIKA_ID` only after creating those counters and handling applicable privacy notice or consent requirements. Empty values omit the trackers. A successful build or deployment does not prove analytics collection, DNS propagation, or real-user performance.
 
-Copy `.env.example` to `.env` or configure `SITE_URL` in the deployment build environment. Set it to the HTTPS origin, without a path, query or fragment. The domain is not hardcoded: rebuilding generates absolute canonical, language, social and schema URLs plus `sitemap.xml` and its `robots.txt` declaration. Without `SITE_URL`, canonical and hreflang links are omitted, social/schema URLs remain relative, and no invalid relative sitemap is emitted. Set `SITE_URL` before publication; absolute URLs are needed for reliable language discovery and social previews.
+## License and assets
 
-Publish the entire `dist` folder at the domain root. Serve generated `.html`, `.md`, `.json`, `.txt`, images and assets directly; return genuine HTTP 404 for unknown paths instead of rewriting every missing resource to the homepage. Configure HTTPS and one canonical hostname at the host/CDN. Use short revalidating caching for HTML, resumes and mutable public assets (including `voxel-portrait.json`); use long immutable caching only for hashed `/_astro/` files. Enable Brotli for text, JavaScript, CSS and JSON, with gzip fallback. Protect staging from indexing at the host. These host settings cannot be enforced by a static build.
-
-The visible photographs have WebP sources with the original PNG/JPEG fallbacks. The 3D voxel JSON remains the largest entry asset; its appearance and interaction are preserved, so deploy it with HTTP compression and revalidation rather than a risky unversioned cache or lossy geometry rewrite.
-
-After publishing, verify ownership in Google Search Console and Bing Webmaster Tools, submit `/sitemap.xml`, and inspect the live language URLs and structured data. On domain migration, update `SITE_URL`, rebuild, and configure permanent redirects from corresponding old URLs; retain the old domain while search engines process the move. Search-console ownership, external indexing, CDN rules and real-user Core Web Vitals require the deployed site and are not established by local tests. The hero still loads Three.js and triggers a bundle-size warning during the Astro build.
-
-Validation: `node --test tests/seo-build.test.mjs` checks builds with two different origins and without one. `node node_modules/@playwright/test/cli.js test tests/seo.spec.js tests/localization.spec.js tests/agent-discovery.spec.js tests/agent-view.spec.js --workers=1` checks static HTML, JavaScript-disabled reading, metadata, localization and agent resources.
-
-## Agent interfaces
-
-Root-domain static resources are available at `/skill.md`, `/agents.md`, `/mcp.json`, and `/llms.txt`. The Agent view links to all four; HTML alternate links advertise the Russian, English and Kazakh Markdown profiles.
-
-The portable skill lives in `public/skills/artem-portfolio/`: distribute `SKILL.md` together with `references/`. The Astro `/skill.md` route generates the root alias with adjusted links; the build script generates the three bundled profile snapshots from the same data as the downloadable resumes. Edit the canonical skill, not the generated alias or snapshots. The build copies these resources into `dist`; deploy them as real files without a homepage rewrite. Paths assume deployment at the domain root.
-
-The skill follows [Agent Skills](https://agentskills.io/specification). The visitor guide distinguishes itself from repository [AGENTS.md](https://agents.md/) instructions. The additional [llms.txt](https://llmstxt.org/) index is a discovery proposal, not a guarantee of agent support or automatic activation.
-
-The MCP file follows the [official Fetch server configuration](https://github.com/modelcontextprotocol/servers/tree/main/src/fetch). It starts a pinned local stdio server via `uvx`; this static site does not host a remote MCP endpoint. Users explicitly merge the entry into compatible client settings. Fetch can read arbitrary public sites, not just this portfolio. No credentials or private-address bypass are configured. Installation and MCP client connection are not automatic.
-
-Validate with `node node_modules/@playwright/test/cli.js test tests/agent-discovery.spec.js tests/agent-view.spec.js --workers=1` and `npm run build`.
-
-## Motion implementation (original implementation notes)
-
-The hero uses the exact 400×400 reference supplied by the owner (`public/artem-reference.png`). Its face is registered directly onto a closed 3D surface: front geometry coordinates and UVs preserve the source proportions, smile and tilt. Orthographic projection avoids additional perspective distortion. A shader converts the source to monochrome; satin metallic lighting supplies depth without replacing the facial features. The original image resolution limits fine detail. The rounded back is an approximation, not a scan.
-
-The portrait stays assembled most of the time. Every 24 seconds, only three neighbouring plates complete a staggered turn; the selected band alternates between forehead and lower neck. Head rotation and subtle iris displacement follow the cursor across the viewport. Pause and reduced motion are preserved. Scroll no longer disassembles the face. The manual disassembly control remains available.
-
-`public/head-contours.bin` contains 40,723 vertices (814,460 bytes). Regenerate with `python scripts/bake-head.py <face_landmarker.task>` in an isolated environment with mediapipe, numpy, scipy and pillow. The source photo is processed locally. Historical multi-view fitting files are retained for provenance, but are not used by the current bake or browser.
-
-Run geometry and animation checks with `node --test src/motion.test.js src/sculpture.test.js`. Run the browser scenario with `npx playwright test` (installed Google Chrome required).
-
-## Verified locally
-
-The Astro build, unit checks, static SEO builds and Chrome browser scenarios cover geometry and motion, localized HTML without JavaScript, island hydration, disclosures, PDF delivery and a 390px viewport. Desktop and mobile layouts were visually inspected. The hero still loads Three.js on entry; moving the page shell to Astro does not remove that cost. Physical iOS/Android devices, public hosting and real-user performance have not been tested. The contour asset adds about 815 KB before HTTP compression.
+Source code and original documentation: [GNU GPL v3.0](LICENSE). Supplied portraits and the CV belong to their respective rights holder and are not granted for reuse by that license. Fonts, icons, and 3D source assets retain the terms in `public/*LICENSE*`, `public/brand-marks/ATTRIBUTION.md`, `public/story/CREDITS.txt`, and `scripts/assets/webxr-hand.LICENSE.md`. The repository is being prepared privately; a GPL license does not by itself make a private repository publicly accessible.

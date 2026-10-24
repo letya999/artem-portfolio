@@ -1153,3 +1153,27 @@ footer{display:flex;flex-direction:column;justify-content:space-between;min-heig
 .view-dock a::after{opacity:.16;}
 @media(max-width:1000px){.about{grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:5%;}.practice-icon{width:65px;height:65px;}.footer-bottom a:last-child{padding-right:85px;}}
 @media(max-width:700px){.md-link{font-size:10px;gap:3px}.md-link svg{width:11px;height:11px}.about{display:flex;flex-direction:column-reverse;gap:20px;padding:35px 6% 40px}.about-photo{max-width:260px}.about .about-sticker{padding:20px 23px 26px}.matryoshka-slot{height:180px}.practice-row{grid-template-columns:minmax(205px,60%) minmax(0,40%)}.practice-area{min-height:100px}.practice-icon{width:49px;height:49px}.practice-tag-label{font-size:14px;padding:4px 7px}.conveyor-section{padding:14px 0 0}.conveyor-stage{height:230px}footer{min-height:calc(100svh - 56px);padding:52px 6% 25px}.footer-bottom{font-size:13px;gap:20px;margin-top:42px}.footer-bottom a:last-child{padding-right:75px}.view-dock{width:140px;}}
+@media(max-width:700px){
+ .practice-inputs{gap:8px}
+ .practice-row{display:block;min-height:0}
+ .practice-area{width:100%;min-height:92px;padding:12px;gap:12px}
+ .practice-icon{width:58px;height:58px}
+ .practice .practice-area h3{font-size:23px}
+ .practice .practice-area p{font-size:13px;line-height:1.4}
+ .practice-more{width:44px;height:44px;flex:none}
+ .practice-stream{height:46px}
+ .practice-press{height:320px}
+ .practice-outcome{height:160px}
+}
+@media(max-width:700px){
+ .portrait-wrap{padding-bottom:0}
+ .portrait-sticker{position:relative;left:2px;bottom:auto;margin:135px 0 16px}
+ .sticker-arrow{width:62px;height:54px;right:-60px;top:15px;transform:rotate(-15deg)}
+ footer{padding:36px 6% 25px}
+ .contact-top{display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;margin:auto 0}
+ .contact-top h2{font-size:clamp(54px,17vw,76px);line-height:.98}
+ .contact-top>div{display:flex;flex-direction:column;align-items:center;margin:0}
+ .contact-top p{margin:0;line-height:1.5}
+ .footer-bottom{grid-template-columns:1fr;justify-items:center;gap:12px;margin:20px auto 0;padding-bottom:75px;text-align:center}
+ .footer-bottom a:last-child{padding-right:0}
+}

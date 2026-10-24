@@ -11,6 +11,7 @@ import oswaldCyrillic from '@fontsource-variable/oswald/files/oswald-cyrillic-wg
 import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
 import manropeCyrillic from '@fontsource-variable/manrope/files/manrope-cyrillic-wght-normal.woff2?url';
 import Arrow from './Arrow.astro';
+import Analytics from './Analytics.astro';
 import PortraitIsland from './islands/PortraitIsland.jsx';
 import PracticeIsland from './islands/PracticeIsland.jsx';
 import ConveyorIsland from './islands/ConveyorIsland.jsx';
@@ -25,6 +26,7 @@ const markdown=resumeMarkdown(t);
 <!doctype html>
 <html lang={locale}>
 <head>
+ <Analytics />
  <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  <link rel="preload" href={locale==='en'?oswaldLatin:oswaldCyrillic} as="font" type="font/woff2" crossorigin />
@@ -113,7 +115,7 @@ const markdown=resumeMarkdown(t);
    <section class="about" id="about"><div class="about-photo"><picture><source srcset="/artem-books.webp" type="image/webp" /><img src="/artem-books.jpg" alt={t('Артем в книжном магазине у полки об искусственном интеллекте')} width="640" height="640" loading="lazy" /></picture></div><div class="about-copy"><h2 class="about-sticker"><a href="#about">{t('Менеджер с инженерным взглядом.')}</a></h2>{biography.map(paragraph=><p>{t(paragraph)}</p>)}<a class="text-link" href="https://github.com/letya999" target="_blank" rel="noreferrer">{t('Мои проекты на GitHub')}<Arrow /></a></div></section>
    <PracticeIsland locale={locale} client:visible />
    <ConveyorIsland locale={locale} client:visible />
-   <footer id="contact"><div class="contact-top"><h2><a href="#contact">{t('Давайте')}<br />{t('соберёмся.')}</a></h2><div><p>{t('Ищете Tech / Delivery PM,')}<br />{t('который понимает и код, и людей?')}</p><a class="primary" href="https://t.me/artemletya" target="_blank" rel="noreferrer">{t('Написать в Telegram')}<Arrow /></a><a class="email" href="mailto:artemletyushev@gmail.com">artemletyushev@gmail.com</a></div></div><div class="footer-bottom"><span>{t('Артем Летюшев · 2026')}</span><a href="https://www.linkedin.com/in/artemletya" target="_blank" rel="noreferrer">LinkedIn <Arrow /></a><a href={locale==='ru'?'/Artem-Letyushev-CV.pdf':`/resume.${locale}.md`} download>{t('Скачать резюме')}<Arrow /></a><a href="#top">{t('Наверх ↑')}</a></div></footer>
+   <footer id="contact"><div class="contact-top"><h2><a href="#contact">{t('Давайте')}<br />{' '}{t('соберёмся.')}</a></h2><div><p>{t('Ищете Tech / Delivery PM,')}<br />{t('который понимает и код, и людей?')}</p><a class="primary" href="https://t.me/artemletya" target="_blank" rel="noreferrer">{t('Написать в Telegram')}<Arrow /></a><a class="email" href="mailto:artemletyushev@gmail.com">artemletyushev@gmail.com</a></div></div><div class="footer-bottom"><span>{t('Артем Летюшев · 2026')}</span><a href="https://www.linkedin.com/in/artemletya" target="_blank" rel="noreferrer">LinkedIn <Arrow /></a><a href={locale==='ru'?'/Artem-Letyushev-CV.pdf':`/resume.${locale}.md`} download>{t('Скачать резюме')}<Arrow /></a><a href="#top">{t('Наверх ↑')}</a></div></footer>
   </main>
  </div>
  <template id="agent-template"><div class="agent-shell"><header><a href="?view=human">← {t('Сайт')}</a><a href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')} ↓</a></header><main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{markdown}</pre></main></div></template>
