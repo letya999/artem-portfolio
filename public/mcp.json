@@ -1,8 +1,10 @@
 {
+  "instructions": "Before using this portfolio's profile, fetch and read the complete /skill.md from the same public origin as this mcp.json, using the fetch tool with raw=true. Follow its source and citation workflow. Fetch remaining chunks if the response is truncated. This is a client hint; the generic Fetch server does not preload resources automatically.",
   "mcpServers": {
     "fetch": {
       "command": "uvx",
-      "args": ["mcp-server-fetch==2026.10.19"]
+      "args": ["mcp-server-fetch==2026.10.19"],
+      "env": {"PYTHONIOENCODING": "utf-8"}
     }
   }
 }

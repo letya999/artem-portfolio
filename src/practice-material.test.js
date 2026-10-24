@@ -4,7 +4,9 @@ import {createPalmPile,samplePalmParticle} from './practice-material.js';
 
 test('arriving cubes fall, bounce without crossing their support, and settle on the palm or previous layer',()=>{
  const pile=createPalmPile();assert.equal(pile.particles.length,64);
- assert.equal(pile.size,10.5);assert.ok(pile.particles.at(-1).arrival<10);
+ assert.equal(pile.size,10.5);assert.ok(pile.particles.at(-1).arrival<20);
+ assert.ok(Math.max(...pile.particles.map(p=>p.rest.x))+pile.size/2<34);
+ assert.ok(pile.particles[45].arrival>17);
  assert.equal(new Set(pile.particles.slice(0,36).map(p=>p.rest.x.toFixed(1)+','+p.rest.z.toFixed(1))).size,36);
  assert.ok(pile.particles[63].rest.y>pile.particles[0].rest.y);
  for(const [i,particle] of pile.particles.entries()){
@@ -21,7 +23,7 @@ test('arriving cubes fall, bounce without crossing their support, and settle on 
 
 test('pressing keeps every cube and aligns one supported four-by-four-by-four product',()=>{
  const pile=createPalmPile();
- const packed=pile.particles.map(p=>samplePalmParticle(p,13.5,1));
+ const packed=pile.particles.map(p=>samplePalmParticle(p,23.5,1));
  assert.equal(new Set(packed.map(p=>p.toArray().join(','))).size,64);
  for(const axis of ['x','y','z']){
   const levels=[...new Set(packed.map(p=>p[axis]))].sort((a,b)=>a-b);assert.equal(levels.length,4);
@@ -29,6 +31,6 @@ test('pressing keeps every cube and aligns one supported four-by-four-by-four pr
  }
  for(let i=0;i<64;i++){
   if(i<16)assert.ok(packed[i].y-pile.size/2>=pile.particles[i].packedSupport-1e-8);
-  assert.ok(samplePalmParticle(pile.particles[i],13.3,1).distanceTo(packed[i])<1e-8);
+  assert.ok(samplePalmParticle(pile.particles[i],23.3,1).distanceTo(packed[i])<1e-8);
  }
 });

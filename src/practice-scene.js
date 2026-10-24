@@ -115,7 +115,7 @@ export function createPracticeScene(root){
       if(width<700){press.x-=24;lanes=lanes.map((_,i)=>({x:-width/2+12,y:press.y+(1-i)*44}));}
       dirty=false;
     }
-    const state=pressCycle(reduced.matches?17.6:elapsed),{phase,closure,compression,travel}=state;
+    const state=pressCycle(reduced.matches?26.8:elapsed),{phase,closure,compression,travel}=state;
     const scale=Math.min(1.35,Math.max(.7,width/1250));
     upper.scale.setScalar(scale*1.24);lower.scale.setScalar(scale*1.24);
     upper.userData.pose(closure);lower.userData.pose(closure);
@@ -140,7 +140,7 @@ export function createPracticeScene(root){
       }
       for(let row=0;row<3;row++)for(let j=0;j<16;j++){
         const particle=pile.particles[j*3+row],tag=tags[row][block+j],origin=tagOrigins[row],size=tagSizes[row][block+j];
-        const age=phase*PRACTICE_CYCLE_SECONDS-(particle.arrival-3);
+        const age=phase*PRACTICE_CYCLE_SECONDS-(particle.arrival-4);
         const target=intakePoint(particle,row,j,scale);
         const from={x:origin.x+size.width/2+8,y:origin.y-12-Math.floor(j/4)*22};
         const motion=tagMotion(age,from,target);
@@ -181,16 +181,16 @@ export function createPracticeScene(root){
       if(!local&&flightAge>=0)rotation.slerp(new THREE.Quaternion().setFromEuler(new THREE.Euler(.35,.55,Math.sin(i)*.2)),1-ease(flightAge/flight));
       matrix.compose(position,rotation,sizeVector.setScalar((local||flightAge>=0?batchScale:0)*(1+.13*travel)));batch.setMatrixAt(i,matrix);
     }
-    batch.instanceMatrix.needsUpdate=true;
-    settled.visible=state.cycle>0&&travel<.8;
-    settledMaterial.opacity=1-ease((travel-.2)/.6);
-    settled.position.copy(destination);settled.scale.setScalar(batchScale*1.13);
-    resultShadow.position.set(destination.x,destination.y-55*scale,-150);resultShadow.scale.set(scale*.65,scale,1);
-    resultShadowMaterial.opacity=Math.max(state.cycle>0?settledMaterial.opacity:0,ease((travel-.65)/.35));
-    canvas.dataset.cycleTime=phase.toFixed(3);canvas.dataset.pressPhase=state.stage;canvas.dataset.accumulated=String(accumulated);canvas.dataset.deliveryProgress=travel.toFixed(3);
+    batch.instanceMatrix.needsUpdate=true;batch.visible=travel<1;
+    settled.visible=travel===1&&state.exit<1;
+    settledMaterial.opacity=1-state.exit;
+    settled.position.copy(destination);settled.position.x+=180*scale*state.exit;settled.scale.setScalar(batchScale*1.13);
+    resultShadow.position.set(settled.position.x,destination.y-55*scale,-150);resultShadow.scale.set(scale*.65,scale,1);
+    resultShadowMaterial.opacity=settled.visible?settledMaterial.opacity:0;
+    canvas.dataset.cycleTime=phase.toFixed(3);canvas.dataset.pressPhase=state.stage;canvas.dataset.accumulated=String(accumulated);canvas.dataset.deliveryProgress=travel.toFixed(3);canvas.dataset.productVisible=String(settled.visible);
     renderer.render(scene,camera);
   }
-  function tick(now){frame=0;if(!visible||document.hidden||disposed)return;elapsed+=Math.max(0,Math.min((now-last)/1000,.05));last=now;draw();if(!reduced.matches)frame=requestAnimationFrame(tick);}
+  function tick(now){frame=0;if(!visible||document.hidden||disposed)return;elapsed+=Math.max(0,(now-last)/1000);last=now;draw();if(!reduced.matches)frame=requestAnimationFrame(tick);}
   function resume(){cancelAnimationFrame(frame);last=performance.now();if(visible&&!document.hidden)frame=requestAnimationFrame(tick);}
   const observer=new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;root.classList.toggle('practice-paused',!visible);resume();});observer.observe(root);
   const resize=new ResizeObserver(()=>{dirty=true;resume();});resize.observe(root);

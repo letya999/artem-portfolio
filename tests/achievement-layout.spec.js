@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-test('achievements have a raised centered heading and five large results to the left of the equation', async ({page}) => {
+test('achievements have a centered heading and seven project cases to the left of the equation', async ({page}) => {
   await page.setViewportSize({width: 1440, height: 900});
   await page.goto('/');
   const layout = await page.evaluate(() => {
@@ -14,13 +14,13 @@ test('achievements have a raised centered heading and five large results to the 
       count: entries.length,
       metrics: entries.map(entry => entry.querySelector('strong').textContent),
       leftOfEquation: entries.every(entry => entry.getBoundingClientRect().right < law.left),
-      metricSizes: entries.map(entry => parseFloat(getComputedStyle(entry.querySelector('strong')).fontSize)),
+      titleLeads: entries.every(entry => parseFloat(getComputedStyle(entry.querySelector('h3')).fontSize) > parseFloat(getComputedStyle(entry.querySelector('strong')).fontSize)),
     };
   });
   expect.soft(layout.headingOffset).toBeLessThanOrEqual(64);
   expect.soft(Math.abs(layout.headingCenter - 720)).toBeLessThan(8);
-  expect.soft(layout.count).toBe(5);
-  expect.soft(layout.metrics).toEqual(['64→16', '÷2,5', '−60%', '+40%', '12→34%']);
+  expect.soft(layout.count).toBe(7);
+  expect.soft(layout.metrics).toEqual(['9 сервисов · фрод ↓ в 2,5 раза','10+ каналов коммуникации','Мексика · Индия · Нигерия','5 продуктовых + 2 сервисные команды','ЮMoney · Amundsen','ITIS · команда 5 → 18','Renewal · безубыточность за 2 месяца']);
   expect.soft(layout.leftOfEquation).toBe(true);
-  expect.soft(layout.metricSizes.every(size => size >= 64)).toBe(true);
+  expect.soft(layout.titleLeads).toBe(true);
 });

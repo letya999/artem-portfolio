@@ -360,13 +360,15 @@ export default function Portrait() {
         role="img"
         aria-label={t("Кинетический объёмный портрет Артема")}
       >
-        <img
-          src="./artem-reference.png"
-          className="portrait-fallback"
-          alt={t("Артем Летюшев")}
-        />
+        <picture>
+          <source srcSet="./artem-reference.webp" type="image/webp" />
+          <img
+            src="./artem-reference.png"
+            className="portrait-fallback"
+            alt={t("Артем Летюшев")}
+          />
+        </picture>
       </div>
-      <div className="portrait-controls"><span>{t("Порядок из сложности")}</span></div>
       <PortraitStory/>
     </div>
   );

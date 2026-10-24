@@ -1,6 +1,8 @@
-# Artem Letyushev portfolio
+# Tech PM - Artem Letyushev
 
-Astro static portfolio with three React islands for the portrait, practice and conveyor scenes. Content is based on the supplied CV. Estimates and projections are explicitly labelled.
+Astro static Tech Project Manager portfolio with three React islands for the portrait, practice and conveyor scenes. Content is based on the owner's supplied and approved professional profile. Estimates, prototypes and launch-stage projects retain their status.
+
+Edit experience, major cases and biography in `src/portfolio-data.js`; edit the product, engineering and process descriptions in `src/practice-data.js`. Update all three translations in `src/messages.json` and the profile update date when facts change. `npm run build` regenerates the downloadable Markdown and bundled skill references from those sources. The supplied PDF is a separate Russian original document, linked only on the Russian page; English and Kazakh pages offer their matching Markdown resumes.
 
 ## Development
 
@@ -19,6 +21,8 @@ The production site is generated into `dist`. No backend, cookies, analytics or 
 
 Monochrome editorial typography with an electric lime interaction accent. References: https://typesafe.ai/ and https://olhalazarieva.com/. Manrope and Oswald are locally bundled under the SIL Open Font License. No third-party photographs or invented portraits are used.
 
+The owner-supplied logo kit provides the header symbol, favicons, touch icons and mask icon. The header uses the monochrome symbol by default and its colour counterpart on hover or keyboard focus. On narrow phones the symbol stands alone to leave room for navigation.
+
 ## Accessibility
 
 Semantic landmarks, keyboard-operable disclosure controls, visible focus, native anchors, and reduced-motion support. No scroll hijacking.
@@ -29,9 +33,11 @@ The build serves readable profile HTML before JavaScript, using the same localiz
 
 Each page includes localized title/description, canonical and reciprocal language links, Open Graph metadata, a Twitter summary card, and Schema.org `ProfilePage` with `Person`. The supplied portrait is used for previews. Public content is allowed by `robots.txt`; the agent Markdown resources remain accessible. No hidden keywords, fabricated reviews or guaranteed AI rankings are used. See [Google's JavaScript guidance](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) and [AI search guidance](https://developers.google.com/search/docs/appearance/ai-features).
 
-Copy `.env.example` to `.env` or configure `SITE_URL` in the deployment build environment. Set it to the HTTPS origin, without a path, query or fragment. The domain is not hardcoded: rebuilding generates absolute canonical, language, social and schema URLs plus `sitemap.xml` and its `robots.txt` declaration. Without `SITE_URL`, metadata remains relative and no invalid relative sitemap is emitted. Absolute URLs are needed for reliable production language discovery and social previews.
+Copy `.env.example` to `.env` or configure `SITE_URL` in the deployment build environment. Set it to the HTTPS origin, without a path, query or fragment. The domain is not hardcoded: rebuilding generates absolute canonical, language, social and schema URLs plus `sitemap.xml` and its `robots.txt` declaration. Without `SITE_URL`, canonical and hreflang links are omitted, social/schema URLs remain relative, and no invalid relative sitemap is emitted. Set `SITE_URL` before publication; absolute URLs are needed for reliable language discovery and social previews.
 
-Publish the entire `dist` folder at the domain root. Serve generated `.html`, `.md`, `.json`, `.txt`, images and assets directly; return genuine HTTP 404 for unknown paths instead of rewriting every missing resource to the homepage. Configure HTTPS and one canonical hostname at the host/CDN. Use short caching for HTML and long immutable caching only for hashed `/_astro/` files. Protect staging from indexing at the host. These host settings cannot be enforced by a static build.
+Publish the entire `dist` folder at the domain root. Serve generated `.html`, `.md`, `.json`, `.txt`, images and assets directly; return genuine HTTP 404 for unknown paths instead of rewriting every missing resource to the homepage. Configure HTTPS and one canonical hostname at the host/CDN. Use short revalidating caching for HTML, resumes and mutable public assets (including `voxel-portrait.json`); use long immutable caching only for hashed `/_astro/` files. Enable Brotli for text, JavaScript, CSS and JSON, with gzip fallback. Protect staging from indexing at the host. These host settings cannot be enforced by a static build.
+
+The visible photographs have WebP sources with the original PNG/JPEG fallbacks. The 3D voxel JSON remains the largest entry asset; its appearance and interaction are preserved, so deploy it with HTTP compression and revalidation rather than a risky unversioned cache or lossy geometry rewrite.
 
 After publishing, verify ownership in Google Search Console and Bing Webmaster Tools, submit `/sitemap.xml`, and inspect the live language URLs and structured data. On domain migration, update `SITE_URL`, rebuild, and configure permanent redirects from corresponding old URLs; retain the old domain while search engines process the move. Search-console ownership, external indexing, CDN rules and real-user Core Web Vitals require the deployed site and are not established by local tests. The hero still loads Three.js and triggers a bundle-size warning during the Astro build.
 
@@ -41,7 +47,7 @@ Validation: `node --test tests/seo-build.test.mjs` checks builds with two differ
 
 Root-domain static resources are available at `/skill.md`, `/agents.md`, `/mcp.json`, and `/llms.txt`. The Agent view links to all four; HTML alternate links advertise the Russian, English and Kazakh Markdown profiles.
 
-The portable skill lives in `public/skills/artem-portfolio/`: distribute `SKILL.md` together with `references/`. The build script generates the root skill alias with adjusted links and the three bundled profile snapshots from the same data as the downloadable resumes. Edit the canonical skill, not the generated alias or snapshots. The build copies these resources into `dist`; deploy them as real files without a homepage rewrite. Paths assume deployment at the domain root.
+The portable skill lives in `public/skills/artem-portfolio/`: distribute `SKILL.md` together with `references/`. The Astro `/skill.md` route generates the root alias with adjusted links; the build script generates the three bundled profile snapshots from the same data as the downloadable resumes. Edit the canonical skill, not the generated alias or snapshots. The build copies these resources into `dist`; deploy them as real files without a homepage rewrite. Paths assume deployment at the domain root.
 
 The skill follows [Agent Skills](https://agentskills.io/specification). The visitor guide distinguishes itself from repository [AGENTS.md](https://agents.md/) instructions. The additional [llms.txt](https://llmstxt.org/) index is a discovery proposal, not a guarantee of agent support or automatic activation.
 

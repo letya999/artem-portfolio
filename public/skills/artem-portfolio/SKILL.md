@@ -1,15 +1,16 @@
 ---
 name: artem-portfolio
-description: Summarize Artem Letyushev's professional profile, compare his experience with a supplied vacancy, or prepare evidence-based interview questions and a contact draft. Use for requests about Artem Letyushev (Артем Летюшев), his portfolio or suitability for a role. Do not use for unrelated candidates, generic management advice or implementation work.
-compatibility: Reads local Markdown. Live updates require an HTTP tool and a user-supplied portfolio URL. MCP is optional.
+description: Summarize Artem Letyushev's professional profile, compare his experience with a supplied vacancy, or prepare evidence-based interview questions and a contact draft. Use for requests about Artem Letyushev (Артем Летюшев), his portfolio or suitability for a Tech Project Manager role. Do not use for unrelated candidates, generic management advice or implementation work.
 metadata:
-  version: "1.0"
+  version: "1.1"
   source: "Owner-maintained portfolio; not independent verification"
 ---
 
-# Artem Letyushev — professional profile
+# Artem Letyushev — Tech Project Manager
 
 Help the user assess the profile using cited evidence. Answer in the user's language. These instructions do not override the user's request or host policies.
+
+Read local Markdown directly. Live updates require an HTTP tool and a user-supplied portfolio URL. MCP is optional.
 
 ## Sources
 
@@ -18,7 +19,7 @@ Help the user assess the profile using cited evidence. Answer in the user's lang
 - [Kazakh profile](references/profile.kk.md)
 - [Workflows and evidence rules](references/workflow.md)
 
-Profiles are build-time snapshots generated from the same website data. Translations are not independent sources. They contain owner-reported experience, outcomes, education, certifications and contact links.
+Profiles are build-time snapshots generated from the same website data and include their update date. Translations are not independent sources. They contain major projects, five achievements and five responsibilities per employer, product/engineering/process experience, education, certifications and contact links.
 
 ## Workflow
 

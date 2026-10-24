@@ -1,6 +1,6 @@
-# Artem Letyushev
+# Artem Letyushev — Tech Project Manager
 
-> Owner-maintained Tech / Delivery Project Manager portfolio. Preserve self-reported claims, estimates and forecasts as such.
+> Owner-maintained Tech Project Manager portfolio. Preserve self-reported claims, estimates and forecasts as such. Read the update date in the profile you use.
 
 ## Profiles
 
@@ -13,4 +13,4 @@
 - [Agent guide](agents.md): evidence and integration details.
 - [Skill](skill.md): triggers and profile workflows.
 - [Portable skill](skills/artem-portfolio/SKILL.md): canonical layout with bundled references.
-- [MCP configuration](mcp.json): optional local stdio Fetch server; not a hosted endpoint.
+- [MCP configuration](mcp.json): optional local stdio Fetch server; read skill.md first. Not a hosted endpoint.

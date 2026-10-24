@@ -2,7 +2,8 @@ import {test,expect} from '@playwright/test';
 
 test('the brand, paper headline and exclusive rocker modes work in both views',async({page})=>{
  await page.goto('/en.html?view=human#about');
- await expect(page.locator('header .mark img')).toHaveAttribute('src',/\/favicon\.svg$/);
+ await expect(page.locator('header .mark .logo-mono')).toHaveAttribute('src','/brand/logo-mono.png');
+ await expect(page.locator('header .mark .logo-color')).toHaveAttribute('src','/brand/logo-color.png');
  await expect(page.locator('.about-copy h2')).toHaveClass(/about-sticker/);
  await expect(page.locator('.view-dock a')).toHaveCount(2);
  expect(await page.locator('.view-dock').evaluate(element=>getComputedStyle(element).gridTemplateColumns.split(' ').length)).toBe(2);

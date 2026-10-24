@@ -27,14 +27,14 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
     photo: true,
   });
   await expect(
-    page.getByText("Tech / Delivery Project Manager", { exact: true }),
+    page.locator('.role'),
   ).toBeVisible();
   const stage = page.locator(".portrait-stage");
   await expect(stage).toHaveClass(/loaded/);
   await expect(stage.locator("canvas")).toBeVisible();
   await page.getByRole("link", { name: "Опыт", exact: true }).click();
   await page.locator('#experience summary').getByText("МТС", { exact: true }).click();
-  await expect(page.locator('#experience').getByText(/LeSS на SAFe/)).toBeVisible();
+  await expect(page.locator('#experience').getByText(/переход от LeSS к SAFe/)).toBeVisible();
   await expect(page.locator('footer a[href="https://t.me/artemletya"]')).toBeVisible();
   expect(
     (await page.request.get("/Artem-Letyushev-CV.pdf")).headers()[

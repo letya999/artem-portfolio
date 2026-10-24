@@ -94,14 +94,23 @@ header a:not(.mark):hover {
   text-underline-offset: 6px;
 }
 .mark {
-  font-family: var(--display);
-  font-size: 35px;
-  font-weight: 650;
-  letter-spacing: -0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
-.mark span {
-  color: #698d32;
-}
+.mark .logo-name { color: var(--ink); font-size: 22px; }
+.logo-images { position: relative; display: block; width: 48px; height: 48px; flex-shrink: 0; }
+.logo-images img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity .22s ease; }
+.logo-mono { opacity: 1; }
+.logo-color { opacity: 0; }
+.mark:is(:hover,:focus-visible) .logo-mono { opacity: 0; }
+.mark:is(:hover,:focus-visible) .logo-color { opacity: 1; }
+.mark:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+@media (max-width: 480px) { .mark .logo-name { display: none; } }
+@media (prefers-reduced-motion: reduce) { .logo-images img { transition: none; } }
 .cv-link {
   display: flex;
   align-items: center;
@@ -287,14 +296,16 @@ h1 > span {
 .achievement-list strong {
   display: block;
   font-family: var(--display);
-  font-size: clamp(64px, 6.3vw, 96px);
+  font-size: clamp(22px, 2.2vw, 32px);
+  color: var(--lime);
+  margin-bottom: 14px;
   font-weight: 450;
   line-height: 1.05;
   letter-spacing: -.035em;
   font-variant-numeric: tabular-nums;
 }
 .achievement-list strong span { color: var(--lime); margin: 0 .12em; }
-.results .achievement-list h3 { margin: 14px 0 8px; font-size: 20px; }
+.results .achievement-list h3 { margin: 0 0 14px; font-family: var(--display); font-size: clamp(30px, 3.2vw, 46px); font-weight: 500; line-height: 1.12; text-wrap: balance; }
 .little-law { min-width: 0; position: sticky; top: 18svh; }
 .equation-slot {
   position: relative;
@@ -571,7 +582,7 @@ summary:hover {
 .practice .dialog-lead { font-size: 20px; line-height: 1.5; margin: 16px 0 30px; }
 .dialog-detail { padding: 22px 0; border-top: 1px solid #b8bdaf; }
 .practice .dialog-detail h3 { font-size: 17px; margin-bottom: 9px; }
-.practice .dialog-detail p { font-size: 15px; line-height: 1.75; }
+.practice .dialog-detail p { font-size: 15px; line-height: 1.75; white-space: pre-line; }
 .dialog-close { position: absolute; top: 24px; right: 24px; width: 44px; height: 44px; font-size: 30px; border: 1px solid #a7ad9e; background: transparent; cursor: pointer; }
 @keyframes practice-dialog-in { from { opacity: .2; transform: translateY(20px) scale(.98); } to { opacity: 1; transform: none; } }
 @media (min-width: 681px) and (max-width: 1000px) { .practice-columns { grid-template-columns: repeat(2,minmax(0,1fr)); } }
@@ -675,8 +686,10 @@ footer {
     gap: 18px;
   }
   .mark {
-    font-size: 29px;
+    gap: 6px;
   }
+  .mark .logo-name { font-size: 16px; }
+  .logo-images { width: 36px; height: 36px; }
   header nav {
     gap: 18px;
     margin: 0 0 0 auto;
@@ -1105,3 +1118,38 @@ astro-island { display: block; }
 @keyframes site-fade-out{to{opacity:0;filter:blur(5px)}}
 @keyframes site-fade-in{from{opacity:0;filter:blur(5px)}to{opacity:1;filter:blur(0)}}
 @media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation-duration:.01ms}}
+
+/* Finishing pass for the compact editorial composition. */
+.md-link{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-size:14px;}
+.md-link svg{width:15px;height:15px;}
+.hero-bottom{justify-content:flex-end;}
+.experience{padding-top:64px;padding-bottom:64px;}
+.experience-body{margin-top:30px;}
+.matryoshka-slot{height:clamp(170px,15vw,235px);}
+.about{grid-template-columns:minmax(0,520px) minmax(0,1fr);justify-content:center;gap:clamp(42px,5vw,90px);padding:44px 6% 52px;}
+.about-photo{max-width:520px;}
+.about .about-sticker{padding:24px 32px 30px;border:0;border-radius:2px 2px 15px 2px;background:linear-gradient(#fffefa 0 12%,#f7f6ef 12% 100%);box-shadow:2px 5px 9px #0005,9px 15px 20px #0004;transform:rotate(-2deg);}
+.about .about-sticker::before{width:38px;height:34px;background:linear-gradient(135deg,#c1c0b6,#fffefa 55%,#e0ded4);}
+.about .about-sticker::after{inset:10px 0 auto;height:1px;background:#d8d8ce;opacity:.75;}
+.about-copy > p{margin-top:17px;line-height:1.6;}
+.about .text-link{margin-top:18px;}
+.practice-row{grid-template-columns:minmax(280px,50%) minmax(0,50%);}
+.practice-area{gap:12px;min-height:110px;background:#fbfbf8;border-color:#d4d8d1;box-shadow:0 10px 20px #202b2420;}
+.practice-icon{width:94px;height:94px;object-fit:contain;filter:none;}
+.practice-more{font-size:24px;border-radius:0;}
+.practice-more:hover,.practice-more:focus-visible{background:transparent;transform:translateX(3px);outline:2px solid #171b1e;outline-offset:2px;}
+.practice-tag-label{padding:5px 9px;font-size:16px;}
+.conveyor-section{padding:14px 2% 0;}
+.conveyor-section > h2{margin:16px 0 0;}
+.conveyor-stage{max-width:1500px;height:clamp(215px,22vw,300px);}
+footer{display:flex;flex-direction:column;justify-content:space-between;min-height:calc(100svh - 64px);padding:64px 6% 28px;}
+.footer-bottom{font-size:15px;margin-top:58px;}
+.footer-bottom a:last-child{padding-right:120px;}
+.view-dock{width:168px;transform:scale(.72);border-radius:11px;background:#242826;box-shadow:0 7px 17px #0005,inset 0 1px #ffffff35;}
+.view-dock a,.view-dock a[aria-current]{min-height:98px;background:#272c2a;box-shadow:inset 0 2px 3px #ffffff28,inset 0 -5px 7px #0008;}
+.view-dock a::before{background:#c1f168;box-shadow:inset 0 2px 5px #fff9,inset 0 -7px 8px #728f3d;}
+.view-dock a[aria-current]{color:#152010;border-color:#778e54;box-shadow:inset 0 2px 4px #fff9,inset 0 -5px 7px #688739;}
+.view-dock a[aria-current] .switch-state,.view-dock a[aria-current] .switch-off{color:#152010;text-shadow:none;}
+.view-dock a::after{opacity:.16;}
+@media(max-width:1000px){.about{grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:5%;}.practice-icon{width:65px;height:65px;}.footer-bottom a:last-child{padding-right:85px;}}
+@media(max-width:700px){.md-link{font-size:10px;gap:3px}.md-link svg{width:11px;height:11px}.about{display:flex;flex-direction:column-reverse;gap:20px;padding:35px 6% 40px}.about-photo{max-width:260px}.about .about-sticker{padding:20px 23px 26px}.matryoshka-slot{height:180px}.practice-row{grid-template-columns:minmax(205px,60%) minmax(0,40%)}.practice-area{min-height:100px}.practice-icon{width:49px;height:49px}.practice-tag-label{font-size:14px;padding:4px 7px}.conveyor-section{padding:14px 0 0}.conveyor-stage{height:230px}footer{min-height:calc(100svh - 56px);padding:52px 6% 25px}.footer-bottom{font-size:13px;gap:20px;margin-top:42px}.footer-bottom a:last-child{padding-right:75px}.view-dock{width:140px;}}

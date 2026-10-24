@@ -21,7 +21,7 @@ export function createConveyor(root){
   const rim=new THREE.DirectionalLight(0xd1e2ff,1.5);rim.position.set(5,2,-3);scene.add(rim);
   const geometry=new THREE.BoxGeometry(.9,.9,.9),matrix=new THREE.Matrix4();
   const links=[...root.querySelectorAll('a')],models=[],gears=[],rollers=[],listeners=[];
-  let width=20,belt,frameMesh,active=-1,time=0,previous=0,frame,visible=false,disposed=false,dirty=true;
+  let width=20,beltWidth=16,belt,frameMesh,active=-1,time=0,previous=0,frame,visible=false,disposed=false,dirty=true;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   function cubes(points,material,name,scale=1){
     const mesh=new THREE.InstancedMesh(geometry,material,points.length);mesh.name=name;
@@ -34,8 +34,8 @@ export function createConveyor(root){
   const feed=cubes(Array.from({length:24},()=>[0,0,0]),metal,'conveyor:feed',.09);
   for(let i=0;i<2;i++){
     const points=[];
-    for(let a=0;a<24;a++)for(let z=0;z<10;z++)points.push([Math.cos(a*Math.PI/12)*.23,Math.sin(a*Math.PI/12)*.23,(z-4.5)*.12]);
-    rollers.push(cubes(points,metal,`conveyor:roller:${i}`,.105));
+    for(let a=0;a<16;a++)for(let z=0;z<10;z++)points.push([Math.cos(a*Math.PI/8)*.23,Math.sin(a*Math.PI/8)*.23,(z-4.5)*.12]);
+    rollers.push(cubes(points,metal,`conveyor:roller:${i}`,.085));
   }
   for(let i=0;i<2;i++){
     const points=[];
@@ -50,18 +50,19 @@ export function createConveyor(root){
     width=Math.max(11,r.width/56);renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;
     const distance=width/(2*Math.tan(THREE.MathUtils.degToRad(17.5))*camera.aspect);
     camera.position.set(0,distance*.18,distance);camera.lookAt(0,0,0);camera.updateProjectionMatrix();
-    machine.position.set(-width/2+2.0,.05,0);
+    beltWidth=width*.8;
+    machine.position.set(-beltWidth/2+1.15,.05,0);
     gears[0].position.set(machine.position.x-.23,.28,.6);gears[1].position.set(machine.position.x+.32,-.08,.61);
     if(belt){scene.remove(belt);belt.dispose();}
     if(frameMesh){scene.remove(frameMesh);frameMesh.dispose();}
-    const points=[],framePoints=[],columns=Math.ceil((width-1.2)/.17);
+    const points=[],framePoints=[],columns=Math.floor((beltWidth-1.9)/.17)+1;
     for(let x=0;x<columns;x++)for(let z=0;z<8;z++){
-      const px=-width/2+.6+x*.17;
+      const px=-beltWidth/2+.95+x*.17;
       points.push([px,-.72,(z-3.5)*.13]);points.push([px,-1.12,(z-3.5)*.13]);
       if(z===0||z===7)framePoints.push([px,-.94,(z-3.5)*.16]);
     }
     belt=cubes(points,metal,'conveyor:belt',.125);frameMesh=cubes(framePoints,dark,'conveyor:frame',.15);
-    rollers.forEach((r,i)=>r.position.set((i?1:-1)*(width/2-.6),-.92,0));dirty=true;
+    rollers.forEach((r,i)=>r.position.set((i?1:-1)*(beltWidth/2-.6),-.92,0));dirty=true;
   }
   function logo(svg,name){
     const doc=new DOMParser().parseFromString(svg,'image/svg+xml'),view=doc.documentElement.getAttribute('viewBox').split(/[ ,]+/).map(Number);
@@ -79,13 +80,13 @@ export function createConveyor(root){
     if(!visible||document.hidden||models.length!==5)return;
     if(!reduced.matches){time+=dt;dirty=true;}
     if(!dirty)return;
-    const start=machine.position.x+.9,end=width/2-.6,span=end-start,gap=span/5;
+    const start=machine.position.x+.9,end=beltWidth/2-.6,span=end-start,gap=span/6;
     models.forEach((model,i)=>{
       const pose=reduced.matches?{x:(i+.5)*gap,y:0,rotation:0}:conveyorPose(time*.85,i,span);
       const target=active===i&&!reduced.matches?.28:0;model.userData.lift=THREE.MathUtils.damp(model.userData.lift,target,12,dt);
-      const scale=Math.min(.8,reduced.matches?(gap-.12)/3.5:1);
+      const scale=Math.min(.8,(gap-.2)/3.5);
       model.scale.setScalar(scale);model.rotation.z=-pose.rotation;
-      model.position.set(start+pose.x,-.65-model.boundingBox.min.y*scale+pose.y+model.userData.lift,.12);model.visible=pose.y>-4;
+      model.position.set(start+pose.x,-.42-model.boundingBox.min.y*scale+pose.y+model.userData.lift,.12);model.visible=pose.y>-4;
       model.updateMatrixWorld(true);
       const box=model.boundingBox.clone().applyMatrix4(model.matrixWorld),min=new THREE.Vector2(Infinity,Infinity),max=new THREE.Vector2(-Infinity,-Infinity);
       for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){
@@ -93,7 +94,7 @@ export function createConveyor(root){
       }
       const el=links[i];el.style.visibility=model.visible?'visible':'hidden';el.style.transform=`translate3d(${min.x}px,${min.y}px,0)`;el.style.width=`${max.x-min.x}px`;el.style.height=`${max.y-min.y}px`;
     });
-    gears.forEach((gear,i)=>gear.rotation.z=time*(i?1.3:-.9));belt.position.x=(time*.85)%.17;rollers.forEach(r=>r.rotation.z=-time*3);
+    gears.forEach((gear,i)=>gear.rotation.z=time*(i?1.3:-.9));
     for(let i=0;i<feed.count;i++){
       const phase=reduced.matches?i/24:(time*.55+i/24)%1;
       matrix.makeRotationZ(phase*4+i).scale(new THREE.Vector3(.09,.09,.09)).setPosition(machine.position.x+Math.sin(i*7)*.18,2.6-phase*phase*2.5,Math.cos(i*3)*.14);feed.setMatrixAt(i,matrix);

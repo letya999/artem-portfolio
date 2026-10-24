@@ -3,9 +3,13 @@ import '@fontsource-variable/manrope';
 import '@fontsource-variable/oswald';
 import './style.css';
 import messages from './messages.json';
-import {jobs,businesses} from './portfolio-data.js';
+import {jobs,businesses,achievements,biography} from './portfolio-data.js';
 import {profileMeta} from './seo.js';
 import {resumeMarkdown} from './resume.js';
+import oswaldLatin from '@fontsource-variable/oswald/files/oswald-latin-wght-normal.woff2?url';
+import oswaldCyrillic from '@fontsource-variable/oswald/files/oswald-cyrillic-wght-normal.woff2?url';
+import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+import manropeCyrillic from '@fontsource-variable/manrope/files/manrope-cyrillic-wght-normal.woff2?url';
 import Arrow from './Arrow.astro';
 import PortraitIsland from './islands/PortraitIsland.jsx';
 import PracticeIsland from './islands/PracticeIsland.jsx';
@@ -23,13 +27,15 @@ const markdown=resumeMarkdown(t);
 <head>
  <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <link rel="preload" href={locale==='en'?oswaldLatin:oswaldCyrillic} as="font" type="font/woff2" crossorigin />
+ <link rel="preload" href={locale==='en'?manropeLatin:manropeCyrillic} as="font" type="font/woff2" crossorigin />
  <meta name="description" content={description} />
  <meta name="theme-color" content="#efefeb" />
  <meta name="site-origin" content={origin} />
  <meta name="robots" content="index,follow,max-image-preview:large" />
- <link rel="canonical" href={url} />
- {['ru','en','kk'].map(lang=><link rel="alternate" hreflang={lang} href={`${origin}/${lang}.html`} />)}
- <link rel="alternate" hreflang="x-default" href={`${origin}/`} />
+ {origin&&<link rel="canonical" href={url} />}
+ {origin&&['ru','en','kk'].map(lang=><link rel="alternate" hreflang={lang} href={`${origin}/${lang}.html`} />)}
+ {origin&&<link rel="alternate" hreflang="x-default" href={`${origin}/`} />}
  <meta property="og:type" content="profile" />
  <meta property="og:title" content={title} />
  <meta property="og:description" content={description} />
@@ -38,15 +44,23 @@ const markdown=resumeMarkdown(t);
  <meta property="og:image:alt" content={t('Артем Летюшев')} />
  <meta property="og:locale" content={{ru:'ru_RU',en:'en_US',kk:'kk_KZ'}[locale]} />
  <meta name="twitter:card" content="summary" />
+ <meta name="twitter:title" content={title} />
+ <meta name="twitter:description" content={description} />
+ <meta name="twitter:image" content={image} />
+ <meta name="author" content={t('Артем Летюшев')} />
+ <link rel="alternate" type="text/markdown" title="Agent guide" href="/agents.md" />
+ <link rel="alternate" type="text/markdown" title="Portfolio skill" href="/skill.md" />
  <script id="profile-schema" type="application/ld+json" set:html={schemaJson} />
  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
  <link rel="shortcut icon" href="/favicon.ico" />
  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+ <link rel="mask-icon" href="/mask-icon.svg" color="#20211f" />
  <link rel="manifest" href="/site.webmanifest" />
  {['ru','en','kk'].map(lang=><link rel="alternate" type="text/markdown" lang={lang} href={`/resume.${lang}.md`} />)}
  <title>{title}</title>
+ <noscript><style is:inline>.portrait-fallback{visibility:visible!important}</style></noscript>
  <script is:inline>
   if(location.pathname==='/'){
    let saved;try{saved=localStorage.getItem('portfolio-language')}catch{}
@@ -61,11 +75,11 @@ const markdown=resumeMarkdown(t);
  <div class="human-shell">
   <a class="skip" href="#main">{t('К содержанию')}</a>
   <header>
-   <a class="mark" href="#top" aria-label={t('В начало')}><img src="/favicon.svg" alt="" width="48" height="48" /></a>
+   <a id="home-link" class="mark" href="#top" aria-label={t('Artem Letyushev — в начало')}><span class="logo-images" aria-hidden="true"><img class="logo-mono" src="/brand/logo-mono.png" alt="" width="48" height="48" /><img class="logo-color" src="/brand/logo-color.png" alt="" width="48" height="48" /></span><span class="logo-name">Artem Letyushev</span></a>
    <nav aria-label={t('Основная навигация')}><a href="#experience">{t('Опыт')}</a><a href="#about">{t('Обо мне')}</a><a href="#contact">{t('Контакт')}</a></nav>
-   <a class="cv-link" href="/Artem-Letyushev-CV.pdf" download>{t('Резюме PDF')}<Arrow /></a>
-   <a class="md-link" href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')}</a>
-   <select class="language-select" aria-label={t('Язык')} data-language>
+   {locale==='ru'&&<a id="resume-pdf" class="cv-link" href="/Artem-Letyushev-CV.pdf" download>{t('Резюме .PDF')}<Arrow /></a>}
+   <a id="resume-markdown" class="md-link" href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме .MD')}<Arrow /></a>
+   <select id="language-select" class="language-select" aria-label={t('Язык')} data-language>
     <option value="ru" selected={locale==='ru'}>RU</option><option value="en" selected={locale==='en'}>EN</option><option value="kk" selected={locale==='kk'}>ҚАЗ</option>
    </select>
   </header>
@@ -73,41 +87,37 @@ const markdown=resumeMarkdown(t);
    <section class="hero" id="top">
     <div class="hero-copy">
      <h1 aria-label={t('Артем Летюшев')}><span>{t('АРТЕМ')}</span><span>{t('ЛЕТЮШЕВ')}<span class="name-dot">.</span></span></h1>
-     <p class="role">{t('Tech / Delivery Project Manager')}</p>
+     <p class="role">{t('Tech Project Manager')}</p>
      <p class="intro">{t('Соединяю инженерию,')}<br />{t('команды и бизнес.')}</p>
-     <a class="primary" href="#contact">{t('Обсудить работу')}<Arrow /></a>
+     <a id="contact-cta" class="primary" href="#contact">{t('Обсудить работу')}<Arrow /></a>
      <p class="hero-note">{t('7+ лет. Финтех, телеком, дейтинг.')}<br />{t('От требований до запуска.')}</p>
     </div>
     <PortraitIsland locale={locale} client:load />
-    <div class="hero-bottom"><span>{t('Инженерный подход. Человеческий контакт.')}</span><a href="#results">{t('Дальше — результаты')}<span aria-hidden="true">↓</span></a></div>
+    <div class="hero-bottom"><a href="#results">{t('Дальше — результаты')}<span aria-hidden="true">↓</span></a></div>
    </section>
    <section class="results" id="results">
-    <h2 class="achievements-heading"><a href="#results">{t('Достижения в цифрах.')}</a></h2>
+    <h2 class="achievements-heading"><a href="#results">{t('Результаты.')}</a></h2>
     <div class="achievements-body">
      <div class="achievement-list">
-      <article><strong>64<span>→</span>16</strong><h3>{t('Дней от задачи до результата')}</h3><p>{t('Twinby · Сформировал backend-команду, ввёл инженерные стандарты и регулярные релизы.')}</p></article>
-      <article><strong>÷{new Intl.NumberFormat(locale).format(2.5)}</strong><h3>{t('Снижение fraud rate')}</h3><p>{t('Twinby · Антифрод из 9 сервисов: ML-детекция, device fingerprinting, автомодерация и liveness.')}</p></article>
-      <article><strong>−60%</strong><h3>{t('Time-to-market аналитики')}</h3><p>{t('Twinby · Docs-as-code, AI-флоу, ADR и архитектурный надзор.')}</p></article>
-      <article><strong>+40%</strong><h3>{t('Производительность команд')}</h3><p>{t('Финтех-холдинг · Расширил отдел с 2 до 5 команд и сократил интервал релизов.')}</p></article>
-      <article><strong>12<span>→</span>34%</strong><h3>{t('Маржинальность проектов')}</h3><p>{t('Itis Team · Автоматизация и повторное использование кода.')}</p></article>
+      {achievements.map(([heading,highlight,body])=><article><h3>{t(heading)}</h3><strong>{t(highlight)}</strong><p>{t(body)}</p></article>)}
      </div>
-     <div class="little-law" role="img" aria-label={t('Закон Литтла: Lead time равно WIP, делённому на Throughput')}><div class="equation-slot"><div class="equation-typeset" aria-hidden="true"><span>Lead time</span><span>=</span><span class="equation-fraction"><span>WIP</span><span>Throughput</span></span></div></div><p>{t('Время выполнения = задачи в работе / пропускная способность')}</p></div>
+     <div class="little-law" role="img" aria-label={t('Закон Литтла: Lead time равно WIP, делённому на Throughput')}><div class="equation-slot"><div class="equation-typeset" aria-hidden="true"><span>Lead time</span><span>=</span><span class="equation-fraction"><span>WIP</span><span>Throughput</span></span></div></div></div>
     </div>
    </section>
    <section class="experience" id="experience">
     <div class="section-top"><h2><a href="#experience">{t('Опыт работы')}</a></h2><p>{t('2026 → 2019. Сначала последнее место работы. Раскройте компанию, чтобы увидеть задачи и результаты.')}</p></div>
     <div class="experience-body"><div class="history">
-     {jobs.map(([company,role,date,scope,points],i)=><div class="career-entry"><details open={i===0} data-company={company}><summary><span class="company-line"><span class="company">{t(company)}</span><span class="business">{t(businesses[company])}</span></span><span class="job">{t(role)}</span><span class="date">{date}</span><span class="disclosure"><span class="when-closed">{t('Подробнее')}</span><span class="when-open">{t('Свернуть')}</span><span class="plus" aria-hidden="true">+</span></span></summary><div class="job-content"><p>{t(scope)}</p><ul>{points.map(point=><li>{t(point)}</li>)}</ul></div></details><div class="matryoshka-slot" role="img" aria-label={`${t('Матрёшка')}: ${t(company)}`}><p class="matryoshka-fallback">{t(company)}</p></div></div>)}
+     {jobs.map(([company,role,date,scope,points,responsibilities,projects],i)=><div class="career-entry"><details open={i===0} data-company={company}><summary><span class="company-line"><span class="company">{t(company)}</span><span class="business">{t(businesses[company])}</span></span><span class="job">{t(role)}</span><span class="date">{t(date)}</span><span class="disclosure"><span class="when-closed">{t('Подробнее')}</span><span class="when-open">{t('Свернуть')}</span><span class="plus" aria-hidden="true">+</span></span></summary><div class="job-content"><p>{t(scope)}</p><h3>{t('Проекты')}</h3><p>{t(projects)}</p><h3>{t('Результаты')}</h3><ul class="job-results">{points.map(point=><li>{t(point)}</li>)}</ul><h3>{t('Обязанности')}</h3><ul class="job-responsibilities">{responsibilities.map(point=><li>{t(point)}</li>)}</ul></div></details><div class="matryoshka-slot" role="img" aria-label={`${t('Матрёшка')}: ${t(company)}`}><p class="matryoshka-fallback">{t(company)}</p></div></div>)}
     </div></div>
    </section>
-   <section class="about" id="about"><div class="about-photo"><img src="/artem-books.jpg" alt={t('Артем в книжном магазине у полки об искусственном интеллекте')} width="640" height="640" loading="lazy" /><span>{t('Любопытство — часть работы.')}</span></div><div class="about-copy"><h2 class="about-sticker"><a href="#about">{t('Менеджер.')}<br />{t('С инженерной оптикой.')}</a></h2><p class="large-copy">{t('Мне важно понимать,')}<br />{t('как устроена система.')}<br />{t('И как работают люди внутри неё.')}</p><p>{t('Начинал с Android-разработки. Сегодня управляю сроками, ресурсами, рисками и межкомандными зависимостями. Могу обсуждать с инженерами API и архитектуру, а с бизнесом — экономический эффект.')}</p><p>{t('Развиваю open-source проекты и основал AI Engineers Guild — инженерное сообщество с 900+ участниками.')}</p><a class="text-link" href="https://github.com/letya999" target="_blank" rel="noreferrer">{t('Мои проекты на GitHub')}<Arrow /></a></div></section>
+   <section class="about" id="about"><div class="about-photo"><picture><source srcset="/artem-books.webp" type="image/webp" /><img src="/artem-books.jpg" alt={t('Артем в книжном магазине у полки об искусственном интеллекте')} width="640" height="640" loading="lazy" /></picture></div><div class="about-copy"><h2 class="about-sticker"><a href="#about">{t('Менеджер с инженерным взглядом.')}</a></h2>{biography.map(paragraph=><p>{t(paragraph)}</p>)}<a class="text-link" href="https://github.com/letya999" target="_blank" rel="noreferrer">{t('Мои проекты на GitHub')}<Arrow /></a></div></section>
    <PracticeIsland locale={locale} client:visible />
    <ConveyorIsland locale={locale} client:visible />
-   <footer id="contact"><div class="contact-top"><h2><a href="#contact">{t('Давайте')}<br />{t('соберёмся.')}</a></h2><div><p>{t('Ищете Tech / Delivery PM,')}<br />{t('который понимает и код, и людей?')}</p><a class="primary" href="https://t.me/artemletya" target="_blank" rel="noreferrer">{t('Написать в Telegram')}<Arrow /></a><a class="email" href="mailto:artemletyushev@gmail.com">artemletyushev@gmail.com</a></div></div><div class="footer-bottom"><span>{t('Артем Летюшев · 2026')}</span><a href="https://www.linkedin.com/in/artemletya" target="_blank" rel="noreferrer">LinkedIn <Arrow /></a><a href="/Artem-Letyushev-CV.pdf" download>{t('Скачать резюме')}<Arrow /></a><a href="#top">{t('Наверх ↑')}</a></div></footer>
+   <footer id="contact"><div class="contact-top"><h2><a href="#contact">{t('Давайте')}<br />{t('соберёмся.')}</a></h2><div><p>{t('Ищете Tech / Delivery PM,')}<br />{t('который понимает и код, и людей?')}</p><a class="primary" href="https://t.me/artemletya" target="_blank" rel="noreferrer">{t('Написать в Telegram')}<Arrow /></a><a class="email" href="mailto:artemletyushev@gmail.com">artemletyushev@gmail.com</a></div></div><div class="footer-bottom"><span>{t('Артем Летюшев · 2026')}</span><a href="https://www.linkedin.com/in/artemletya" target="_blank" rel="noreferrer">LinkedIn <Arrow /></a><a href={locale==='ru'?'/Artem-Letyushev-CV.pdf':`/resume.${locale}.md`} download>{t('Скачать резюме')}<Arrow /></a><a href="#top">{t('Наверх ↑')}</a></div></footer>
   </main>
  </div>
  <template id="agent-template"><div class="agent-shell"><header><a href="?view=human">← {t('Сайт')}</a><a href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')} ↓</a></header><main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{markdown}</pre></main></div></template>
- <aside class="view-dock" aria-label={t('Формат сайта')}><a href="?view=human" aria-current="page"><span class="switch-state" aria-hidden="true">I</span><span>Human</span><span class="switch-off" aria-hidden="true">O</span></a><a href="?view=agent"><span class="switch-state" aria-hidden="true">I</span><span>Agent</span><span class="switch-off" aria-hidden="true">O</span></a></aside>
+ <aside class="view-dock" aria-label={t('Формат сайта')}><a href="?view=human" aria-current="page"><span class="switch-state" aria-hidden="true">I</span><span>{t('Human')}</span><span class="switch-off" aria-hidden="true">O</span></a><a href="?view=agent"><span class="switch-state" aria-hidden="true">I</span><span>{t('Agent')}</span><span class="switch-off" aria-hidden="true">O</span></a></aside>
  <script is:inline>
   if(document.documentElement.dataset.view==='agent'){
    const fragment=document.querySelector('#agent-template').content.cloneNode(true);

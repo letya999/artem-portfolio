@@ -8,7 +8,7 @@ function palmHeight(x,z){
  return nearest.reduce((sum,t)=>sum+t.y/(t.d+1),0)/weight;
 }
 export function createPalmPile(){
- const size=10.5,pitch=10.7,restPitch=11.7,spots=[];
+ const size=10.5,pitch=10.7,restPitch=8,spots=[];
  for(let z=0;z<6;z++)for(let x=0;x<6;x++)spots.push([x,z,0]);
  for(let z=1;z<5;z++)for(let x=1;x<5;x++)spots.push([x,z,1]);
  for(let z=1;z<4;z++)for(let x=1;x<4;x++)spots.push([x,z,2]);
@@ -17,10 +17,10 @@ export function createPalmPile(){
  const floor=Math.max(...packedFloor);
  const center=new Vector3(10,floor+size/2+1.5*pitch,7);
  const particles=spots.map(([x,z,layer],i)=>{
-  const px=10+(x-2.5)*restPitch+Math.sin(i*12.9898)*.45;
+  const px=8+(x-2.5)*restPitch+Math.sin(i*12.9898)*.45;
   const pz=7+(z-2.5)*restPitch+Math.cos(i*7.23)*.45;
   const packedX=10+(i%4-1.5)*pitch,packedZ=7+(Math.floor(i/4)%4-1.5)*pitch;
-  return {arrival:i<48?3+Math.floor(i/3)*.45+(i%3)*.04:3.2+(i-48)*.4,yaw:Math.sin(i*12.9898)*.4,packedSupport:packedFloor[i%16],
+  return {arrival:i<48?4+Math.floor(i/3)*.95+(i%3)*.04:4+(i-48)*.85,yaw:Math.sin(i*12.9898)*.4,packedSupport:packedFloor[i%16],
    rest:new Vector3(px,palmHeight(px,pz)+size/2+layer*pitch,pz),
    packed:new Vector3(packedX,floor+size/2+Math.floor(i/16)*pitch,packedZ)};
  });
