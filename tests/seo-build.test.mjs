@@ -16,14 +16,14 @@ test('static SEO build is portable and changes its absolute URLs with SITE_URL',
   for(const lang of ['ru','en','kk']){
    const html=readFileSync(`${output}/${lang}.html`,'utf8');
    assert.ok(html.includes(`<html lang="${lang}">`));assert.ok(html.includes('Twinby'));
-   if(origin)assert.ok(html.includes(`rel="canonical" href="${origin}/${lang}.html"`));
+   if(origin){assert.ok(html.includes(`rel="canonical" href="${origin}/${lang}"`));assert.ok(html.includes(`property="og:image" content="${origin}/social-card.png"`));assert.ok(html.includes('name="twitter:card" content="summary_large_image"'));assert.ok(existsSync(`${output}/social-card.png`));}
    else assert.ok(!html.includes('rel="canonical"'));
    assert.equal((html.match(/id="profile-schema"/g)||[]).length,1);
    for(const match of html.matchAll(/(?:src|href)="\/_astro\/([^"]+)"/g))assert.ok(existsSync(`${output}/_astro/${match[1]}`));
   }
   assert.equal(existsSync(`${output}/sitemap.xml`),Boolean(origin));
   const robots=readFileSync(`${output}/robots.txt`,'utf8');
-  if(origin){const sitemap=readFileSync(`${output}/sitemap.xml`,'utf8');assert.equal((sitemap.match(/<loc>/g)||[]).length,4);assert.ok(sitemap.includes(`${origin}/en.html`));assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));}
+  if(origin){const sitemap=readFileSync(`${output}/sitemap.xml`,'utf8');assert.equal((sitemap.match(/<loc>/g)||[]).length,4);assert.ok(sitemap.includes(`${origin}/en</loc>`));assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));}
   else assert.ok(!robots.includes('Sitemap:'));
  }
  const target=realpathSync(output),parent=realpathSync(tmpdir());

@@ -17,7 +17,7 @@ test('search engines receive localized HTML, structured profile, crawl rules and
   expect(html).not.toContain('hreflang=');
   expect(html).toContain('property="og:image"');expect(html).toContain('name="twitter:card"');
   expect(html).toContain('srcset="/artem-books.webp"');
-  expect(html).toContain('srcSet="./artem-reference.webp"');
+  expect(html).toContain(locale==='ru'?'Загружаем 3D-портрет':locale==='en'?'Loading 3D portrait':'3D портрет жүктелуде');
   expect(html).toContain(`<span>${locale==='en'?'Human':locale==='ru'?'Человек':'Адам'}</span>`);
   const schema=JSON.parse(html.match(/<script id="profile-schema" type="application\/ld\+json">(.*?)<\/script>/s)[1]);
   expect(schema['@type']).toBe('ProfilePage');expect(schema.inLanguage).toBe(locale);expect(schema.mainEntity['@type']).toBe('Person');expect(schema.mainEntity.sameAs).toContain('https://github.com/letya999');
@@ -30,11 +30,11 @@ test('search engines receive localized HTML, structured profile, crawl rules and
  expect(await (await request.get('/robots.txt')).text()).toContain('User-agent: *\nAllow: /');
  const context=await browser.newContext({javaScriptEnabled:false});const staticPage=await context.newPage();await staticPage.goto('/en.html');await expect(staticPage.locator('h1')).toHaveAttribute('aria-label','Artem Letyushev');await expect(staticPage.locator('main')).toContainText('Twinby');await expect(staticPage.locator('.portrait-fallback')).toBeVisible();await context.close();
  await page.goto('/kk.html?view=agent');await expect(page.locator('html')).toHaveAttribute('lang','kk');
- await page.locator('select').selectOption('en');await expect(page).toHaveURL(/en\.html\?view=agent/);await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+ await page.locator('select').selectOption('en');await expect(page).toHaveURL(/en\?view=agent/);await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content','Tech Project Manager — Artem Letyushev');
  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/7\+ years/);
  await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content','en_US');
- await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content','/en.html');
+ await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content','/en');
  await page.reload();await expect(page.locator('html')).toHaveAttribute('lang','en');
  for(const lang of ['ru','en','kk','x-default'])await expect(page.locator(`head link[hreflang="${lang}"]`)).toHaveCount(0);
 });

@@ -1,0 +1,11 @@
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/voxel-portrait.json
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/story/models/iphone-scan.glb
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/social-card.png
+  Cache-Control: public, max-age=86400

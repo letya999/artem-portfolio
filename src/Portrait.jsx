@@ -1,5 +1,6 @@
 import {useI18n} from './i18n.jsx';
 import PortraitStory from './PortraitStory.jsx';
+import PortraitLoader from './PortraitLoader.jsx';
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { makeVoxelPortrait, poseVoxelPortrait, updateCubeWave } from "./voxel.js";
@@ -22,7 +23,7 @@ export default function Portrait() {
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     } catch {
-      host.classList.add('fallback-visible');
+      host.classList.add('fallback-visible', 'load-failed');
       return;
     }
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -145,7 +146,7 @@ export default function Portrait() {
     const lost = (e) => {
       e.preventDefault();
       host.classList.remove("loaded");
-      host.classList.add('fallback-visible');
+      host.classList.add('fallback-visible', 'load-failed');
       resetEquation();
 
       renderer.setAnimationLoop(null);
@@ -170,8 +171,9 @@ export default function Portrait() {
           scene.add(dolls);
         } catch { /* The readable HTML equation remains available. */ }
         host.classList.add("loaded");
+        host.classList.remove('fallback-visible');
 
-      }).catch(() => { host.classList.add('fallback-visible'); });
+      }).catch(() => { host.classList.add('fallback-visible', 'load-failed'); });
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let previousReduced = reduced.matches;
     reduced.addEventListener('change', onScroll);
@@ -357,7 +359,7 @@ export default function Portrait() {
       <div
         ref={ref}
         className="portrait-stage"
-        role="img"
+        role="group"
         aria-label={t("Кинетический объёмный портрет Артема")}
       >
         <picture>
@@ -368,6 +370,7 @@ export default function Portrait() {
             alt={t("Артем Летюшев")}
           />
         </picture>
+        <PortraitLoader/>
       </div>
       <PortraitStory/>
     </div>

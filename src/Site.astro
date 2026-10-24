@@ -18,7 +18,7 @@ import ConveyorIsland from './islands/ConveyorIsland.jsx';
 const {locale,root=false}=Astro.props;
 const t=text=>messages[text]?.[locale]??text;
 const origin=import.meta.env.SITE_URL||'';
-const path=root?'/':`/${locale}.html`;
+const path=root?'/':`/${locale}`;
 const {title,description,url,image,schema}=profileMeta(locale,t,origin,path);
 const schemaJson=JSON.stringify(schema).replaceAll('<','\\u003c');
 const markdown=resumeMarkdown(t);
@@ -36,19 +36,24 @@ const markdown=resumeMarkdown(t);
  <meta name="site-origin" content={origin} />
  <meta name="robots" content="index,follow,max-image-preview:large" />
  {origin&&<link rel="canonical" href={url} />}
- {origin&&['ru','en','kk'].map(lang=><link rel="alternate" hreflang={lang} href={`${origin}/${lang}.html`} />)}
+ {origin&&['ru','en','kk'].map(lang=><link rel="alternate" hreflang={lang} href={`${origin}/${lang}`} />)}
  {origin&&<link rel="alternate" hreflang="x-default" href={`${origin}/`} />}
- <meta property="og:type" content="profile" />
+ <meta property="og:type" content="website" />
+ <meta property="og:site_name" content="Artem Letyushev" />
  <meta property="og:title" content={title} />
  <meta property="og:description" content={description} />
  <meta property="og:url" content={url} />
  <meta property="og:image" content={image} />
- <meta property="og:image:alt" content={t('Артем Летюшев')} />
+ <meta property="og:image:type" content="image/png" />
+ <meta property="og:image:width" content="1200" />
+ <meta property="og:image:height" content="630" />
+ <meta property="og:image:alt" content={`${t('Артем Летюшев')} — ${t('Tech Project Manager')}`} />
  <meta property="og:locale" content={{ru:'ru_RU',en:'en_US',kk:'kk_KZ'}[locale]} />
- <meta name="twitter:card" content="summary" />
+ <meta name="twitter:card" content="summary_large_image" />
  <meta name="twitter:title" content={title} />
  <meta name="twitter:description" content={description} />
  <meta name="twitter:image" content={image} />
+ <meta name="twitter:image:alt" content={`${t('Артем Летюшев')} — ${t('Tech Project Manager')}`} />
  <meta name="author" content={t('Артем Летюшев')} />
  <link rel="alternate" type="text/markdown" title="Agent guide" href="/agents.md" />
  <link rel="alternate" type="text/markdown" title="Portfolio skill" href="/skill.md" />
@@ -67,7 +72,7 @@ const markdown=resumeMarkdown(t);
   if(location.pathname==='/'){
    let saved;try{saved=localStorage.getItem('portfolio-language')}catch{}
    const chosen=['ru','en','kk'].includes(saved)?saved:(navigator.languages||[navigator.language]).map(value=>value.toLowerCase().split('-')[0]).find(value=>['ru','en','kk'].includes(value))||'en';
-   location.replace(`/${chosen}.html${location.search}${location.hash}`);
+   location.replace(`/${chosen}${location.search}${location.hash}`);
   }
   if(new URLSearchParams(location.search).get('view')==='agent')document.documentElement.dataset.view='agent';
  </script>
@@ -94,7 +99,7 @@ const markdown=resumeMarkdown(t);
      <a id="contact-cta" class="primary" href="#contact">{t('Обсудить работу')}<Arrow /></a>
      <p class="hero-note">{t('7+ лет. Финтех, телеком, дейтинг.')}<br />{t('От требований до запуска.')}</p>
     </div>
-    <PortraitIsland locale={locale} client:load />
+    <PortraitIsland locale={locale} client:idle />
     <div class="hero-bottom"><a href="#results">{t('Дальше — результаты')}<span aria-hidden="true">↓</span></a></div>
    </section>
    <section class="results" id="results">
@@ -158,7 +163,7 @@ const markdown=resumeMarkdown(t);
   document.querySelectorAll('select[data-language]').forEach(select=>select.addEventListener('change',()=>{
    const locale=select.value;if(!['ru','en','kk'].includes(locale))return;
    try{localStorage.setItem('portfolio-language',locale)}catch{}
-   location.assign(`/${locale}.html${location.search}${location.hash}`);
+   location.assign(`/${locale}${location.search}${location.hash}`);
   }));
  </script>
 </body>
