@@ -17,7 +17,7 @@ test('career dolls have complete hollow voxel shells, an ivory face with eyes an
   assert.ok(parts.array.some((v,i)=>i%2===1&&v===0), 'The lower bowl must remain grounded');
 });
 
-test('ordinary scrolling translates the shared doll mesh without rewriting thousands of instance matrices', () => {
+test('ordinary scrolling updates doll centers without rewriting thousands of instance matrices', () => {
   const dolls=sculpture.makeMatryoshkas(new THREE.BoxGeometry(1,1,1));
   const rows=Array.from({length:6},(_,i)=>({x:1,y:-i*2,width:2,height:1.5}));
   dolls.userData.layout(rows);
@@ -25,7 +25,38 @@ test('ordinary scrolling translates the shared doll mesh without rewriting thous
   dolls.userData.layout(rows.map(row=>({...row,y:row.y+.3})));
   assert.equal(dolls.instanceMatrix.version,version,'Scrolling alone must not upload the entire shell geometry again');
   assert.deepEqual(dolls.instanceMatrix.array,original);
-  assert.ok(Math.abs(dolls.position.y-.3)<1e-6);
+  assert.ok(Math.abs(dolls.userData.centers.value[0].y+dolls.position.y-(rows[0].y+.3-.075))<1e-6);
+  assert.ok(Math.abs(dolls.userData.rows[0].y+dolls.position.y-(rows[0].y+.3))<1e-6,'Stored rows must use mesh-local coordinates');
+});
+
+test('moving one career row does not upload every doll cube again', () => {
+  const dolls=sculpture.makeMatryoshkas(new THREE.BoxGeometry(1,1,1));
+  const rows=Array.from({length:6},(_,i)=>({x:1,y:-i*2,width:2,height:1.5}));
+  dolls.userData.layout(rows);
+  const version=dolls.instanceMatrix.version;
+  const before=new THREE.Matrix4();dolls.getMatrixAt(0,before);
+  dolls.userData.layout(rows.map((row,i)=>({...row,y:row.y+(i===0?.3:0)})));
+  assert.equal(dolls.instanceMatrix.version,version);
+  assert.ok(Math.abs(dolls.userData.centers.value[0].y+dolls.position.y-(rows[0].y+.3-.075))<1e-6);
+  const matrix=new THREE.Matrix4();
+  dolls.getMatrixAt(0,matrix);
+  const movedY=new THREE.Vector3().setFromMatrixPosition(matrix).y+dolls.position.y;
+  const originalY=new THREE.Vector3().setFromMatrixPosition(before).y;
+  assert.ok(Math.abs(movedY-originalY-.3)<1e-6,'The first bowl matrix must stay at its rendered position');
+});
+
+test('row layout keeps each bowl matrix aligned after a row moves or resizes', () => {
+  const dolls=sculpture.makeMatryoshkas(new THREE.BoxGeometry(1,1,1));
+  const rows=Array.from({length:6},(_,i)=>({x:1,y:-i*2,width:2,height:1.5}));
+  dolls.userData.layout(rows);
+  const before=new THREE.Matrix4();dolls.getMatrixAt(0,before);
+  const changed=rows.map((row,i)=>i===0?{...row,x:row.x+.2,y:row.y+.3,width:row.width+.2,height:row.height+.2}:row);
+  dolls.userData.layout(changed);
+  const after=new THREE.Matrix4();dolls.getMatrixAt(0,after);
+  const a=new THREE.Vector3().setFromMatrixPosition(before),b=new THREE.Vector3().setFromMatrixPosition(after);
+  assert.ok(b.x>a.x+.1);
+  assert.ok(b.y+dolls.position.y>a.y+.2);
+  assert.ok(after.getMaxScaleOnAxis()>before.getMaxScaleOnAxis());
 });
 
 test('a complete doll has a solid lower base and occupies most of its reserved height',()=>{

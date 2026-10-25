@@ -76,7 +76,7 @@ test('the first bowl receives scattered letters; its lid rests to the left and i
   check(states[1].stage,'A scroll between jobs must show a continuous cube flight, not an instantaneous focus switch').toBeGreaterThan(.2);
   check(states[1].stage).toBeLessThan(.8);
   check(states[2].stage).toBeCloseTo(1,2);
-  check(states[1].spread,'The nested child must break into flying cubes during transfer').toBeGreaterThan(.4);
+  check(states[1].spread,'The nested child must stay visually coherent during transfer').toBeLessThan(.2);
   check(states[3].stage,'Scrolling upward must reverse the exact same transfer').toBeCloseTo(states[1].stage,2);
   check(states[4].stage).toBeCloseTo(0,2);
   expect(errors).toEqual([]);

@@ -126,6 +126,22 @@ const markdown=resumeMarkdown(t);
  <template id="agent-template"><div class="agent-shell"><header><a href="?view=human">← {t('Сайт')}</a><a href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')} ↓</a></header><main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{markdown}</pre></main></div></template>
  <aside class="view-dock" aria-label={t('Формат сайта')}><a href="?view=human" aria-current="page"><span class="switch-state" aria-hidden="true">I</span><span>{t('Human')}</span><span class="switch-off" aria-hidden="true">O</span></a><a href="?view=agent"><span class="switch-state" aria-hidden="true">I</span><span>{t('Agent')}</span><span class="switch-off" aria-hidden="true">O</span></a></aside>
  <script is:inline>
+  const sectionNav=document.documentElement.dataset.view==='agent'?null:document.querySelector('.human-shell > header nav');
+  if(sectionNav){
+   const links=[...sectionNav.querySelectorAll('a')];
+   const sections=[...document.querySelectorAll('.human-shell main section[id], .human-shell main footer[id]')];
+   const updateSection=()=>{
+    let current;
+    for(const section of sections)if(section.offsetTop<=scrollY+sectionNav.parentElement.offsetHeight+64)current=section.id;
+    for(const link of links){
+     if(link.hash.slice(1)===current)link.setAttribute('aria-current','location');
+     else link.removeAttribute('aria-current');
+    }
+   };
+   updateSection();
+   addEventListener('scroll',updateSection,{passive:true});
+   addEventListener('resize',updateSection);
+  }
   if(document.documentElement.dataset.view==='agent'){
    const fragment=document.querySelector('#agent-template').content.cloneNode(true);
    fragment.querySelector('.agent-shell header').append(document.querySelector('select[data-language]'));

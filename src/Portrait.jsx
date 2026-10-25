@@ -105,7 +105,7 @@ export default function Portrait() {
       experienceSlots.forEach(slot => slot.classList.remove('sculpture-rendered'));
       if (equation) { equation.visible = false; equation.userData.restore(); equation.userData.experienceProgress.value = 0; }
       if (dolls) dolls.visible = false;
-      if (sculpture) { sculpture.visible = true; sculpture.position.set(0, 0, 0); sculpture.userData.dissolve.value = 0; }
+      if (sculpture) { sculpture.visible = true; sculpture.position.set(0, 0, 0); sculpture.userData.dissolve.value = 0; sculpture.userData.neckFill.visible = amount < .01; }
       scrollProgress = 0;
       experienceFlow = 0;
     };
@@ -244,6 +244,7 @@ export default function Portrait() {
           equation.userData.progress.value = scrollProgress;
           equation.visible = experienceFlow < 1 && destination.bottom > 0 && destination.top < innerHeight;
           sculpture.userData.dissolve.value = scrollProgress;
+          sculpture.userData.neckFill.visible = false;
           sculpture.visible = source.bottom > 0 && scrollProgress < 1;
           sculpture.position.set((source.left + source.width / 2 - left - renderWidth / 2) * units, (top + renderHeight / 2 - source.top - source.height / 2) * units, 0);
           equationSlot.classList.add('equation-rendered');

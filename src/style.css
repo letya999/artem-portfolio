@@ -929,6 +929,8 @@ button:disabled {
 html { scroll-padding-top: 96px; }
 header { position: sticky; top: 0; z-index: 30; height: 80px; background: #efefebf5; border-bottom: 1px solid #20211f18; }
 header nav { margin-right: 2%; }
+header nav a[aria-current="location"] { color: #355923; font-weight: 800; text-decoration: underline; text-decoration-thickness: 3px; text-decoration-color: #527524; text-underline-offset: 8px; }
+header nav a:focus-visible { outline: 2px solid #527524; outline-offset: 4px; }
 .language-select { font: inherit; font-size: 13px; font-weight: 700; color: var(--ink); background: transparent; border: 1px solid #20211f44; padding: 10px 6px; cursor: pointer; }
 .language-select:focus-visible { outline: 2px solid #527524; outline-offset: 3px; }
 @supports (animation-timeline: scroll()) {

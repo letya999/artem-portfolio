@@ -30,10 +30,11 @@ test('the whole bust dissolves into a deep perspective equation, which enters op
     const units=4.1/document.querySelector('.portrait-stage canvas').getBoundingClientRect().height;
     const bowl=new Box3(),matrix=new Matrix4(),point=new Vector3();
     if(dolls){dolls.updateMatrixWorld();for(let i=0;i<dolls.count/6;i++)if(dolls.geometry.attributes.dollPart.getY(i)===0){dolls.getMatrixAt(i,matrix);bowl.expandByPoint(point.setFromMatrixPosition(matrix).applyMatrix4(dolls.matrixWorld));}}
-    return {absorbedInside:!!law.userData.absorption && bowl.containsPoint(law.userData.absorption.value),widthRatio:(right-left)/(document.querySelector('.equation-slot').getBoundingClientRect().width*units),dissolve: head.userData.dissolve?.value ?? 0, lawVisible: law.visible, depth: (front-back)/(right-left), yaw: law.rotation.y, pitch: law.rotation.x, perspective: !!window.portraitCamera.isPerspectiveCamera, flow: law.userData.experienceProgress.value, openings: dolls ? [...dolls.userData.dollOpen.value] : [], dollCount: dolls?.count ?? 0, active: dolls?.userData.active ?? -1};
+    return {absorbedInside:!!law.userData.absorption && bowl.containsPoint(law.userData.absorption.value),widthRatio:(right-left)/(document.querySelector('.equation-slot').getBoundingClientRect().width*units),dissolve: head.userData.dissolve?.value ?? 0, neckFillVisible: head.userData.neckFill.visible, lawVisible: law.visible, depth: (front-back)/(right-left), yaw: law.rotation.y, pitch: law.rotation.x, perspective: !!window.portraitCamera.isPerspectiveCamera, flow: law.userData.experienceProgress.value, openings: dolls ? [...dolls.userData.dollOpen.value] : [], dollCount: dolls?.count ?? 0, active: dolls?.userData.active ?? -1};
   });
   await page.evaluate(() => {document.documentElement.style.scrollBehavior = 'auto'; scrollTo(0, document.querySelector('#results').offsetTop - innerHeight * .55);});
   await check.poll(async () => (await state()).dissolve, {message:'The remaining head and neck must also disintegrate'}).toBeGreaterThan(.2);
+  check((await state()).neckFillVisible,'The neck cavity must not show an inner plug during disintegration').toBe(false);
   await page.evaluate(() => scrollTo(0, document.querySelector('#results').offsetTop));
   await check.poll(async () => (await state()).dissolve).toBe(1);
   const law = await state();

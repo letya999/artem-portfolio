@@ -44,12 +44,11 @@ export function makeMatryoshkas(cubeGeometry) {
     if(Math.hypot(x,z)<.48) shell.push({x,y:.02,z,upper:false,color:0xb3a16e});
   }
   const geometry=cubeGeometry.clone(),count=shell.length*6;
-  const parts=new Float32Array(count*2),lifts=new Float32Array(count*4),localPoints=new Float32Array(count*3);
+  const parts=new Float32Array(count*2),localPoints=new Float32Array(count*3);
   geometry.setAttribute('dollPart',new THREE.InstancedBufferAttribute(parts,2));
-  geometry.setAttribute('dollLift',new THREE.InstancedBufferAttribute(lifts,4));
   geometry.setAttribute('dollLocal',new THREE.InstancedBufferAttribute(localPoints,3));
   const dollOpen={value:new Float32Array(6)},flow={value:0};
-  const stage={value:0},innerScale={value:.66},transferSpread={value:.75};
+  const stage={value:0},innerScale={value:.66},transferSpread={value:.12};
   const centers={value:Array.from({length:6},()=>new THREE.Vector3())},sizes={value:new Float32Array(6)};
   const orientation={value:new THREE.Matrix3().setFromMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(.07,-.24,0)))};
   const material=new THREE.MeshStandardMaterial({color:0xffffff,metalness:.78,roughness:.30,envMapIntensity:1.1,alphaHash:true});
@@ -104,26 +103,23 @@ export function makeMatryoshkas(cubeGeometry) {
   }
   let arranged;
   mesh.userData.layout=rows=>{
-    const delta=arranged ? rows[0].y-arranged[0].y : 0;
-    if(arranged && rows.every((row,i)=>Math.abs(row.x-arranged[i].x)<1e-6 && Math.abs(row.y-arranged[i].y-delta)<1e-6 && row.width===arranged[i].width && row.height===arranged[i].height)) {
-      mesh.position.y=delta;
-      return;
-    }
-    arranged=rows.map(row=>({...row}));
-    mesh.position.y=0;
-    mesh.userData.rows=rows;
+    const delta=arranged ? rows[rows.length-1].y-arranged[rows.length-1].y : 0;
+    mesh.position.y=delta;
     rows.forEach((row,group)=>{
       const size=Math.min(row.width*.90/3.2,row.height*.90/2.8)*(1-group*.105);
-      row.scale=size;center.set(row.x,row.y-.075,0);
+      row.scale=size;center.set(row.x,row.y-delta-.075,0);
       centers.value[group].copy(center);sizes.value[group]=size;
+      const old=arranged?.[group];
+      if(old && old.x===row.x && old.y===row.y-delta && old.scale===size) return;
       for(let j=0;j<shell.length;j++) {
         const i=group*shell.length+j,p=shell[j];
         position.set(p.x,p.y-1.24,p.z).applyQuaternion(rotation).multiplyScalar(size).add(center);
         matrix.compose(position,rotation,scale.setScalar(.066*size));mesh.setMatrixAt(i,matrix);
-        lifts.set([size,...center],i*4);
       }
     });
-    mesh.instanceMatrix.needsUpdate=true;geometry.attributes.dollLift.needsUpdate=true;
+    mesh.userData.rows=rows.map(row=>({...row,y:row.y-delta}));
+    if(!arranged) mesh.instanceMatrix.needsUpdate=true;
+    arranged=rows.map(row=>({x:row.x,y:row.y-delta,scale:row.scale}));
   };
   Object.assign(mesh.userData,{dollOpen,flow,stage,innerScale,transferSpread,centers,sizes,active:0});
   return mesh;
