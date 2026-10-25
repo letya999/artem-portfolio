@@ -83,9 +83,11 @@ const markdown=resumeMarkdown(t);
   <a class="skip" href="#main">{t('К содержанию')}</a>
   <header>
    <a id="home-link" class="mark" href="#top" aria-label={t('Artem Letyushev — в начало')}><span class="logo-images" aria-hidden="true"><img class="logo-mono" src="/brand/logo-mono.png" alt="" width="48" height="48" /><img class="logo-color" src="/brand/logo-color.png" alt="" width="48" height="48" /></span><span class="logo-name">Artem Letyushev</span></a>
-   <nav aria-label={t('Основная навигация')}><a href="#experience">{t('Опыт')}</a><a href="#about">{t('Обо мне')}</a><a href="#contact">{t('Контакт')}</a></nav>
-   {locale==='ru'&&<a id="resume-pdf" class="cv-link" href="/Artem-Letyushev-CV.pdf" download>{t('Резюме .PDF')}<Arrow /></a>}
-   <a id="resume-markdown" class="md-link" href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме .MD')}<Arrow /></a>
+   <nav aria-label={t('Основная навигация')}><a href="#results">{t('Результаты')}</a><a href="#experience">{t('Опыт')}</a><a href="#about">{t('Обо мне')}</a><a href="#conveyor">{t('Мои ресурсы').replace(/\.$/,'')}</a><a href="#contact">{t('Контакт')}</a></nav>
+   <details class="resume-menu">
+    <summary>{t('Резюме')}<svg class="resume-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg></summary>
+    <div class="resume-options"><a id="resume-pdf" href="/Artem-Letyushev-CV.pdf" hreflang="ru" download><span>.PDF · RU</span><Arrow /></a><a id="resume-markdown" href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}><span>.MD</span><Arrow /></a></div>
+   </details>
    <select id="language-select" class="language-select" aria-label={t('Язык')} data-language>
     <option value="ru" selected={locale==='ru'}>RU</option><option value="en" selected={locale==='en'}>EN</option><option value="kk" selected={locale==='kk'}>ҚАЗ</option>
    </select>
@@ -126,6 +128,11 @@ const markdown=resumeMarkdown(t);
  <template id="agent-template"><div class="agent-shell"><header><a href="?view=human">← {t('Сайт')}</a><a href={`/resume.${locale}.md`} download={`Artem-Letyushev-${locale}.md`}>{t('Резюме MD')} ↓</a></header><main><nav><a href="/skill.md">SKILL.md</a> · <a href="/agents.md">agents.md</a> · <a href="/mcp.json">MCP</a> · <a href="/llms.txt">llms.txt</a></nav><pre>{markdown}</pre></main></div></template>
  <aside class="view-dock" aria-label={t('Формат сайта')}><a href="?view=human" aria-current="page"><span class="switch-state" aria-hidden="true">I</span><span>{t('Human')}</span><span class="switch-off" aria-hidden="true">O</span></a><a href="?view=agent"><span class="switch-state" aria-hidden="true">I</span><span>{t('Agent')}</span><span class="switch-off" aria-hidden="true">O</span></a></aside>
  <script is:inline>
+  const resumeMenu=document.querySelector('.resume-menu');
+  if(resumeMenu){
+   addEventListener('click',event=>{if(!resumeMenu.contains(event.target)||event.target.closest('a'))resumeMenu.open=false;});
+   addEventListener('keydown',event=>{if(event.key==='Escape'&&resumeMenu.open){resumeMenu.open=false;resumeMenu.querySelector('summary').focus();}});
+  }
   const sectionNav=document.documentElement.dataset.view==='agent'?null:document.querySelector('.human-shell > header nav');
   if(sectionNav){
    const links=[...sectionNav.querySelectorAll('a')];

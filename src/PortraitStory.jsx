@@ -18,7 +18,7 @@ export default function PortraitStory(){
  return <>
   <div className={`portrait-sticker ${peeled?'peeled':''}`} onPointerLeave={()=>setPeeled(false)}>
    <button className="sticker-paper" aria-expanded={peeled} aria-controls="story-reveal" onClick={()=>setPeeled(!peeled)}>{t('Это я')}</button>
-   <button id="story-reveal" className="story-trigger" onClick={()=>{setOpen(true);dialog.current.showModal();}}>{t('Посмотреть, как это сделано')} <span aria-hidden="true">↗</span></button>
+   <button id="story-reveal" className="story-trigger" aria-label={t('Посмотреть, как это сделано')} onClick={()=>{setOpen(true);dialog.current.showModal();}}>{t('Как это сделано')} <span aria-hidden="true">↗</span></button>
    <svg className="sticker-arrow" viewBox="0 0 160 100" fill="none" aria-hidden="true"><path d="M4 90C34 31 81 19 146 25M128 8l20 17-20 17" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/><path d="M7 93C39 35 81 21 143 27" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity=".45"/></svg>
   </div>
   <dialog ref={dialog} className="story-dialog practice-dialog" aria-labelledby="story-title" onClose={()=>setOpen(false)}>
