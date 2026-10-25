@@ -49,7 +49,7 @@ Read the [product notes](docs/product.md), [architecture notes](docs/architectur
 
 ## Deployment and analytics
 
-GitHub Actions checks and builds `main` with Node.js 24, `npm ci`, `npm test`, and `npm run build`, then publishes `dist` to GitHub Pages. The workflow sets `SITE_URL=https://artemletyushev.website`. The custom domain is configured in repository Settings → Pages; Cloudflare manages DNS with DNS-only CNAME records for the apex and `www`, pointing to `letya999.github.io`. The [runbook](docs/operations/runbook.md) records verification and rollback.
+GitHub Actions checks and builds `main` with Node.js 24, `npm ci`, `npm test`, and `npm run build`, then publishes `dist` to GitHub Pages. The workflow sets `SITE_URL=https://artemletyushev.website`. The custom domain is configured in repository Settings → Pages with HTTPS enforced. REG.RU provides DNS through `ns1.reg.ru` and `ns2.reg.ru`: the apex has GitHub Pages A/AAAA records, and `www` is a CNAME to `letya999.github.io`. The [runbook](docs/operations/runbook.md) records verification and rollback.
 
 Set `PUBLIC_GA_MEASUREMENT_ID` and/or `PUBLIC_YANDEX_METRIKA_ID` only after creating those counters and handling applicable privacy notice or consent requirements. Empty values omit the trackers. A successful build or deployment does not prove analytics collection, DNS propagation, or real-user performance.
 

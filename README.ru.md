@@ -47,7 +47,7 @@ npm test
 
 ## Развертывание и аналитика
 
-GitHub Actions проверяет и собирает ветку `main` на Node.js 24 командами `npm ci`, `npm test` и `npm run build`, затем публикует `dist` в GitHub Pages. Workflow задает `SITE_URL=https://artemletyushev.website`. Домен подключен в Settings → Pages; Cloudflare обслуживает DNS с записями CNAME для основного домена и `www`, направленными на `letya999.github.io` в режиме DNS only. Проверки и откат описаны в [runbook](docs/operations/runbook.md).
+GitHub Actions проверяет и собирает ветку `main` на Node.js 24 командами `npm ci`, `npm test` и `npm run build`, затем публикует `dist` в GitHub Pages. Workflow задает `SITE_URL=https://artemletyushev.website`. Домен подключен в Settings → Pages с обязательным HTTPS. DNS обслуживает REG.RU через `ns1.reg.ru` и `ns2.reg.ru`: основной домен направлен на A/AAAA-адреса GitHub Pages, а `www` — CNAME на `letya999.github.io`. Проверки и откат описаны в [runbook](docs/operations/runbook.md).
 
 `PUBLIC_GA_MEASUREMENT_ID` и `PUBLIC_YANDEX_METRIKA_ID` задаются после создания счетчиков и решения вопроса с уведомлением или согласием на отслеживание. Пустые значения отключают загрузку счетчиков. Успешная сборка не подтверждает сбор аналитики, распространение DNS или скорость у реальных посетителей.
 
