@@ -12,7 +12,7 @@
 
 ## Стек и процесс
 
-Astro 7 · React 19 · Three.js · JavaScript · CSS · Playwright · Cloudflare Pages. Визуальное направление прорабатывалось в Sketch и дорабатывалось короткими итерациями дизайна и разработки. В рабочем процессе автор использует [Impeccable](https://github.com/pbakaus/impeccable), [Test Designer](https://github.com/letya999/test-designer), [Test Critic](https://github.com/letya999/test-critic), [Probity](https://github.com/letya999/probity) и [AI Repo Safety](https://github.com/letya999/ai-repo-safety-skill). Это инструменты разработки, а не зависимости сайта или гарантия результата.
+Astro 7 · React 19 · Three.js · JavaScript · CSS · Playwright · GitHub Pages. Визуальное направление прорабатывалось в Sketch и дорабатывалось короткими итерациями дизайна и разработки. В рабочем процессе автор использует [Impeccable](https://github.com/pbakaus/impeccable), [Test Designer](https://github.com/letya999/test-designer), [Test Critic](https://github.com/letya999/test-critic), [Probity](https://github.com/letya999/probity) и [AI Repo Safety](https://github.com/letya999/ai-repo-safety-skill). Это инструменты разработки, а не зависимости сайта или гарантия результата.
 
 ## Локальный запуск
 
@@ -47,10 +47,10 @@ npm test
 
 ## Развертывание и аналитика
 
-Cloudflare Pages собирает ветку `main` командой `npm run build` и публикует `dist`. В среде сборки задается `SITE_URL=https://artemletyushev.website`; основной домен и `www` подключаются в Cloudflare. Порядок переноса описан в [runbook](docs/operations/runbook.md).
+GitHub Actions проверяет и собирает ветку `main` на Node.js 24 командами `npm ci`, `npm test` и `npm run build`, затем публикует `dist` в GitHub Pages. Workflow задает `SITE_URL=https://artemletyushev.website`. Домен подключен в Settings → Pages; Cloudflare обслуживает DNS с записями CNAME для основного домена и `www`, направленными на `letya999.github.io` в режиме DNS only. Проверки и откат описаны в [runbook](docs/operations/runbook.md).
 
 `PUBLIC_GA_MEASUREMENT_ID` и `PUBLIC_YANDEX_METRIKA_ID` задаются после создания счетчиков и решения вопроса с уведомлением или согласием на отслеживание. Пустые значения отключают загрузку счетчиков. Успешная сборка не подтверждает сбор аналитики, распространение DNS или скорость у реальных посетителей.
 
 ## Лицензия
 
-Исходный код и оригинальная документация — [GNU GPL v3.0](LICENSE). Предоставленные владельцем фотографии и резюме не передаются для свободного использования по этой лицензии. Лицензии шрифтов, значков и 3D-ассетов указаны в файлах `public/*LICENSE*`, `public/brand-marks/ATTRIBUTION.md`, `public/story/CREDITS.txt` и `scripts/assets/webxr-hand.LICENSE.md`. Репозиторий пока закрыт: GPL не делает его автоматически общедоступным.
+Исходный код и оригинальная документация — [GNU GPL v3.0](LICENSE). Предоставленные владельцем фотографии и резюме не передаются для свободного использования по этой лицензии. Лицензии шрифтов, значков и 3D-ассетов указаны в файлах `public/*LICENSE*`, `public/brand-marks/ATTRIBUTION.md`, `public/story/CREDITS.txt` и `scripts/assets/webxr-hand.LICENSE.md`. Репозиторий открыт; исключения для ассетов сохраняются.

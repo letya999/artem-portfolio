@@ -12,7 +12,7 @@ The site presents a professional profile in Russian, English, and Kazakh. Its st
 
 ## Built with
 
-Astro 7 · React 19 · Three.js · JavaScript · CSS · Playwright · Cloudflare Pages. The visual direction was explored in Sketch and refined through a rapid, iterative design-and-build workflow. The author's agent-assisted workflow draws on [Impeccable](https://github.com/pbakaus/impeccable), [Test Designer](https://github.com/letya999/test-designer), [Test Critic](https://github.com/letya999/test-critic), [Probity](https://github.com/letya999/probity), and [AI Repo Safety](https://github.com/letya999/ai-repo-safety-skill). These are development aids, not runtime dependencies or guarantees.
+Astro 7 · React 19 · Three.js · JavaScript · CSS · Playwright · GitHub Pages. The visual direction was explored in Sketch and refined through a rapid, iterative design-and-build workflow. The author's agent-assisted workflow draws on [Impeccable](https://github.com/pbakaus/impeccable), [Test Designer](https://github.com/letya999/test-designer), [Test Critic](https://github.com/letya999/test-critic), [Probity](https://github.com/letya999/probity), and [AI Repo Safety](https://github.com/letya999/ai-repo-safety-skill). These are development aids, not runtime dependencies or guarantees.
 
 ## Run locally
 
@@ -49,10 +49,10 @@ Read the [product notes](docs/product.md), [architecture notes](docs/architectur
 
 ## Deployment and analytics
 
-Cloudflare Pages builds `main` with `npm run build` and publishes `dist`. Set `SITE_URL=https://artemletyushev.website` in its build environment. The apex and `www` hostnames are attached as custom domains in Cloudflare. The domain and DNS are managed separately from GitHub; the [runbook](docs/operations/runbook.md) records the cutover procedure.
+GitHub Actions checks and builds `main` with Node.js 24, `npm ci`, `npm test`, and `npm run build`, then publishes `dist` to GitHub Pages. The workflow sets `SITE_URL=https://artemletyushev.website`. The custom domain is configured in repository Settings → Pages; Cloudflare manages DNS with DNS-only CNAME records for the apex and `www`, pointing to `letya999.github.io`. The [runbook](docs/operations/runbook.md) records verification and rollback.
 
 Set `PUBLIC_GA_MEASUREMENT_ID` and/or `PUBLIC_YANDEX_METRIKA_ID` only after creating those counters and handling applicable privacy notice or consent requirements. Empty values omit the trackers. A successful build or deployment does not prove analytics collection, DNS propagation, or real-user performance.
 
 ## License and assets
 
-Source code and original documentation: [GNU GPL v3.0](LICENSE). Supplied portraits and the CV belong to their respective rights holder and are not granted for reuse by that license. Fonts, icons, and 3D source assets retain the terms in `public/*LICENSE*`, `public/brand-marks/ATTRIBUTION.md`, `public/story/CREDITS.txt`, and `scripts/assets/webxr-hand.LICENSE.md`. The repository is being prepared privately; a GPL license does not by itself make a private repository publicly accessible.
+Source code and original documentation: [GNU GPL v3.0](LICENSE). Supplied portraits and the CV belong to their respective rights holder and are not granted for reuse by that license. Fonts, icons, and 3D source assets retain the terms in `public/*LICENSE*`, `public/brand-marks/ATTRIBUTION.md`, `public/story/CREDITS.txt`, and `scripts/assets/webxr-hand.LICENSE.md`. The repository is public; the asset exclusions still apply.

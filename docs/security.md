@@ -1,6 +1,6 @@
 # Security and publication boundaries
 
-The site is static and needs no server credentials. `.env` is local and ignored by Git; `.env.example` documents only public build values. Cloudflare build settings should contain `SITE_URL` and, if deliberately enabled, public analytics IDs. Never put tokens in `PUBLIC_*` variables: they are bundled into browser code.
+The site is static and needs no server credentials. `.env` is local and ignored by Git; `.env.example` documents only public build values. GitHub Actions sets `SITE_URL` and may include public analytics IDs if deliberately enabled. Deployment uses the workflow's short-lived GitHub token with Pages and OIDC permissions. Never put tokens in `PUBLIC_*` variables: they are bundled into browser code.
 
 Before publication, scan staged files and Git history for credentials, inspect large or unexpected files, and verify `.env` is ignored. Do not commit local scanner state, private task traces, or setup tokens. A passing scanner reduces risk but does not prove that every sensitive fact is absent.
 
