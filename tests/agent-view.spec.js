@@ -1,19 +1,22 @@
 import {test,expect} from '@playwright/test';
-import {jobs,businesses} from '../src/portfolio-data.js';
-import {areas,content} from '../src/practice-data.js';
-test('agent URL is plain localized Markdown without WebGL and offers a matching downloadable resume',async({page})=>{
+import {jobs,businesses,profileRole,profileLead} from '../src/portfolio-data.js';
+import {content} from '../src/practice-data.js';
+test('AI view displays the same raw Markdown as its download in every language without WebGL',async({page})=>{
  const models=[];page.on('request',r=>{if(/voxel-portrait|head-contours/.test(r.url()))models.push(r.url());});
- await page.goto('/?view=agent');
- await expect.soft(page.locator('canvas')).toHaveCount(0,{timeout:200});
- const text=await page.locator('body').innerText();expect.soft(text).toContain('# Артем Летюшев');expect.soft(text).toContain('## Опыт работы');expect.soft(text).toContain('SAFe 5');expect.soft(models).toEqual([]);
- await expect.soft(page.locator('.view-dock a')).toHaveCount(2,{timeout:200});
- const md=await page.request.get('/resume.ru.md');expect.soft(md.headers()['content-type']).toContain('text/');expect.soft(await md.text()).toContain('# Артем Летюшев');
- const markdown=await md.text();
- for(const [language,title] of [['en','# Artem Letyushev'],['kk','# Артем Летюшев']]){const response=await page.request.get(`/resume.${language}.md`);expect.soft(await response.text()).toContain(title);}
- for(const value of ['Tech Project Manager','Соединяю инженерию, команды и бизнес.','7+ лет. Финтех, телеком, дейтинг.','https://t.me/artemletya','https://github.com/letya999','https://www.linkedin.com/in/artemletya','https://vc.ru/id458029','https://github.com/letya999/ai-stp'])expect.soft(markdown).toContain(value);
- const missing=[...jobs.flat(3),...Object.values(businesses),...areas.flat(),...content.flat(4)].filter(value=>!markdown.includes(value));expect.soft(missing,'Markdown must preserve every published resume fact and skill').toEqual([]);
- for(const required of ['### Twinby — Tech Project Manager','### Renewal Studio','## Процессы','## Инженерия','## Продукт','## Публикации и проекты','artemletyushev@gmail.com','https://habr.com/ru/users/Renewal_Studio/','https://github.com/letya999/job_ftch','64 до 16','SAFe 5'])expect.soft(markdown).toContain(required);
- if(await page.locator('select').count())await page.locator('select').selectOption('en');
- await expect.soft(page.locator('body')).toContainText('# Artem Letyushev');
- await page.goto('/');await expect(page.locator('header a[download$=".md"]')).toHaveCount(1);
+ await page.goto('/ru?view=agent');
+ for(const locale of ['ru','en','kk']){
+  if(locale!=='ru')await page.locator('select').selectOption(locale);
+  await expect(page).toHaveURL(new RegExp(`/${locale}\\?view=agent`));
+  const raw=page.locator('.agent-shell pre'),download=await page.request.get(`/resume.${locale}.md`);expect(download.ok()).toBe(true);
+  await expect(raw).toBeVisible();expect(await raw.textContent()).toBe(await download.text());
+  await expect(raw).toHaveCSS('white-space','pre-wrap');expect(await raw.evaluate(e=>getComputedStyle(e).fontFamily)).toContain('monospace');
+  await expect(page.locator('.agent-shell h1,.agent-shell article,canvas')).toHaveCount(0);
+  await expect(page.locator('.agent-shell header a[download]')).toHaveAttribute('href',`/resume.${locale}.md`);
+  if(locale==='en')await expect(raw).not.toContainText(/[А-Яа-яЁё]/);
+ }
+ await page.setViewportSize({width:390,height:844});
+ expect(await page.locator('.agent-shell pre').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ expect(models).toEqual([]);
+ const markdown=await(await page.request.get('/resume.ru.md')).text();
+ for(const value of [profileRole,profileLead,...jobs.flat(Infinity),...Object.values(businesses),...content.flat(Infinity)])expect(markdown).toContain(value);
 });

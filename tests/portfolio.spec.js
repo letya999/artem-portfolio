@@ -34,10 +34,10 @@ test("visitor explores the kinetic portrait, reads experience and reaches contac
   await expect(stage.locator("canvas")).toBeVisible();
   await page.getByRole("link", { name: "Опыт", exact: true }).click();
   await page.locator('#experience summary').getByText("МТС", { exact: true }).click();
-  await expect(page.locator('#experience').getByText(/переход от LeSS к SAFe/)).toBeVisible();
+  await expect(page.locator('#experience').getByText(/переход семи команд от LeSS к SAFe/)).toBeVisible();
   await expect(page.locator('footer a[href="https://t.me/artemletya"]')).toBeVisible();
   expect(
-    (await page.request.get("/Artem-Letyushev-CV.pdf")).headers()[
+    (await page.request.get("/resume.ru.pdf")).headers()[
       "content-type"
     ],
   ).toContain("pdf");

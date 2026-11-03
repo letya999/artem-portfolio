@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 
 test('eight steps include the landmarks image and use consistent opening actions',async({page})=>{
- await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.goto('/ru.html');await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  const cards=page.locator('.story-dialog figure');await expect(cards).toHaveCount(8);
  await expect(cards.nth(2).locator('img')).toHaveAttribute('src',/landmarks\.png/);
  await expect(page.locator('.story-dialog .story-media-trigger')).toHaveCount(8);
@@ -11,7 +11,7 @@ test('eight steps include the landmarks image and use consistent opening actions
 });
 
 test('every making-of step opens its own media; the original textured scan rotates',async({page})=>{
- await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.goto('/ru.html');await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  const story=page.locator('.story-dialog');await expect(story.locator('figure')).toHaveCount(8);
  await expect(story.locator('figure').nth(4).locator('.scan-preview')).toHaveAttribute('data-state','ready');
  await expect(story.locator('.story-media-trigger')).toHaveCount(8);

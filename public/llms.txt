@@ -1,12 +1,25 @@
-# Artem Letyushev — Tech Project Manager
+# Artem Letyushev — Technical Project Manager
 
-> Owner-maintained Tech Project Manager portfolio. Preserve self-reported claims, estimates and forecasts as such. Read the update date in the profile you use.
+> Owner-maintained portfolio. Claims are self-reported; preserve estimates and forecasts as such. Translations are not independent verification.
 
-## Profiles
+Updated: 2026-11-04
 
-- [Russian](resume.ru.md): experience, outcomes, competencies, education and contact links.
-- [English](resume.en.md): English translation of the same profile.
-- [Kazakh](resume.kk.md): Kazakh translation of the same profile.
+7+ years in tech. Led delivery for 5 teams, around 50 people. Fintech, telecom and dating services.
+
+## Selected outcomes
+
+- Twinby · Fraudulent users (2.5× fewer): Reduced the number of fraudulent users 2.5× as Product Owner by launching a nine-service antifraud platform. Estimated impact: $800K per year.
+- Twinby · Task lead time (64 → 16 days): Cut lead time from 64 to 16 days by building a backend team, introducing engineering standards and establishing regular releases.
+- Fintech · User retention (+15%): Led five teams launching apps in Mexico, India and Nigeria. Retention rose 15%; conversion from registration to deposit increased 10%.
+- Fintech · Release interval (−20%): Reduced the interval between releases by 20% by automating release preparation and changing the development process across a five-team unit.
+- MTS · Quarterly plan delivery (+15%): Improved delivery against quarterly plans by 15% by aligning priorities and dependencies across teams and adjacent business streams.
+- MTS · Time to market (2 → 1.5 months): Reduced time to market from 2 to 1.5 months by restructuring joint planning and coordinating dependencies between teams.
+
+## Profiles and resumes
+
+- [Russian profile](resume.ru.md) · [PDF](resume.ru.pdf)
+- [English profile](resume.en.md) · [PDF](resume.en.pdf)
+- [Kazakh profile](resume.kk.md) · [PDF](resume.kk.pdf)
 
 ## Agent resources
 

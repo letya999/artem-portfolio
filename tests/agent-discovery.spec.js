@@ -12,6 +12,11 @@ test('agent entrypoints serve usable documents and a portable skill',async({requ
  for(const [path,body] of [['/skill.md',skill],['/skills/artem-portfolio/SKILL.md',canonical],['/agents.md',await read('/agents.md')],['/llms.txt',await read('/llms.txt')]]){
   for(const match of body.matchAll(/\]\(([^)]+)\)/g))if(!match[1].startsWith('https:'))await read(new URL(match[1],`http://127.0.0.1:5173${path}`).pathname);
  }
+ const index=await read('/llms.txt');
+ expect(index).toContain('Updated: 2026-11-04');
+ expect(index).toContain('Estimated impact: $800K per year.');
+ expect(index.split('## Selected outcomes\n\n')[1].split('\n\n## ')[0].split('\n')).toHaveLength(6);
+ for(const locale of ['ru','en','kk'])for(const format of ['pdf','md'])expect(index).toContain(`resume.${locale}.${format}`);
  const config=JSON.parse(await read('/mcp.json'));
  expect(config.mcpServers.fetch.command).toBe('uvx');
  expect(config.mcpServers.fetch.args).toEqual(['mcp-server-fetch==2026.10.19']);

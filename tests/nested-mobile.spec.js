@@ -1,27 +1,27 @@
 import {test,expect} from '@playwright/test';
-
-test('the sideways lid and nested doll have a readable full-width mobile stage above the job text',async({page})=>{
-  await page.setViewportSize({width:390,height:844});
-  await page.addInitScript(()=>{window.scenes=[];window.__THREE_DEVTOOLS__=new EventTarget();window.__THREE_DEVTOOLS__.addEventListener('observe',({detail})=>{if(detail.isScene)window.scenes.push(detail);if(typeof detail.render==='function'){const render=detail.render;window.renderer=detail;detail.render=function(scene,camera){window.camera=camera;return render.call(this,scene,camera);};}});});
-  await page.goto('/');await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/,{timeout:20000});
-  const layout=await page.evaluate(()=>{
-    const row=document.querySelector('.career-entry'),slot=row.querySelector('.matryoshka-slot').getBoundingClientRect(),details=row.querySelector('details').getBoundingClientRect();
-    return {stageWidth:slot.width,textWidth:details.width,above:slot.bottom<=details.top+1,overflow:document.documentElement.scrollWidth>innerWidth};
-  });
-  expect.soft(layout.stageWidth,'A left-lying lid and an inner face cannot fit in a 90px column').toBeGreaterThan(280);
-  expect.soft(layout.textWidth).toBeGreaterThan(300);
-  expect.soft(layout.above).toBe(true);
-  expect.soft(layout.overflow).toBe(false);
-  await page.evaluate(()=>{document.documentElement.style.scrollBehavior='auto';const c=[...document.querySelectorAll('.matryoshka-slot')].slice(0,2).map(s=>{const r=s.getBoundingClientRect();return scrollY+r.top+r.height/2;});scrollTo(0,(c[0]+c[1])/2-innerHeight*.45);});
-  await page.waitForTimeout(350);
-  const visible=await page.evaluate(async()=>{
-    const {WebGLRenderTarget}=await import('/node_modules/three/build/three.module.js');
-    const scene=window.scenes.find(s=>s.children.some(m=>m.userData.dollOpen)),dolls=scene.children.find(m=>m.userData.dollOpen),renderer=window.renderer,visibility=scene.children.map(m=>m.visible),target=new WebGLRenderTarget(195,422),previous=renderer.getRenderTarget(),camera=window.camera;
-    const parts=dolls.geometry.attributes.dollPart,parent=parts.array.slice(0,dolls.count/6*2);
-    try{for(let i=0;i<dolls.count/6;i++)parts.setX(i,5);parts.needsUpdate=true;scene.children.forEach(m=>m.visible=false);dolls.visible=true;renderer.setRenderTarget(target);renderer.render(scene,camera);const p=new Uint8Array(195*422*4);renderer.readRenderTargetPixels(target,0,0,195,422,p);return p.subarray(195*84*4,195*338*4).filter((v,i)=>i%4===3&&v>128).length;}
-    finally{parts.array.set(parent);parts.needsUpdate=true;scene.children.forEach((m,i)=>m.visible=visibility[i]);renderer.setRenderTarget(previous);target.dispose();renderer.render(scene,camera);}
-  });
-  expect.soft(visible,'The flying child must remain in the middle of the viewport halfway between tall mobile job sections').toBeGreaterThan(50);
-  const textAboveParticles=await page.evaluate(()=>parseInt(getComputedStyle(document.querySelector('.career-entry details')).zIndex,10)>parseInt(getComputedStyle(document.querySelector('.portrait-stage canvas')).zIndex,10));
-  expect.soft(textAboveParticles,'Mobile job cards must remain readable above the passing particle layer').toBe(true);
+test('mobile sculptures sit beside summaries while expanded text keeps the full width',async({page})=>{
+ await page.addInitScript(()=>{window.scenes=[];window.__THREE_DEVTOOLS__=new EventTarget();window.__THREE_DEVTOOLS__.addEventListener('observe',({detail})=>{if(detail.isScene)window.scenes.push(detail);if(typeof detail.render==='function'){const render=detail.render;window.renderer=detail;detail.render=function(scene,camera){window.camera=camera;return render.call(this,scene,camera);};}});});
+ await page.setViewportSize({width:390,height:844});await page.goto('/ru');
+ await expect(page.locator('.portrait-stage')).toHaveClass(/loaded/,{timeout:20000});
+ const row=page.locator('.career-entry').first();await row.locator('summary').click();
+ const layout=await row.evaluate(e=>{const slot=e.querySelector('.matryoshka-slot').getBoundingClientRect(),summary=e.querySelector('summary').getBoundingClientRect(),text=e.querySelector('.job-content').getBoundingClientRect();return {slotRight:slot.right,companyLeft:e.querySelector('.company').getBoundingClientRect().left,slotTop:slot.top,summaryBottom:summary.bottom,textWidth:text.width};});
+ expect(layout.slotRight).toBeLessThan(layout.companyLeft);expect(layout.slotTop).toBeLessThan(layout.summaryBottom);expect(layout.textWidth).toBeGreaterThan(300);
+ const screenshot=await row.locator('.matryoshka-slot').screenshot();
+ const dark=await page.evaluate(src=>new Promise(resolve=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);const p=ctx.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<p.length;i+=4)if(p[i]<150&&p[i+1]<150&&p[i+2]<150)n++;resolve(n);};img.src=src;}),'data:image/png;base64,'+screenshot.toString('base64'));
+ expect(dark,'The page must show the doll, not cover it with the job card background').toBeGreaterThan(200);
+ await row.locator('summary').click();
+ const positions=await page.evaluate(()=>[...document.querySelectorAll('.matryoshka-slot')].slice(0,2).map(s=>{const r=s.getBoundingClientRect();return scrollY+r.top+r.height/2-innerHeight*.45;}));
+ await page.evaluate(y=>scrollTo({top:y,behavior:'instant'}),(positions[0]+positions[1])/2);
+ await expect.poll(()=>page.evaluate(()=>window.scenes.flatMap(s=>s.children).find(m=>m.userData.dollOpen)?.userData.stage.value)).toBeCloseTo(.5,1);
+ const pixels=await page.evaluate(async()=>{
+  const {WebGLRenderTarget}=await import('/node_modules/three/build/three.module.js');
+  const scene=window.scenes.find(s=>s.children.some(m=>m.userData.dollOpen)),dolls=scene.children.find(m=>m.userData.dollOpen),renderer=window.renderer,target=new WebGLRenderTarget(195,422),previous=renderer.getRenderTarget(),visibility=scene.children.map(m=>m.visible),part=dolls.geometry.attributes.dollPart,saved=part.array.slice();
+  try{
+   // Keep only group 1, the flying nested child, in the actual GPU draw.
+   for(let i=0;i<part.count;i++)if(part.getX(i)!==1)part.setX(i,5);part.needsUpdate=true;
+   scene.children.forEach(m=>m.visible=false);dolls.visible=true;renderer.setRenderTarget(target);renderer.render(scene,window.camera);
+   const data=new Uint8Array(98*422*4);renderer.readRenderTargetPixels(target,0,0,98,422,data);return data.filter((v,i)=>i%4===3&&v>128).length;
+  }finally{part.array.set(saved);part.needsUpdate=true;scene.children.forEach((m,i)=>m.visible=visibility[i]);renderer.setRenderTarget(previous);target.dispose();renderer.render(scene,window.camera);}
+ });
+ expect(pixels,'The nested child must actually render in the left half of the mobile screen').toBeGreaterThan(30);
 });

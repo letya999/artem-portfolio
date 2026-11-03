@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 test('peel sticker reveals an accessible making-of with real source imagery and an interactive scan',async({page})=>{
  await page.goto('/');
  await expect(page.locator('.portrait-sticker')).toHaveCount(1);
- if(await page.locator('.portrait-sticker').count()){await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();}
+ if(await page.locator('.portrait-sticker').count()){await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();}
  const story=page.locator('.story-dialog');
  await expect.soft(story).toBeVisible({timeout:200});
  expect.soft(await story.locator('figure').count()).toBeGreaterThanOrEqual(5);
@@ -18,8 +18,8 @@ test('peel sticker reveals an accessible making-of with real source imagery and 
  expect.soft(await story.count()?await story.innerText():'').toContain('MediaPipe');
  expect.soft(await story.count()?await story.innerText():'').toContain('скан');
  if(await story.count()){for(const img of await story.locator('img').all())expect.soft(await img.evaluate(e=>e.complete&&e.naturalWidth>0)).toBe(true);await page.keyboard.press('Escape');await expect(story).not.toBeVisible();}
- await page.locator('select').selectOption('en');await expect.soft(page.locator('.sticker-paper')).toHaveText("That's me",{timeout:200});
+ await page.locator('select').selectOption('en');await expect(page.locator('.sticker-paper')).toHaveText("That's me");
  await page.locator('select').selectOption('ru');await page.route('**/story/models/iphone-scan.glb',route=>route.abort());
- await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  await expect.soft(page.locator('.scan-hint')).toContainText('Не удалось загрузить 3D',{timeout:1000});
 });

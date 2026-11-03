@@ -24,8 +24,15 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: npm test
+      - run: npm run test:build
       - run: npm run build
+      - name: Check localized PDF text
+        run: |
+          python -m venv "$RUNNER_TEMP/pdf-check"
+          "$RUNNER_TEMP/pdf-check/bin/python" -m pip install pypdf==6.10.0
+          "$RUNNER_TEMP/pdf-check/bin/python" scripts/check-resume-pdfs.py
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: dist

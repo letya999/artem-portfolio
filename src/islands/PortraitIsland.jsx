@@ -11,7 +11,7 @@ function PortraitGate(){
  return <div className="portrait-wrap">
   <div className="portrait-stage" role="group" aria-label={t('Кинетический объёмный портрет Артема')}>
    {failed?<p className="portrait-load-error">{t('Не удалось загрузить 3D-портрет')}</p>:<PortraitLoader/>}
-   <noscript><img src="/artem-reference.webp" alt={t('Артем Летюшев')} className="portrait-fallback"/></noscript>
+   <img src="/portrait-poster.webp" alt={t('Артем Летюшев')} fetchPriority="high" className="portrait-fallback" width="663" height="634"/>
   </div>
  </div>;
 }

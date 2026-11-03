@@ -80,7 +80,7 @@ export function createConveyor(root){
     if(!visible||document.hidden||models.length!==5)return;
     if(!reduced.matches){time+=dt;dirty=true;}
     if(!dirty)return;
-    const start=machine.position.x+.9,end=beltWidth/2-.6,span=end-start,gap=span/6;
+    const start=machine.position.x+.9,end=beltWidth/2-.6,span=end-start,gap=span/5;
     models.forEach((model,i)=>{
       const mobile=root.clientWidth<700;
       const pose=reduced.matches?{x:(i+.5)*gap,y:0,rotation:0}:conveyorPose(time*.85,i,span);

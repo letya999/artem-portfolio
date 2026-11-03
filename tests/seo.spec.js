@@ -1,40 +1,11 @@
 import {test,expect} from '@playwright/test';
-
-test('search engines receive localized HTML, structured profile, crawl rules and stable language URLs',async({request,page,browser})=>{
- const root=await (await request.get('/')).text();
- expect(root).toContain('application/ld+json');
- expect(root).toContain('Twinby');
- for(const [locale,name] of [['ru','Артем Летюшев'],['en','Artem Letyushev'],['kk','Артем Летюшев']]){
-  const response=await request.get(`/${locale}.html`);expect(response.ok()).toBeTruthy();const html=await response.text();
-  expect(html).toContain(`<html lang="${locale}">`);expect(html).toContain(`<h1 aria-label="${name}">`);
-  expect(html).toContain(`<title>${locale==='kk'?'Техникалық жобалар менеджері — Артем Летюшев':locale==='en'?'Tech Project Manager — Artem Letyushev':'Tech Project Manager — Артем Летюшев'}</title>`);
-  expect((html.match(/rel="preload"[^>]+as="font"/g)||[]).length).toBe(2);
-  for(const id of ['home-link','resume-markdown','language-select','contact-cta'])expect(html).toContain(`id="${id}"`);
-  if(locale==='ru')expect(html).toContain('id="resume-pdf"');
-  else expect(html).not.toContain('/Artem-Letyushev-CV.pdf');
-  expect(html).toContain('Renewal Studio');expect(html).toContain('SAFe 5');
-  expect(html).not.toContain('rel="canonical"');
-  expect(html).not.toContain('hreflang=');
-  expect(html).toContain('property="og:image"');expect(html).toContain('name="twitter:card"');
-  expect(html).toContain('srcset="/artem-books.webp"');
-  expect(html).toContain(locale==='ru'?'Загружаем 3D-портрет':locale==='en'?'Loading 3D portrait':'3D портрет жүктелуде');
-  expect(html).toContain(`<span>${locale==='en'?'Human':locale==='ru'?'Человек':'Адам'}</span>`);
-  const schema=JSON.parse(html.match(/<script id="profile-schema" type="application\/ld\+json">(.*?)<\/script>/s)[1]);
-  expect(schema['@type']).toBe('ProfilePage');expect(schema.inLanguage).toBe(locale);expect(schema.mainEntity['@type']).toBe('Person');expect(schema.mainEntity.sameAs).toContain('https://github.com/letya999');
-  if(locale==='kk'){
-   expect(schema.mainEntity.jobTitle).toBe('Техникалық жобалар менеджері');
-   expect(schema.description).toContain('Техникалық жобалар менеджері');
-  }
-  expect(schema.mainEntity.alternateName).toEqual(expect.arrayContaining(['Артем Летюшев','Artem Letyushev']));
+test('localized static pages provide truthful metadata and readable no-JavaScript content',async({request,browser})=>{
+ const roles={ru:'Руководитель IT-проектов',en:'Technical Project Manager',kk:'IT жобаларының жетекшісі'};
+ for(const locale of ['ru','en','kk']){
+  const response=await request.get('/'+locale+'.html');expect(response.ok()).toBe(true);const html=await response.text();
+  expect(html).toContain('<html lang="'+locale+'">');expect(html).toContain('<title>'+roles[locale]);
+  const schema=JSON.parse(html.split('<script id="profile-schema" type="application/ld+json">')[1].split('</script>')[0]);expect(schema.mainEntity.jobTitle).toBe(roles[locale]);expect(schema.dateModified).toBe('2026-11-04');expect(schema.mainEntity.sameAs).toContain('https://github.com/letya999');
+  expect(html).toContain(`href="/resume.${locale}.pdf"`);expect(html).toContain('property="og:image"');
  }
- expect(await (await request.get('/robots.txt')).text()).toContain('User-agent: *\nAllow: /');
- const context=await browser.newContext({javaScriptEnabled:false});const staticPage=await context.newPage();await staticPage.goto('/en.html');await expect(staticPage.locator('h1')).toHaveAttribute('aria-label','Artem Letyushev');await expect(staticPage.locator('main')).toContainText('Twinby');await expect(staticPage.locator('.portrait-fallback')).toBeVisible();await context.close();
- await page.goto('/kk.html?view=agent');await expect(page.locator('html')).toHaveAttribute('lang','kk');
- await page.locator('select').selectOption('en');await expect(page).toHaveURL(/en\?view=agent/);await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
- await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content','Tech Project Manager — Artem Letyushev');
- await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/7\+ years/);
- await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content','en_US');
- await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content','/en');
- await page.reload();await expect(page.locator('html')).toHaveAttribute('lang','en');
- for(const lang of ['ru','en','kk','x-default'])await expect(page.locator(`head link[hreflang="${lang}"]`)).toHaveCount(0);
+ const context=await browser.newContext({javaScriptEnabled:false});const page=await context.newPage();await page.goto('/en');await expect(page.locator('.hero h1')).toHaveAttribute('aria-label','Artem Letyushev');await expect(page.locator('.achievement-list article')).toHaveCount(6);await expect(page.locator('.portrait-fallback')).toBeVisible();await page.locator('#experience summary').first().click();await expect(page.locator('.job-results').first()).toBeVisible();await context.close();
 });

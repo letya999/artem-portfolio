@@ -1,0 +1,16 @@
+<div class="cursor-trail" aria-hidden="true">{Array.from({length:8},()=><img src="/xp-hand.svg" alt="" width="32" height="32" />)}</div>
+<script>
+ const trail=[...document.querySelectorAll<HTMLImageElement>('.cursor-trail img')];
+ const fine=matchMedia('(hover: hover) and (pointer: fine)'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ let index=0,last=0,x=0,y=0;
+ const clear=()=>trail.forEach(image=>{image.getAnimations().forEach(a=>a.cancel());image.style.opacity='0';});
+ document.addEventListener('pointermove',event=>{
+  if(event.pointerType!=='mouse'||!fine.matches||reduced.matches||event.timeStamp-last<24||Math.hypot(event.clientX-x,event.clientY-y)<6)return;
+  last=event.timeStamp;x=event.clientX;y=event.clientY;
+  const image=trail[index++%trail.length];image.getAnimations().forEach(a=>a.cancel());
+  image.style.transform=`translate3d(${x-10}px,${y-1}px,0)`;
+  image.animate([{opacity:.32},{opacity:0}],{duration:420,easing:'ease-out'});
+ },{passive:true});
+ document.documentElement.addEventListener('pointerleave',clear);addEventListener('blur',clear);
+ reduced.addEventListener('change',clear);fine.addEventListener('change',clear);
+</script>

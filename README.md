@@ -8,7 +8,7 @@
 
 ## What is here
 
-The site presents a professional profile in Russian, English, and Kazakh. Its static Astro pages remain readable without JavaScript; React and Three.js power three interactive islands: portrait, practice, and conveyor. A downloadable CV, contact links, localized metadata, agent-readable resources, and a real 404 page round out the experience. Claims and estimates follow the owner's approved profile.
+The site presents a professional profile in Russian, English, and Kazakh. Its static Astro pages remain readable without JavaScript; React and Three.js power two interactive islands: portrait/career sculptures and resource conveyor. Six selected outcomes lead into a compact career history. A downloadable CV, contact links, localized metadata, agent-readable resources, and a real 404 page round out the experience. Claims and estimates follow the owner's approved profile.
 
 ## Built with
 
@@ -16,7 +16,7 @@ Astro 7 · React 19 · Three.js · JavaScript · CSS · Playwright · GitHub Pag
 
 ## Run locally
 
-Requires Node.js 22.23.4 or newer.
+Requires Node.js 22.23.4 or newer and Google Chrome for PDF generation during dev/build. CI installs Playwright Chromium instead.
 
 ```sh
 npm ci
@@ -30,7 +30,10 @@ On Windows PowerShell, use `Copy-Item .env.example .env`. The local `.env` is ig
 npm run build
 npm run preview
 npm test
+npm run test:build
 ```
+
+The header offers PDF and Markdown resumes in Russian, English and Kazakh, selected by the current page language. Both formats are regenerated from shared content. For PDF text/link validation, install `pypdf==6.10.0` and run `python scripts/check-resume-pdfs.py` after building.
 
 `dist/` is the static deployment artifact. Browser checks use `npm run test:e2e` with a local Chrome installation. See the [runbook](docs/operations/runbook.md) for deployment, domain cutover, and verification.
 
@@ -49,7 +52,7 @@ Read the [product notes](docs/product.md), [architecture notes](docs/architectur
 
 ## Deployment and analytics
 
-GitHub Actions checks and builds `main` with Node.js 24, `npm ci`, `npm test`, and `npm run build`, then publishes `dist` to GitHub Pages. The workflow sets `SITE_URL=https://artemletyushev.website`. The custom domain is configured in repository Settings → Pages with HTTPS enforced. REG.RU provides DNS through `ns1.reg.ru` and `ns2.reg.ru`: the apex has GitHub Pages A/AAAA records, and `www` is a CNAME to `letya999.github.io`. The [runbook](docs/operations/runbook.md) records verification and rollback.
+GitHub Actions checks and builds `main` with Node.js 24, `npm ci`, `npm test`, `npm run test:build`, and `npm run build`, then publishes `dist` to GitHub Pages. The workflow sets `SITE_URL=https://artemletyushev.website`. The custom domain is configured in repository Settings → Pages with HTTPS enforced. REG.RU provides DNS through `ns1.reg.ru` and `ns2.reg.ru`: the apex has GitHub Pages A/AAAA records, and `www` is a CNAME to `letya999.github.io`. The [runbook](docs/operations/runbook.md) records verification and rollback.
 
 Set `PUBLIC_GA_MEASUREMENT_ID` and/or `PUBLIC_YANDEX_METRIKA_ID` only after creating those counters and handling applicable privacy notice or consent requirements. Empty values omit the trackers. A successful build or deployment does not prove analytics collection, DNS propagation, or real-user performance.
 

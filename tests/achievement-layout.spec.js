@@ -1,26 +1,35 @@
-import {test, expect} from '@playwright/test';
+import {test,expect} from '@playwright/test';
+test('six XYZ outcomes cover Twinby, NDA and MTS without overflow',async({page})=>{
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:900});await page.goto('/ru');
+  await expect(page.locator('.achievement-list h3')).toHaveText(['В 2,5 раза меньше','64 → 16 дней','+15%','−20%','+15%','2 → 1,5 мес.']);
+  await expect(page.locator('.achievement-label')).toHaveText(['Twinby · Количество мошенников','Twinby · Срок выполнения задач','Финтех · Удержание пользователей','Финтех · Интервал между релизами','МТС · Выполнение квартальных планов','МТС · Вывод изменений на рынок']);
+  await expect(page.locator('.achievement-context')).toHaveCount(6);
+  for(const description of await page.locator('.achievement-context').all())expect((await description.innerText()).length).toBeGreaterThan(80);
+  await expect(page.locator('.little-law,#practice')).toHaveCount(0);
+  const layout=await page.locator('#results').evaluate(e=>({width:e.scrollWidth,client:e.clientWidth,height:e.getBoundingClientRect().height,body:document.documentElement.scrollWidth,viewport:innerWidth}));
+  expect(layout.width).toBeLessThanOrEqual(layout.client);expect(layout.body).toBeLessThanOrEqual(layout.viewport);
+ }
+});
 
-test('achievements have a centered heading and seven project cases to the left of the equation', async ({page}) => {
-  await page.setViewportSize({width: 1440, height: 900});
-  await page.goto('/');
-  const layout = await page.evaluate(() => {
-    const section = document.querySelector('#results').getBoundingClientRect();
-    const heading = document.querySelector('#results h2').getBoundingClientRect();
-    const law = document.querySelector('.little-law').getBoundingClientRect();
-    const entries = [...document.querySelectorAll('.achievement-list article')];
-    return {
-      headingOffset: heading.top - section.top,
-      headingCenter: (heading.left + heading.right) / 2,
-      count: entries.length,
-      metrics: entries.map(entry => entry.querySelector('strong').textContent),
-      leftOfEquation: entries.every(entry => entry.getBoundingClientRect().right < law.left),
-      titleLeads: entries.every(entry => parseFloat(getComputedStyle(entry.querySelector('h3')).fontSize) > parseFloat(getComputedStyle(entry.querySelector('strong')).fontSize)),
-    };
-  });
-  expect.soft(layout.headingOffset).toBeLessThanOrEqual(64);
-  expect.soft(Math.abs(layout.headingCenter - 720)).toBeLessThan(8);
-  expect.soft(layout.count).toBe(7);
-  expect.soft(layout.metrics).toEqual(['9 сервисов · фрод ↓ в 2,5 раза','10+ каналов коммуникации','Мексика · Индия · Нигерия','5 продуктовых + 2 сервисные команды','ЮMoney · Amundsen','ITIS · команда 5 → 18','Renewal · безубыточность за 2 месяца']);
-  expect.soft(layout.leftOfEquation).toBe(true);
-  expect.soft(layout.titleLeads).toBe(true);
+test('hero and all six results fit separate screens at the supplied window sizes and 125% scale',async({browser})=>{
+ for(const [width,height,dpr] of [[1515,682,1.25],[1496,680,1.25],[1894,853,1]])for(const locale of ['ru','en','kk']){
+  const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:dpr,reducedMotion:'reduce'}),page=await context.newPage();
+  try{
+   await page.goto('/'+locale);await page.evaluate(()=>document.fonts.ready);await expect(page.locator('.portrait-sticker')).toBeVisible();
+   const hero=await page.locator('.hero').boundingBox();expect(Math.abs(hero.y+hero.height-height),`${locale} ${width}: next chapter starts below the first screen`).toBeLessThan(2);
+   for(const selector of ['.hero h1','.hero .primary','.portrait-stage','.portrait-sticker']){
+    const box=await page.locator(selector).boundingBox();expect(box.y,selector).toBeGreaterThanOrEqual(79);expect(box.y+box.height,selector).toBeLessThanOrEqual(height);expect(box.x,selector).toBeGreaterThanOrEqual(0);expect(box.x+box.width,selector).toBeLessThanOrEqual(width);
+   }
+   await page.locator('header nav a[href="#results"]').click();
+   await expect.poll(()=>page.locator('#results').evaluate(e=>Math.abs(e.getBoundingClientRect().top-document.querySelector('.human-shell > header').getBoundingClientRect().bottom))).toBeLessThan(2);
+   const results=await page.locator('#results').boundingBox();expect(Math.abs(results.y+results.height-height),`${locale} ${width}: results fill the second screen`).toBeLessThan(2);
+   await expect(page.locator('.achievement-context')).toHaveCount(6);
+   const fit=await page.locator('#results').evaluate(e=>{
+    const dock=document.querySelector('.view-dock').getBoundingClientRect();
+    return [...e.querySelectorAll('h2,h3,p')].map(p=>{const r=document.createRange();r.selectNodeContents(p);const b=r.getBoundingClientRect();return {text:p.textContent,top:b.top,bottom:b.bottom,clipped:getComputedStyle(p).overflowY!=='visible'&&p.scrollHeight>p.clientHeight+1,covered:b.left<dock.right&&b.right>dock.left&&b.top<dock.bottom&&b.bottom>dock.top};});
+   });
+   for(const item of fit){expect(item.top,item.text).toBeGreaterThanOrEqual(79);expect(item.bottom,item.text).toBeLessThanOrEqual(height-8);expect(item.clipped,item.text).toBe(false);expect(item.covered,item.text).toBe(false);}
+  }finally{await context.close();}
+ }
 });

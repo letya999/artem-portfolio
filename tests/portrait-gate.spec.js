@@ -9,7 +9,7 @@ test('mobile shows the 3D loader while the model arrives automatically',async({p
  await page.goto('/ru.html',{waitUntil:'domcontentloaded'});
  await expect(page.locator('.portrait-loading-preview')).toBeVisible();
  await expect(page.getByRole('button',{name:'Показать 3D-портрет'})).toHaveCount(0);
- await expect(page.locator('.portrait-fallback')).not.toBeVisible();
+ await expect(page.locator('.portrait-fallback')).toBeVisible();
  await modelRequest;
  await expect(page.locator('.portrait-loading-preview')).toBeVisible();
  release();

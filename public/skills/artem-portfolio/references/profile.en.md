@@ -1,64 +1,60 @@
 # Artem Letyushev
 
-Tech Project Manager
+Technical Project Manager
 
-Updated: 2026-10-24
+Updated: 2026-11-04
 
-Connecting engineering, teams and business.
+I launch products and coordinate teams.
 
-7+ years. Fintech, telecom, dating.
+7+ years in tech. Led delivery for 5 teams, around 50 people.
+
+Fintech, telecom and dating services.
 
 artemletyushev@gmail.com · [Telegram](https://t.me/artemletya) · [GitHub](https://github.com/letya999) · [LinkedIn](https://www.linkedin.com/in/artemletya)
 
-## A manager with an engineering mindset.
+## About me
 
-From Android development and my own studio to international products and multi-team management. Along the way, I have worked with mobile services, payments, corporate data, advertising and antifraud.
+I have worked on mobile apps, payments, antifraud and corporate data. I help business and engineering agree on outcomes, set priorities and deliver. My engineering background lets me discuss APIs, data and architecture with the team.
 
-Co-founded Curestry, a platform for debugging and evaluating AI agents, and the AI Engineers Guild community. I develop open-source tools, mentor managers, write and speak about development, AI and management.
+I co-founded Curestry, a platform for debugging and evaluating AI agents, and the AI Engineers Guild community. I build open-source tools, mentor managers, and write and speak about software, AI and management. I started in Android development and my own studio.
 
-## Results.
+## Results
 
-### Antifraud from scratch
+### Twinby · Fraudulent users
 
-9 services · 2.5× less fraud
+2.5× fewer
 
-Led the creation of Twinby’s antifraud system: ML detection, device fingerprinting, automated moderation and liveness verification. Owned product priorities and coordinated Data Science, backend and analysts.
+Reduced the number of fraudulent users 2.5× as Product Owner by launching a nine-service antifraud platform. Estimated impact: $800K per year.
 
-### CDP and personalised communications
+### Twinby · Task lead time
 
-10+ communication channels
+64 → 16 days
 
-Led the creation of an audience segmentation and communications platform. A shared segment builder, campaign launches and analytics without bespoke development for each campaign. Brought the platform to the launch stage.
+Cut lead time from 64 to 16 days by building a backend team, introducing engineering standards and establishing regular releases.
 
-### Mobile products in international markets
+### Fintech · User retention
 
-Mexico · India · Nigeria
++15%
 
-Released an international fintech holding’s mobile apps in three markets. Coordinated five teams from local requirements and payment flows through testing and release. Retention increased by 15%, conversion by 10%.
+Led five teams launching apps in Mexico, India and Nigeria. Retention rose 15%; conversion from registration to deposit increased 10%.
 
-### A new department at MTS
+### Fintech · Release interval
 
-5 product + 2 service teams
+−20%
 
-Organised the LeSS-to-SAFe transition and launch of a seven-team department. Connected quarterly goals, cross-team dependencies and resource planning into a shared operating model.
+Reduced the interval between releases by 20% by automating release preparation and changing the development process across a five-team unit.
 
-### Corporate data catalogue
+### MTS · Quarterly plan delivery
 
-YooMoney · Amundsen
++15%
 
-Initiated a metadata catalogue project, from analysts’ needs and source requirements to a prototype, demo and feedback. The aim was to make data easier to find and its relationships easier to understand.
+Improved delivery against quarterly plans by 15% by aligning priorities and dependencies across teams and adjacent business streams.
 
-### Scaling project delivery
+### MTS · Time to market
 
-ITIS · team 5 → 18
+2 → 1.5 months
 
-Developed parallel delivery of mobile and web products across GovTech, digital health, city services and social apps. The team grew from 5 to 18, and project margins from 12% to 34%.
-
-### My own studio from scratch
-
-Renewal · break-even in 2 months
-
-Progressed from Android developer to co-founder and project lead. Won corporate clients, built project teams and organised mobile and web service development.
+Reduced time to market from 2 to 1.5 months by restructuring joint planning and coordinating dependencies between teams.
 
 ## Work experience
 
@@ -68,25 +64,25 @@ Progressed from Android developer to co-founder and project lead. Won corporate 
 
 Dating · matchmaking platform
 
-A dating platform with mobile apps and a web version. Worked with Data Science, Backend, systems analysis and advertising platform teams. Acted as Product Owner for antifraud.
+A dating service with mobile apps and a website. Coordinated four teams: backend development, Data Science, systems analysis and the advertising platform. Owned the antifraud product as Product Owner.
 
-Antifraud and moderation; liveness verification; CDP and marketing communications; B2B advertising platform; CIS/global; internal analytics and automation tools.
+Antifraud, moderation and user verification; audience segmentation and messaging; a business advertising platform; separate CIS and international environments.
 
 #### Achievements
 
-- Launched a nine-service antifraud system: ML detection, device fingerprinting, automated moderation and liveness. Fraud decreased by a factor of 2.5.
-- Brought the CDP to the launch stage. Aligned the product and technical scope for audience segmentation and communications across 10+ channels.
-- Organised the release of the CIS/global multitenant architecture, separating regional environments to meet regulatory and investor requirements.
-- Built the backend team and established regular releases. Lead time fell from 64 to 16 days.
-- Redesigned requirements preparation with docs-as-code, ADRs, architecture reviews and AI tools. Analysis preparation time decreased by 60%.
+- As Product Owner, launched a nine-service antifraud platform: ML detection, device fingerprinting, automated moderation and liveness checks. The number of fraudulent users fell 2.5×. Estimated economic impact: $800K per year.
+- Brought an audience segmentation and communications platform with 10+ channels to the launch stage. Defined how marketers select audiences, launch campaigns and evaluate results.
+- Coordinated the release of separate platform versions for CIS and international markets. Teams separated data and infrastructure to meet regulatory requirements and investor conditions.
+- Built the backend team and established regular releases. Task lead time fell from 64 to 16 days.
+- Improved technical requirements with shared documentation, recorded architecture decisions, reviews and AI tools. Analysis preparation time fell by 60%.
 
-#### Responsibilities
+#### My responsibilities
 
-- Antifraud product ownership: business needs, backlog priorities, success criteria, moderation and Data Science collaboration.
-- Delivery management: roadmaps, scope, resources, risks, releases and dependencies across four teams.
-- Systems analysis: API, microservice, data and integration requirements with analysts, developers and the architect.
-- B2B development: advertising platform customers, user problems, changes and priorities.
-- Delivery visibility: team metrics, CEO reporting, OPEX/CAPEX, escalations, incident reviews and management automation.
+- Defined antifraud goals, priorities and success criteria with business, moderation and Data Science teams.
+- Aligned plans, timelines, scope and dependencies across four teams. Managed capacity, risks and releases.
+- Worked through API, data and integration requirements with analysts, developers and the architect.
+- Investigated advertising platform customer needs and agreed change priorities.
+- Reported to the CEO, tracked costs and team metrics, and coordinated incident reviews and issues requiring leadership decisions.
 
 ### Fintech holding — Project Manager · NDA
 
@@ -94,7 +90,7 @@ Antifraud and moderation; liveness verification; CDP and marketing communication
 
 Fintech · international mobile products
 
-Mobile products and internal platforms at an international holding company. Led delivery for five teams, around 50 specialists: Android, iOS, Backend/DevOps, QA and analytics.
+Mobile apps and internal services at an international fintech holding. Led delivery across five teams, around 50 people in Android, iOS, backend, DevOps, QA and analytics.
 
 Regional mobile apps; payment flows and balance updates; deep links and domain delivery; image-data storage; regulatory separation of data.
 
@@ -102,17 +98,17 @@ Regional mobile apps; payment flows and balance updates; deep links and domain d
 
 - Released apps in Mexico, India and Nigeria. Retention increased by 15%; registration-to-deposit conversion increased by 10%.
 - Scaled the department from two to five teams. Four of the five team leads were promoted from within the department.
-- Increased stream throughput from four to approximately twelve major epics per quarter.
-- Accelerated release preparation: regression testing decreased from 4–5 to 2 days, and the release cycle shortened by 20%.
-- Coordinated the rollout of deep-link and domain-delivery services. CRM managers’ workload decreased by 7%.
+- Increased delivery from four to around twelve large epics per quarter.
+- Reduced the interval between releases by 20% through automation and changes to the development process.
+- Coordinated app deep links and a domain delivery service. CRM managers’ workload fell by 7%.
 
-#### Responsibilities
+#### My responsibilities
 
-- End-to-end mobile development: business requirements, scope estimates, testing, publication and subsequent changes.
-- Coordinating platform dependencies: payments, authentication, infrastructure, CRM and shared holding-company services.
-- Stream backlog management: product initiatives, technical debt, infrastructure work and process improvements.
-- Leadership development: hiring, onboarding, regular 1:1s, feedback and growth plans for team leads and managers.
-- Cross-team initiatives: temporary working groups, architecture changes and separation of regulated and unregulated data.
+- Led mobile projects from business requirements and estimation through testing, publication and subsequent updates.
+- Coordinated mobile teams with payments, authentication, infrastructure, CRM and shared holding services.
+- Set priorities across product work, technical debt, infrastructure and process improvements.
+- Hired and onboarded leaders, held one-to-ones, provided feedback and helped build development plans.
+- Organised cross-team work on architecture, infrastructure and data separation under regulatory requirements.
 
 ### MTS — Scrum Master / Agile Coach
 
@@ -126,19 +122,19 @@ LeSS → SAFe transition; launch of a seven-team department; quarterly planning;
 
 #### Achievements
 
-- Organised the LeSS-to-SAFe transition at the digital transformation office’s request: five cross-functional and two service teams.
-- Improved quarterly plan completion by 15% through dependency management and collaboration with adjacent streams.
+- At the Digital Transformation Office’s request, led seven teams from LeSS to SAFe: five cross-functional teams and two service teams.
+- Improved delivery against quarterly plans by 15% and reduced time to market from 2 to 1.5 months by coordinating dependencies with adjacent business streams.
 - Launched an Agile guild to share practices and develop management skills.
-- Built an improvement-management system: a shared backlog, RICE prioritisation, hypotheses, validation criteria and work-in-progress limits.
+- Introduced a shared improvement backlog: teams evaluated ideas, set priorities, checked results and limited concurrent work.
 - Within a year, expanded from Scrum Master to Agile Coach, moving from team support to organisational change.
 
-#### Responsibilities
+#### My responsibilities
 
-- Stream-level planning: quarterly objectives, dependencies, resources and alignment with adjacent areas.
-- Developing team practices: refinement, planning, reviews, retrospectives, goals and blocker resolution.
-- Product Owner support: backlog quality, prioritisation, customer feedback and connecting work to product goals.
-- Improving delivery quality: defect triage, release processes, flow metrics and responsibility allocation.
-- Working with leaders on organisational design, leadership development, resources, payroll and P&L.
+- Aligned quarterly goals, capacity and dependencies across teams and neighbouring business areas.
+- Helped teams plan work, clarify tasks, review results and remove blockers.
+- Helped Product Owners prioritise work and connect tasks to product goals and customer feedback.
+- Improved release preparation, defect triage, delivery metrics and ownership.
+- Helped leaders redesign teams, develop team leads and prepare capacity, payroll and business performance data.
 
 ### YooMoney — Delivery Manager
 
@@ -146,25 +142,25 @@ LeSS → SAFe transition; launch of a seven-team department; quarterly planning;
 
 Fintech · electronic payments
 
-Fintech, electronic payments and corporate analytics. Supported BI/Data Engineering teams and their collaboration with business stakeholders.
+Electronic payments and corporate analytics. Organised BI and Data Engineering teams and aligned work and results with business stakeholders.
 
 Corporate data warehouse; Amundsen metadata catalogue; BI reporting; requirements for a unified delivery-metrics dashboard.
 
 #### Achievements
 
-- Brought delivery of agreed quarterly commitments to 100% of business stakeholders’ expectations.
+- Delivered agreed quarterly commitments to 100% of business stakeholders’ expectations.
 - Coordinated roughly 90 business and technical participants, reducing friction in approvals and task handovers.
-- Initiated a metadata catalogue project. Organised an Amundsen prototype, demonstration and user feedback collection.
+- Initiated a corporate data catalogue, organised an Amundsen prototype, user demonstrations and feedback.
 - Developed a task-definition standard covering purpose, context, inputs, expected outcomes and acceptance criteria.
-- Designed the delivery analytics project: requirements for Jira data collection, metric calculation and Power BI reporting.
+- Defined requirements for team delivery analytics: Jira data collection, metric calculation and Power BI reports.
 
-#### Responsibilities
+#### My responsibilities
 
-- Demand management: business requests, requirements clarification and shared-backlog prioritisation.
-- Organising BI/Data Engineering work: planning, flow, blockers and cross-team dependencies.
-- Stakeholder communications: timelines, scope, status updates, changes and escalations.
-- Internal platform development: business cases, project charters, requirements, demos and feedback.
-- Delivery analysis: throughput, lead time, work in progress, work-item age and evidence for forecasting.
+- Collected business requests, clarified requirements and helped prioritise a shared backlog.
+- Planned analytics and Data Engineering work, removed blockers and coordinated dependencies.
+- Agreed timelines, deliverables and changes with stakeholders, communicated progress and resolved disagreements.
+- Prepared business cases and requirements for internal platforms, demonstrations and feedback collection.
+- Analysed delivery speed, unfinished work and blocked tasks to improve timeline forecasts.
 
 ### Itis Team — Project Manager
 
@@ -184,13 +180,13 @@ Beregi Figuru; Active Friends; Active Citizen; telemedicine; waste collection an
 - Increased team throughput from 7 to 16 tasks per week by reorganising work.
 - Integrated QA into delivery: task and release checks, collaboration between testing and development, and defect management.
 
-#### Responsibilities
+#### My responsibilities
 
-- Project portfolio management: priorities, schedules, specialist capacity and dependencies between engagements.
-- Discovery and presale: customer needs, scope estimates, constraints, MVP scope and commercial agreements.
-- Requirements and design: user journeys, functional documentation, interfaces and API integrations.
-- Delivery organisation: Kanban, regular reviews, retrospectives, testing and acceptance.
-- Studio development: hiring, project documentation, Kaiten, Notion and Deskle, and project economics.
+- Planned multiple projects at once: priorities, timelines, specialist capacity and dependencies between engagements.
+- Clarified customer needs, estimated work, defined the first product version and agreed commercial terms.
+- Worked through user journeys, requirements, interfaces and external service integrations.
+- Organised development, regular reviews, testing and acceptance using Kanban and team retrospectives.
+- Contributed to hiring, project documentation and management tools, and tracked project economics.
 
 ### Renewal Studio — Co-founder · Android Developer → Project Manager
 
@@ -198,7 +194,7 @@ Beregi Figuru; Active Friends; Active Citizen; telemedicine; waste collection an
 
 Software development · project studio
 
-My own mobile and web development studio. Started with Android apps, then took responsibility for customers, teams and business operations.
+Co-founded a mobile and web development studio. Started as an Android developer, then took responsibility for customers, teams and business operations.
 
 GIS app with a map and AR markers; tourism service; ski resort and concert hall apps; social-media promotion web service; AR-mask research.
 
@@ -210,17 +206,15 @@ GIS app with a map and AR markers; tourism service; ski resort and concert hall 
 - Established studio operations: roles, planning, change management and a transition to Scrum.
 - Moved from development into project leadership while retaining hands-on Android, interface design and data experience.
 
-#### Responsibilities
+#### My responsibilities
 
-- Sales and presale: finding customers, understanding needs, estimating projects and agreeing terms.
-- Delivery management: assigning work to staff and external teams, tracking deadlines and acceptance.
-- Business analysis: app functionality, user scenarios and interface design.
-- Change management: defects, new requirements, scope adjustments and schedule updates.
-- Technical and operational work: Android with Java, databases, Jira, Confluence and Slack.
+- Found customers, understood their needs, estimated projects and agreed terms.
+- Assigned work to employees and external teams, monitored timelines and accepted deliverables.
+- Described app functionality, user journeys and interface requirements.
+- Reviewed defects and new requirements, and agreed changes to scope and timelines.
+- Built Android apps in Java, worked with databases and set up team tools: Jira, Confluence and Slack.
 
 ## Processes
-
-Gantt · WBS · Scrum · Kanban · Agile · SAFe · LeSS · Decomposition · Roadmap · Risks · OKR · KPI · Delivery · Backlog · P&L · OPEX / CAPEX · Hiring · Flow · Releases · Budgets · SLA · FinOps · Forecast · PMBoK · P3.express · RTE · Lead Time · Cycle Time · Capacity · Stakeholders · Facilitation · Coaching · Portfolio · Prioritization · AI-native SDLC · Performance Review · Sprint Planning · Sprint Review · Retrospective · Daily Scrum · PI Planning · System Demo · Release Train · Dependency Mapping · Risk Register · RAID · Critical Path · WIP Limits · Throughput · Velocity · Takt Time · Service Level Expectation · Monte Carlo · Incident Management · Change Management · RACI · Decision Log · Stakeholder Map · Resource Planning · Budget Forecast · Team Topologies · Team Health · Continuous Improvement · Value Stream Mapping
 
 I make multi-team work manageable: clear priorities, aligned dependencies, realistic commitments and timely feedback.
 
@@ -230,15 +224,15 @@ Project and Delivery Management, launching teams and departments, portfolio mana
 
 ### Project examples
 
-MTS: LeSS → SAFe transition and a new department of five product and two service teams.
+MTS: the LeSS → SAFe transition and launch of a unit with five cross-functional and two service teams; time to market fell from 2 to 1.5 months.
 
-International holding: scaling a mobile stream to five teams, developing team leads and shortening regression testing.
+International holding: growing the mobile stream to five teams, developing team leads and shortening regression testing.
 
 Twinby: regular backend releases, systems analysis, architecture reviews and engineering metrics.
 
-YooMoney: business demand management and BI/Data Engineering coordination.
+YooMoney: managing business requests and coordinating BI/Data Engineering.
 
-ITIS and Renewal: multi-project delivery, hiring, QA, project economics and client relationships.
+ITIS and Renewal: multi-project delivery, hiring, QA, project economics and customer relationships.
 
 ### Methods and tools
 
@@ -257,8 +251,6 @@ Development teams and team leads, PMs and POs, department heads, CEOs, CTOs and 
 SAFe 5 Release Train Engineer; Scrum.org PSM I; ICAgile: Agile Coaching, Agile Team Facilitation, Agile Fundamentals; Kanban University: System Design, System Improvement.
 
 ## Engineering
-
-React · Rust · Python · TypeScript · Next.js · FastAPI · LangGraph · RAG · API · SQL · ADR · MCP · DevOps · CI/CD · Docker · Git · Data Engineering · MS SQL · Data Lake · Power BI · Airflow · Angular · Flutter · Dart · Android · PostgreSQL · ClickHouse · ETL / ELT · DataLens · Dagster · Go · Tauri · Observability · Microservices · AI Agents · JavaScript · Node.js · Astro · Three.js · WebGL · HTML · CSS · Vite · Playwright · REST · GraphQL · OpenAPI · WebSocket · JSON · DAX · Power Query · T-SQL · Data Warehouse · Data Pipelines · ETL · ELT · Data Modeling · Star Schema · OLAP · GitHub Actions · Linux · Kotlin · Gradle · Android SDK
 
 I started in Android development. I can investigate APIs, data models and architectural dependencies, discuss technical trade-offs and build a prototype to test an idea.
 
@@ -297,8 +289,6 @@ Backend, frontend and mobile developers, architects, systems analysts, Data Engi
 My technical foundation is Android development, data work and my own software projects. I gained further practice in mobile products, platforms and AI tools.
 
 ## Product
-
-Fintech · HealthTech · Dating · Telecom · CustDev · CJM · CDP · Antifraud · Retention · Conversion · Hypotheses · Metrics · A/B · Growth · NPS · UX · Product Discovery · JTBD · MVP · Unit Economics · Monetization · Funnels · Cohorts · Activation · Churn · LTV · CAC · Segmentation · North Star · Go-to-Market · Experimentation · Product Analytics · AppMetrica · User Research · User Interviews · Usability Tests · Funnel Analysis · AARRR · LTV / CAC · ARPU · DAU / MAU · Retention Cohorts · Onboarding · Pricing · Subscription · Payments · Fraud Detection · Recommendations · CRM · Push Campaigns · Journey Mapping · Product Strategy · Value Proposition · Opportunity Mapping · RICE · ICE · Kano · HEART · Feature Adoption · Experiment Design · Product-Market Fit · Market Research · Customer Segments · Product Roadmap
 
 I start with user needs and business goals. I conduct research, formulate hypotheses, model the economics and determine what to build first.
 

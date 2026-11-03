@@ -3,21 +3,21 @@ import {test,expect} from '@playwright/test';
 test('scan viewer loads the original textured GLB rather than the stripped geometry',async({page})=>{
  const requested=[];page.on('response',response=>{if(response.url().includes('/story/models/'))requested.push(response.url());});
  await page.goto('/ru.html');
- await page.locator('.sticker-paper').click();
- await page.locator('.story-trigger').click();
+ await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
+
  await expect(page.locator('.story-dialog .scan-preview')).toHaveAttribute('data-source','./story/models/iphone-scan.glb');
  await expect.poll(()=>requested.some(url=>url.endsWith('/iphone-scan.glb'))).toBe(true);
 });
 
 test('archived model previews load their own model assets',async({page})=>{
- await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.goto('/ru.html');await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  await page.locator('.story-dialog figure').first().locator('.story-media-trigger').click();
  await expect(page.locator('.story-viewer .scan-preview')).toHaveAttribute('data-source','./story/models/original-voxel.glb');
  await expect(page.locator('.story-viewer .scan-preview')).toHaveAttribute('data-state','ready');
 });
 
 test('photo-derived surface is its own interactive stage before the iPhone scan',async({page})=>{
- await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.goto('/ru.html');await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  await page.locator('.story-dialog figure').nth(3).locator('.story-media-trigger').click();
  await expect(page.locator('.story-viewer .scan-preview')).toHaveAttribute('data-source','./story/models/photo-reconstruction.json');
  await expect(page.locator('.story-viewer .scan-preview')).toHaveAttribute('data-state','ready');
@@ -25,13 +25,13 @@ test('photo-derived surface is its own interactive stage before the iPhone scan'
 
 test('the restored chronology remains localized',async({page})=>{
  await page.goto('/ru.html');await page.locator('select').selectOption('en');
- await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  await expect(page.locator('.story-dialog figure').first().locator('h3')).toHaveText('First voxel portrait');
  await expect(page.locator('.story-dialog figure').nth(4).locator('h3')).toHaveText('Original iPhone scan');
 });
 
 test('archived models fit in the viewer and show the detailed face',async({page})=>{
- await page.goto('/ru.html');await page.locator('.sticker-paper').click();await page.locator('.story-trigger').click();
+ await page.goto('/ru.html');await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
  for(const [index,maxBottom,minContrast] of [[0,.02,0],[6,.02,25]]){
   await page.locator('.story-dialog figure').nth(index).locator('.story-media-trigger').click();
   const preview=page.locator('.story-viewer .scan-preview');await expect(preview).toHaveAttribute('data-state','ready');
@@ -44,8 +44,8 @@ test('archived models fit in the viewer and show the detailed face',async({page}
 
 test('making-of follows distinct archived models through the textured scan and later reconstructions',async({page})=>{
  await page.goto('/ru.html');
- await page.locator('.sticker-paper').click();
- await page.locator('.story-trigger').click();
+ await page.locator('.portrait-sticker').hover();await page.locator('.story-trigger').click();
+
  const story=page.locator('.story-dialog');
  await expect(story.locator('#story-title')).toHaveText('От первых кубиков к движению.');
  await expect(story.locator('figure')).toHaveCount(8);

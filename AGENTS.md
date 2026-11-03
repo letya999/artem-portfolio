@@ -1,6 +1,6 @@
 # Artem Portfolio — agent instructions
 
-This repository builds a static, multilingual portfolio with Astro and three React/Three.js islands. Read [README.md](README.md) and [docs/index.md](docs/index.md) before changing behavior.
+This repository builds a static, multilingual portfolio with Astro and two React/Three.js islands. Read [README.md](README.md) and [docs/index.md](docs/index.md) before changing behavior.
 
 ## Work boundaries
 

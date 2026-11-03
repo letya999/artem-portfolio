@@ -8,6 +8,7 @@
     "build": "node scripts/generate-static.js && astro build",
     "preview": "astro preview --host 127.0.0.1",
     "test": "node --test src/*.test.js",
+    "test:build": "node --test --test-concurrency=1 tests/*.test.mjs",
     "test:e2e": "playwright test"
   },
   "dependencies": {
