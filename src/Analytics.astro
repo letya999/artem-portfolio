@@ -4,8 +4,9 @@ const ym=import.meta.env.PUBLIC_YANDEX_METRIKA_ID?.trim();
 const googleId=import.meta.env.PROD&&/^G-[A-Z0-9]+$/.test(ga||'')?ga:null;
 const yandexId=import.meta.env.PROD&&/^\d+$/.test(ym||'')?ym:null;
 const googleInit=googleId&&`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',${JSON.stringify(googleId)});`;
-const yandexInit=yandexId&&`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0];k.async=1;k.src=r;a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js','ym');ym(${yandexId},'init',{clickmap:true,trackLinks:true,accurateTrackBounce:true});`;
+const yandexInit=yandexId&&`(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<e.scripts.length;j++){if(e.scripts[j].src===r)return}k=e.createElement(t),a=e.getElementsByTagName(t)[0];k.async=1;k.src=r;a.parentNode.insertBefore(k,a)})(window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=${yandexId}','ym');ym(${yandexId},'init',{ssr:true,webvisor:true,clickmap:true,ecommerce:'dataLayer',referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});`;
 ---
 {googleId&&<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${googleId}`} />}
 {googleInit&&<script is:inline set:html={googleInit} />}
 {yandexInit&&<script is:inline set:html={yandexInit} />}
+{yandexId&&<noscript><div><img src={`https://mc.yandex.ru/watch/${yandexId}`} style="position:absolute;left:-9999px" alt="" width="1" height="1" /></div></noscript>}

@@ -26,7 +26,6 @@ const markdown=resumeMarkdown(t);
 <!doctype html>
 <html lang={locale}>
 <head>
- <Analytics />
  <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  <link rel="preload" href={locale==='en'?oswaldLatin:oswaldCyrillic} as="font" type="font/woff2" crossorigin />
@@ -79,6 +78,7 @@ const markdown=resumeMarkdown(t);
  <style is:global>html:not([data-view="agent"]) .agent-shell{display:none}html[data-view="agent"] .human-shell{display:none}</style>
 </head>
 <body>
+ <Analytics />
  <div class="human-shell">
   <a class="skip" href="#main">{t('К содержанию')}</a>
   <header>

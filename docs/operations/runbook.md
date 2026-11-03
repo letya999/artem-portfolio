@@ -28,6 +28,12 @@ Check the apex and `www` over HTTPS, each language URL, `/resume.{ru,en,kk}.{pdf
 
 On 2026-10-25, Globalping probes in Rostelecom (AS12389), MTS (AS8359), Vimpelcom (AS3216), and ER-Telecom (AS51570) fetched `/ru` and `/voxel-portrait.json` over HTTPS: all eight requests returned 200 with valid TLS. The model transferred 950,548 compressed bytes. Direct DNS checks from Russian probes against `ns1.reg.ru` and `ns2.reg.ru` returned the GitHub records, including IPv6 and the GitHub verification TXT; the registry RDAP showed both REG.RU nameservers. These are point-in-time network checks, not a guarantee for every ISP, mobile network, browser, or future block. Cached old delegations may still use the retained Cloudflare zone during propagation.
 
+## Yandex Metrika
+
+Production uses counter `114060319` (owner-supplied on 2026-11-04). Set the public repository Actions variable `PUBLIC_YANDEX_METRIKA_ID` to this number; the Pages workflow passes it into the build. Removing the variable disables Metrika on the next deployment. `src/Analytics.astro` includes the owner's Webvisor, click map, link tracking, accurate bounce and `dataLayer` settings, plus a no-JavaScript pixel. The shared template covers the root, Russian, English, Kazakh and 404 pages; agent view uses the same page and counter. The counter ID is public, not a credential. GA remains disabled unless separately configured.
+
+After deployment, verify the counter ID in served HTML and a successful browser request to `mc.yandex.ru/watch/114060319`. This verifies transmission; the dashboard and Webvisor can update later. Ad blockers and browser privacy settings may prevent collection.
+
 ## Cloudflare fallback
 
 The Git-connected Cloudflare project `artem-portfolio-git` remains at `artem-portfolio-git.pages.dev`, built with `npm run build`, output `dist`, `SITE_URL=https://artemletyushev.website`, and `NODE_VERSION=22`. The older Direct Upload project `artem-portfolio` remains at `artem-portfolio-7y3.pages.dev`. Preserve both projects for rollback. Their `_headers` rules still apply when those hosts are used.
