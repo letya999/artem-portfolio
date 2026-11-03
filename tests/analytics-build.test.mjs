@@ -42,6 +42,6 @@ test('development does not collect analytics even with valid IDs',()=>{
    assert.ok(!html.includes('googletagmanager.com/'),'No Google script in development');
   }finally{await server.stop()}
  `;
- const run=spawnSync(process.execPath,['--input-type=module','-e',source],{env:{...process.env,NODE_ENV:'development',PUBLIC_GA_MEASUREMENT_ID:'G-ABC1234567',PUBLIC_YANDEX_METRIKA_ID:'114060319',ASTRO_TELEMETRY_DISABLED:'1'},encoding:'utf8',timeout:60000});
+ const run=spawnSync(process.execPath,['--input-type=module','-e',source],{env:{...process.env,NODE_ENV:'development',PUBLIC_GA_MEASUREMENT_ID:'G-ABC1234567',PUBLIC_YANDEX_METRIKA_ID:'114060319',ASTRO_TELEMETRY_DISABLED:'1',ASTRO_DISABLE_UPDATE_CHECK:'true'},encoding:'utf8',timeout:120000});
  assert.equal(run.status,0,`${run.error||''}\n${run.stdout}\n${run.stderr}`);
 });
